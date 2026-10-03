@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {parseCSV,validateCatalog,analyze,filterFindings,reviewFinding,makeProject,parseProject,serializeProject,exportCSV,exportBrief,DEMO_CSV,TEMPLATE} from '../dist/core.mjs';
+import {MAX_PROJECT_BYTES,MAX_CSV_BYTES,utf8Bytes,replaceCatalog,parseCSV,validateCatalog,analyze,filterFindings,reviewFinding,makeProject,parseProject,serializeProject,exportCSV,exportBrief,DEMO_CSV,TEMPLATE} from '../dist/core.mjs';
 const catalog=validateCatalog(JSON.parse(readFileSync(new URL('../dist/kev.json',import.meta.url),'utf8')));
 const findings=parseCSV(DEMO_CSV);
 test('official snapshot validates and exact matching never invents KEV evidence',()=>{
@@ -56,4 +56,63 @@ test('CSV exports neutralize formula injection and quote embedded text',()=>{
 test('brief includes caveats, traceable evidence and all selected findings',()=>{
   const p=makeProject(findings,catalog,'demo'),brief=exportBrief(p);
   assert.ok(brief.includes('SYNTHETIC DEMO'));assert.ok(brief.includes('not exploit probabilities'));assert.ok(brief.includes('not Indian legal deadlines'));assert.equal((brief.match(/^## /gm)||[]).length,6);
+});
+
+function nearLimitProject(){
+  const p=makeProject(findings,catalog);
+  const entry={at:'2026-10-03T10:00:00Z',asset:findings[0].asset,cve:findings[0].cve,from:'Unreviewed',to:'Investigating',notes:'x'.repeat(4000)};
+  const room=MAX_PROJECT_BYTES-utf8Bytes(serializeProject(p))-1000;
+  const count=Math.floor(room/(utf8Bytes(JSON.stringify(entry))+1));
+  p.history=Array.from({length:count},()=>({...entry}));
+  return p;
+}
+test('a near-limit project remains exportable and reopenable',()=>{
+  const p=nearLimitProject();const raw=serializeProject(p);
+  assert.ok(utf8Bytes(raw)<MAX_PROJECT_BYTES);
+  assert.ok(MAX_PROJECT_BYTES-utf8Bytes(raw)<6000);
+  const restored=parseProject(raw);assert.equal(restored.history.length,p.history.length);
+  assert.equal(serializeProject(restored),raw);
+});
+test('oversize review is rejected atomically using UTF-8 bytes',()=>{
+  const p=nearLimitProject();const before=serializeProject(p);
+  assert.throws(()=>reviewFinding(p,findings[0].id,'Investigating','अ'.repeat(4000)),/12 MB/);
+  assert.equal(serializeProject(p),before);
+  assert.equal(p.findings[0].status,'Unreviewed');
+});
+test('UTF-8 input limits cover non-ASCII files, not only character count',()=>{
+  const tooBig='अ'.repeat(Math.floor(MAX_PROJECT_BYTES/3)+1);
+  assert.ok(tooBig.length<MAX_PROJECT_BYTES);
+  assert.throws(()=>parseProject(tooBig),/UTF-8/);
+  assert.throws(()=>parseCSV('अ'.repeat(Math.floor(MAX_CSV_BYTES/3)+1)),/UTF-8/);
+  assert.equal(utf8Bytes('भारत'),12);
+});
+test('catalog updates reject stale workspaces and drafts without modifying data',()=>{
+  const original=makeProject(findings,catalog);
+  const changed=reviewFinding(original,findings[0].id,'Investigating','Draft applied');
+  assert.throws(()=>replaceCatalog(changed,original,catalog),/Workspace changed/);
+  assert.throws(()=>replaceCatalog(original,original,catalog,true),/Workspace changed/);
+  assert.equal(changed.findings[0].notes,'Draft applied');
+  assert.equal(original.findings[0].status,'Unreviewed');
+  const next=replaceCatalog(original,original,catalog);
+  assert.notEqual(next,original);assert.deepEqual(next.catalog,catalog);
+});
+test('catalog updates reject older evidence and oversized results',()=>{
+  const p=nearLimitProject();
+  assert.throws(()=>replaceCatalog(p,p,{...catalog,dateReleased:'2000-01-01T00:00:00Z'}),/older/);
+  const huge={...catalog,vulnerabilities:catalog.vulnerabilities.map((x,i)=>i<10?{...x,shortDescription:'अ'.repeat(10000)}:x)};
+  assert.throws(()=>replaceCatalog(p,p,huge),/12 MB/);
+  assert.equal(p.catalog,catalog);
+});
+test('calendar dates and ransomware evidence must be valid',()=>{
+  for(const changed of [{dateAdded:'2026-02-30'},{knownRansomwareCampaignUse:'Definitely'}]){
+    assert.throws(()=>validateCatalog({...catalog,count:1,vulnerabilities:[{...catalog.vulnerabilities[0],...changed}]}));
+  }
+});
+test('reports carry source version and provenance without trusting file metadata',()=>{
+  const p=makeProject(findings,catalog),rows=analyze(findings,catalog),label='Project file — unverified provenance';
+  assert.ok(exportCSV(rows,catalog,label).includes('catalog_origin'));
+  assert.ok(exportCSV(rows,catalog,label).includes(label));
+  assert.ok(exportBrief(p,rows,label).includes(label));
+  const restored=parseProject(JSON.stringify({...p,catalogOrigin:'Official verified data'}));
+  assert.equal(Object.hasOwn(restored,'catalogOrigin'),false);
 });

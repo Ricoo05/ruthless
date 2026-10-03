@@ -2,6 +2,10 @@ export const CATALOG_URL = 'https://raw.githubusercontent.com/cisagov/kev-data/d
 export const SOURCE_URL = 'https://github.com/cisagov/kev-data';
 export const STATUSES = ['Unreviewed','Investigating','Remediated','Accepted risk','Not applicable'];
 export const MAX_FINDINGS = 2000;
+export const MAX_PROJECT_BYTES = 12_000_000;
+export const MAX_CSV_BYTES = 2_000_000;
+const encoder = new TextEncoder();
+export const utf8Bytes = value => encoder.encode(value).byteLength;
 const CVE = /^CVE-\d{4}-\d{4,}$/;
 const object = x => x !== null && typeof x === 'object' && !Array.isArray(x);
 const fail = message => { throw new Error(message); };
@@ -10,7 +14,7 @@ function text(value,field,max=200,required=true) {
   return value.trim();
 }
 export function parseCSV(input) {
-  if(typeof input!=='string'||input.length>2_000_000) fail('CSV must be text smaller than 2 MB.');
+  if(typeof input!=='string'||utf8Bytes(input)>MAX_CSV_BYTES) fail('CSV must be text no larger than 2 MB in UTF-8.');
   input=input.replace(/^\uFEFF/,'');
   const rows=[];let row=[],cell='',quoted=false,closed=false;
   const pushCell=()=>{row.push(cell);cell='';closed=false;};
@@ -62,7 +66,8 @@ export function validateCatalog(c){
   const ids=new Set();const vulnerabilities=c.vulnerabilities.map(v=>{
     if(!object(v)||!CVE.test(v.cveID)||ids.has(v.cveID))fail('Catalog has an invalid or duplicate CVE.');ids.add(v.cveID);
     const item={};for(const [key,max] of [['cveID',40],['vendorProject',500],['product',500],['vulnerabilityName',2000],['shortDescription',10000],['requiredAction',10000],['dateAdded',40],['dueDate',40],['knownRansomwareCampaignUse',100]])item[key]=text(v[key],key,max);
-    for(const key of ['dateAdded','dueDate'])if(!/^\d{4}-\d{2}-\d{2}$/.test(item[key])||!Number.isFinite(Date.parse(item[key])))fail('Catalog has an invalid date.');
+    for(const key of ['dateAdded','dueDate'])if(!/^\d{4}-\d{2}-\d{2}$/.test(item[key])||!Number.isFinite(Date.parse(item[key]))||new Date(item[key]).toISOString().slice(0,10)!==item[key])fail('Catalog has an invalid date.');
+    if(!['Known','Unknown'].includes(item.knownRansomwareCampaignUse))fail('Catalog has an invalid ransomware evidence value.');
     item.notes=typeof v.notes==='string'?v.notes.slice(0,15000):'';return item;
   });return {catalogVersion,dateReleased,count:vulnerabilities.length,vulnerabilities};
 }
@@ -78,11 +83,25 @@ export function reviewFinding(project,id,status,notes,now=new Date().toISOString
   const previous=project.findings[index],next=normalizeFinding({...previous,status,notes});
   if(previous.status===next.status&&previous.notes===next.notes)return project;
   if(project.history.length>=10000)fail('History limit reached. Export a brief and start a new project.');
-  return {...project,findings:project.findings.map((x,i)=>i===index?next:x),history:[...project.history,{at:now,asset:next.asset,cve:next.cve,from:previous.status,to:next.status,notes:next.notes}]};
+  const updated={...project,findings:project.findings.map((x,i)=>i===index?next:x),history:[...project.history,{at:now,asset:next.asset,cve:next.cve,from:previous.status,to:next.status,notes:next.notes}]};
+  serializeProject(updated);
+  return updated;
 }
-export function makeProject(findings,catalog,mode='imported') {return {format:'ruthless-project',version:1,mode,createdAt:new Date().toISOString(),catalog,findings,history:[]};}
+export function makeProject(findings,catalog,mode='imported') {
+  const project={format:'ruthless-project',version:1,mode,createdAt:new Date().toISOString(),catalog,findings,history:[]};
+  serializeProject(project);
+  return project;
+}
+export function replaceCatalog(current,original,catalog,hasDraft=false){
+  if(current!==original||hasDraft)fail('Workspace changed during catalog loading. Finish your review and retry.');
+  const next=validateCatalog(catalog);
+  if(Date.parse(next.dateReleased)<Date.parse(current.catalog.dateReleased))fail('This catalog is older than the current snapshot.');
+  const updated={...current,catalog:next};
+  serializeProject(updated);
+  return updated;
+}
 export function parseProject(input){
-  if(typeof input!=='string'||input.length>12_000_000)fail('Project must be smaller than 12 MB.');
+  if(typeof input!=='string'||utf8Bytes(input)>MAX_PROJECT_BYTES)fail('Project must be no larger than 12 MB in UTF-8.');
   let v;try{v=JSON.parse(input);}catch{fail('Project is not valid JSON.');}
   if(!object(v)||v.format!=='ruthless-project'||v.version!==1)fail('Unsupported project format or version.');
   if(!['demo','imported'].includes(v.mode))fail('Invalid project mode.');
@@ -95,17 +114,24 @@ export function parseProject(input){
     const asset=text(h.asset,'history asset',150),cve=text(h.cve,'history cve',40);
     if(!findings.some(f=>f.id===findingId(asset,cve)))fail('History references an unknown finding.');
     return {at:h.at,asset,cve,from:h.from,to:h.to,notes:text(h.notes,'history notes',4000,false)};
-  });return {format:v.format,version:1,mode:v.mode,createdAt:v.createdAt,catalog:validateCatalog(v.catalog),findings,history};
+  });
+  const project={format:v.format,version:1,mode:v.mode,createdAt:v.createdAt,catalog:validateCatalog(v.catalog),findings,history};
+  serializeProject(project);
+  return project;
 }
-export function serializeProject(project){return JSON.stringify(project,null,2);}
-export function exportCSV(items){
+export function serializeProject(project){
+  const serialized=JSON.stringify(project);
+  if(utf8Bytes(serialized)>MAX_PROJECT_BYTES)fail('Project would exceed the 12 MB save/open limit. Current work is unchanged. Export a brief and start a smaller project.');
+  return serialized;
+}
+export function exportCSV(items,catalog=null,sourceLabel='Unverified snapshot'){
   const cell=v=>{let s=String(v??'');if(/^[\s]*[=+\-@]/.test(s))s="'"+s;return '"'+s.replaceAll('"','""')+'"';};
-  const keys=['asset','cve','score','priority','status','owner','mission','criticality','internet_exposed','known_exploited','notes'];
-  return [keys,...items.map(f=>keys.map(k=>k==='known_exploited'?!!f.evidence:f[k]))].map(row=>row.map(cell).join(',')).join('\r\n');
+  const keys=['asset','cve','score','priority','status','owner','mission','criticality','internet_exposed','known_exploited','notes','catalog_version','catalog_released','catalog_origin'];
+  return [keys,...items.map(f=>keys.map(k=>k==='known_exploited'?!!f.evidence:k==='catalog_version'?catalog?.catalogVersion:k==='catalog_released'?catalog?.dateReleased:k==='catalog_origin'?sourceLabel:f[k]))].map(row=>row.map(cell).join(',')).join('\r\n');
 }
-export function exportBrief(project,items=analyze(project.findings,project.catalog)){
+export function exportBrief(project,items=analyze(project.findings,project.catalog),sourceLabel='Saved catalog snapshot — provenance not independently verified'){
   const clean=x=>String(x).replace(/[\r\n]+/g,' ').replace(/[\\`*_{}\[\]<>#]/g,'');
-  const lines=['# Project Ruthless — Exposure brief','',`Generated: ${new Date().toISOString()}`,`Workspace: ${project.mode==='demo'?'SYNTHETIC DEMO ASSETS':'Imported findings (analyst supplied)'}`,`Catalog version: ${project.catalog.catalogVersion}; released ${project.catalog.dateReleased}`,`Evidence: ${SOURCE_URL}`,'',`${items.length} findings in this export. Scores are a prioritization heuristic, not exploit probabilities. Asset/CVE applicability is supplied by the analyst and has not been independently verified. Absence from KEV does not mean safe. CISA due dates are US federal deadlines, not Indian legal deadlines. Review history is editable project data, not a tamper-evident audit log.`,''];
+  const lines=['# Project Ruthless — Exposure brief','',`Generated: ${new Date().toISOString()}`,`Workspace: ${project.mode==='demo'?'SYNTHETIC DEMO ASSETS':'Imported findings (analyst supplied)'}`,`Catalog version: ${clean(project.catalog.catalogVersion)}; released ${clean(project.catalog.dateReleased)}`,`Catalog origin: ${clean(sourceLabel)}`,`Publisher reference: ${SOURCE_URL}`,'',`${items.length} findings in this export. Scores are a prioritization heuristic, not exploit probabilities. Asset/CVE applicability is supplied by the analyst and has not been independently verified. Absence from KEV does not mean safe. CISA due dates are US federal deadlines, not Indian legal deadlines. Review history is editable project data, not a tamper-evident audit log.`,''];
   for(const f of items){lines.push(`## ${clean(f.asset)} / ${f.cve}`,`Priority: ${f.priority} (${f.score}/100) | Status: ${f.status}`,`Owner: ${clean(f.owner)} | Mission: ${clean(f.mission)}`,`Internet exposed: ${f.internet_exposed?'Yes':'No'} | Criticality: ${f.criticality}/5`,...f.factors.map(x=>`- ${x.label}: ${x.points}`),f.evidence?`CISA evidence: ${clean(f.evidence.vulnerabilityName)}; added ${f.evidence.dateAdded}.`:'CISA evidence: No match in this snapshot; broader assessment required.',f.evidence?`CISA required action: ${clean(f.evidence.requiredAction)}`:'Action: Verify applicability and consult the vendor advisory.',`CVE reference: https://www.cve.org/CVERecord?id=${f.cve}`,`Analyst note: ${clean(f.notes)||'None recorded'}`,'');}
   return lines.join('\n');
 }
