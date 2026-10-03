@@ -1,0 +1,2 @@
+asset,cve,criticality,internet_exposed,owner,mission
+Perimeter gateway,CVE-2024-3400,5,true,Network team,Engineering access
