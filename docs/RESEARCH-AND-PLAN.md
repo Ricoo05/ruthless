@@ -1,4 +1,6 @@
-# Project Ruthless: initial research and build decision
+# Project Ruthless: earlier cyber prototype research
+
+Superseded as the core product direction on 3 October 2026 by the founder’s terrorism threat-analysis requirement. See `THREAT-ANALYSIS-DIRECTION.md`. The cyber implementation is retained as a supporting defensive module.
 
 Research date: 3 October 2026. Status: desk research complete for the first prototype; customer demand remains unvalidated. This is a product development plan, not a valuation forecast or evidence of a government contract.
 

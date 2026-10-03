@@ -38,3 +38,16 @@
 ## Next gate
 
 Use GPT-6.1 Sol High for routine work after this review. Finish the blocked browser file checks and private publication when the supported tools permit them. Before a customer pilot, validate the workflow with analysts and scope a separate production security design. No independent security certification is implied.
+
+## v0.3 threat analysis workbench — 3 October 2026
+
+- 29 core tests pass across both modules: 17 cyber tests and 12 threat-workspace tests. Threat tests cover repost source groups, required review evidence, contradictions, assessment chronology, reopening reviewed cases, cross-case/orphan references, duplicate IDs, source URL validation, real dates, round trips, untrusted metadata, bounded UTF-8 size, filters, and brief caveats.
+- Threat app/core syntax checks passed.
+- Browser checks passed: initial three synthetic assessments/four evidence records; review blocked without conflict acknowledgement; cited review changed pending count; new evidence reopened a reviewed case; international scope filter; no-match search; new question creation.
+- Revised save flow was checked: a download request retains the unsaved marker; acknowledgement becomes available; subsequent changes invalidate the old acknowledgement. The receipt acknowledgement was not falsely clicked during testing.
+- Download receipt remains unverified: the browser download event timed out after eight seconds; requested JSON/Markdown files were absent from the expected Downloads directory. Core serialization/restore is tested, but a successful real v0.3 browser save/reopen round trip is not claimed. Browser file import was previously denied, and no bypass was attempted.
+- Desktop and 390×844 mobile screenshots captured. Mobile scroll width equaled client width at 375 CSS px. Viewport override reset. No errors/warnings were reported by the browser log query during the new-workflow checks.
+- The retained cyber page loaded at `/exposure.html` and the link back to the threat desk worked.
+- After a later small change, opening a workspace clears any stale save acknowledgement; that file-import branch remains browser-unverified because of the existing permission restriction.
+- Screenshots are sibling files `ruthless-threat-desktop-v0.3.png` and `ruthless-threat-mobile-v0.3.png`. Browser testing used synthetic records only.
+- Hosted publication status and exact commit are recorded in sibling `ruthless-release-v0.3.json`. No independent security assessment, live source connector, validated attack forecast or government acceptance is claimed.

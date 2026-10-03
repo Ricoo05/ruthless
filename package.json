@@ -1,1 +1,1 @@
-{"name":"project-ruthless","version":"0.2.0","private":true,"type":"module","scripts":{"start":"node serve.mjs","test":"node tests/core.test.mjs","check":"node --check dist/core.mjs && node --check dist/app.mjs"},"engines":{"node":">=20"}}
+{"name":"project-ruthless","version":"0.3.0","private":true,"type":"module","scripts":{"start":"node serve.mjs","test":"node --test tests/core.test.mjs tests/threat.test.mjs","check":"node --check dist/core.mjs && node --check dist/app.mjs && node --check dist/threat-core.mjs && node --check dist/threat-app.mjs"},"engines":{"node":">=20"}}

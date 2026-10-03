@@ -1,0 +1,80 @@
+export const FORMAT='ruthless-threat-workspace';
+export const MAX_BYTES=2_000_000;
+export const SCOPES=['Domestic','Cross-border','International'];
+export const STATES=['Draft','Needs review','Reviewed'];
+export const CONFIDENCE=['Insufficient','Low','Moderate','High'];
+export const PRIORITIES=['Routine','Priority review'];
+export const RELATIONS=['Supports','Challenges','Context'];
+export const CLAIM_STATES=['Unverified','Reported','Disputed','Context'];
+const fail=m=>{throw new Error(m);};
+const object=v=>v&&typeof v==='object'&&!Array.isArray(v);
+const str=(v,label,max=4000,required=true)=>{if(typeof v!=='string')fail(`${label} must be text.`);const s=v.trim();if((required&&!s)||s.length>max)fail(`${label} must contain ${required?'1':'0'}–${max} characters.`);return s;};
+const choice=(v,choices,label)=>{if(!choices.includes(v))fail(`Invalid ${label}.`);return v;};
+const id=v=>{if(typeof v!=='string'||!/^[a-zA-Z0-9_-]{1,60}$/.test(v))fail('Invalid record identifier.');return v;};
+export function day(v){if(typeof v!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(v)||!Number.isFinite(Date.parse(v))||new Date(v).toISOString().slice(0,10)!==v)fail('Use a real date in YYYY-MM-DD format.');return v;}
+export function sourceURL(v){const s=str(v,'Source URL',2000,false);if(!s)return '';let u;try{u=new URL(s);}catch{fail('Source URL must be a valid HTTPS URL.');}if(u.protocol!=='https:'||u.username||u.password)fail('Source URL must use HTTPS without embedded credentials.');return u.href;}
+export function serializeWorkspace(v){const raw=JSON.stringify(v);if(new TextEncoder().encode(raw).length>MAX_BYTES)fail('Workspace exceeds the 2 MB save/open limit. Current work is unchanged.');return raw;}
+function caseRecord(v){
+  if(!object(v))fail('Invalid assessment record.');
+  if(!Array.isArray(v.citedEvidence)||v.citedEvidence.length>1000)fail('Invalid evidence citations.');
+  const citedEvidence=v.citedEvidence.map(id);if(new Set(citedEvidence).size!==citedEvidence.length)fail('Duplicate evidence citations.');
+  return {id:id(v.id),title:str(v.title,'Title',180),area:str(v.area,'Area',150),scope:choice(v.scope,SCOPES,'scope'),asOf:day(v.asOf),question:str(v.question,'Intelligence question',1500),judgment:str(v.judgment,'Assessment',4000,false),gaps:str(v.gaps,'Information gaps',2000,false),confidence:choice(v.confidence,CONFIDENCE,'confidence'),priority:choice(v.priority,PRIORITIES,'review priority'),status:choice(v.status,STATES,'review status'),reviewNote:str(v.reviewNote,'Review note',2000,false),citedEvidence};
+}
+function evidenceRecord(v){
+  if(!object(v)||typeof v.synthetic!=='boolean')fail('Invalid evidence record.');
+  const reportedAt=day(v.reportedAt),recordedAt=day(v.recordedAt);if(recordedAt<reportedAt)fail('Recorded date cannot precede report date.');
+  const url=sourceURL(v.url);if(!v.synthetic&&!url)fail('Non-synthetic evidence requires a source URL.');
+  return {id:id(v.id),assessmentId:id(v.assessmentId),title:str(v.title,'Evidence title',200),publisher:str(v.publisher,'Publisher',150),originGroup:str(v.originGroup,'Underlying source group',150),url,reportedAt,recordedAt,statement:str(v.statement,'Evidence statement',4000),claimState:choice(v.claimState,CLAIM_STATES,'claim state'),relation:choice(v.relation,RELATIONS,'relation'),synthetic:v.synthetic};
+}
+function unique(records){if(new Set(records.map(v=>v.id)).size!==records.length)fail('Duplicate record identifiers.');}
+function assertReview(c,evidence){
+  if(c.status!=='Reviewed')return;
+  if(!c.judgment||!c.gaps||!c.reviewNote||!c.citedEvidence.length)fail('Reviewed assessments require a judgment, information gaps, supporting citations and review note.');
+  if(c.confidence==='Insufficient')fail('Insufficient confidence assessments must remain open for review.');
+  if(evidence.some(e=>c.citedEvidence.includes(e.id)&&e.reportedAt>c.asOf))fail('Reviewed assessments cannot cite reports later than their as-of date.');
+}
+export function validateWorkspace(v){
+  if(!object(v)||v.format!==FORMAT||v.version!==1)fail('Unsupported threat workspace format.');
+  if(!Array.isArray(v.assessments)||!v.assessments.length||v.assessments.length>100||!Array.isArray(v.evidence)||v.evidence.length>1000||!Array.isArray(v.history)||v.history.length>2000)fail('Workspace limits: 1–100 assessments, 1,000 evidence records, 2,000 history entries.');
+  const assessments=v.assessments.map(caseRecord),evidence=v.evidence.map(evidenceRecord);unique(assessments);unique(evidence);
+  const caseIDs=new Set(assessments.map(c=>c.id)),evidenceIDs=new Map(evidence.map(e=>[e.id,e.assessmentId]));
+  for(const e of evidence)if(!caseIDs.has(e.assessmentId))fail('Evidence refers to an unknown assessment.');
+  for(const c of assessments){if(c.citedEvidence.some(e=>evidenceIDs.get(e)!==c.id))fail('Citations must refer to evidence in the same assessment.');assertReview(c,evidence);}
+  const history=v.history.map(h=>{if(!object(h)||!caseIDs.has(h.assessmentId))fail('Invalid history reference.');return {assessmentId:id(h.assessmentId),at:day(h.at),action:str(h.action,'History action',150),note:str(h.note,'History note',2000,false)};});
+  const result={format:FORMAT,version:1,assessments,evidence,history};serializeWorkspace(result);return result;
+}
+export function parseWorkspace(raw){if(typeof raw!=='string'||new TextEncoder().encode(raw).length>MAX_BYTES)fail('Workspace must be no larger than 2 MB in UTF-8.');let v;try{v=JSON.parse(raw);}catch{fail('Workspace is not valid JSON.');}return validateWorkspace(v);}
+export function evidenceSummary(workspace,assessmentId){const rows=workspace.evidence.filter(e=>e.assessmentId===assessmentId);return {records:rows.length,sourceGroups:new Set(rows.filter(e=>e.relation==='Supports').map(e=>e.originGroup.toLowerCase())).size,challenging:rows.filter(e=>e.relation==='Challenges').length,unverified:rows.filter(e=>e.claimState==='Unverified').length,timeline:[...rows].sort((a,b)=>a.reportedAt.localeCompare(b.reportedAt)||a.id.localeCompare(b.id))};}
+export function updateAssessment(workspace,assessmentId,changes,at){
+  day(at);const original=workspace.assessments.find(c=>c.id===assessmentId);if(!original)fail('Assessment no longer exists.');
+  const next=caseRecord({...original,...changes,id:original.id});
+  const previousEvidence=workspace.evidence.filter(e=>e.assessmentId===assessmentId);
+  if(next.status==='Reviewed'&&previousEvidence.some(e=>e.relation==='Challenges')&&!changes.challengesAcknowledged)fail('Acknowledge that conflicting evidence was considered before marking Reviewed.');
+  const result={...workspace,assessments:workspace.assessments.map(c=>c.id===assessmentId?next:c),history:[...workspace.history,{assessmentId,at,action:'Assessment updated',note:`${original.status} → ${next.status}; ${next.confidence} confidence (analyst assigned)`}]};
+  return validateWorkspace(result);
+}
+export function addEvidence(workspace,input,at){
+  day(at);const evidence=evidenceRecord(input);if(workspace.evidence.some(e=>e.id===evidence.id))fail('Evidence identifier already exists.');
+  return validateWorkspace({...workspace,evidence:[...workspace.evidence,evidence],assessments:workspace.assessments.map(c=>c.id===evidence.assessmentId?{...c,status:c.status==='Reviewed'?'Needs review':c.status}:c),history:[...workspace.history,{assessmentId:evidence.assessmentId,at,action:'Evidence added',note:`${evidence.id}: prior reviewed conclusions reopened`} ]});
+}
+export function addAssessment(workspace,input,at){day(at);return validateWorkspace({...workspace,assessments:[...workspace.assessments,caseRecord(input)],history:[...workspace.history,{assessmentId:input.id,at,action:'Assessment created',note:'Analyst-defined intelligence question'}]});}
+export function searchAssessments(workspace,{query='',scope='All',status='All'}={}){const q=query.toLowerCase().trim();return workspace.assessments.filter(c=>(scope==='All'||c.scope===scope)&&(status==='All'||c.status===status)&&(!q||[c.title,c.area,c.question].join(' ').toLowerCase().includes(q)));}
+export function exportAssessment(workspace,assessmentId){
+  const c=workspace.assessments.find(c=>c.id===assessmentId);if(!c)fail('Unknown assessment.');const s=evidenceSummary(workspace,c.id);const clean=v=>String(v).replace(/[\r\n]+/g,' ').replace(/[\\`*_{}\[\]<>#]/g,'');
+  const lines=['# Ruthless — analyst assessment',`Title: ${clean(c.title)}`,`Area: ${clean(c.area)} | Scope: ${c.scope} | As of: ${c.asOf}`,`Status: ${c.status} | Confidence: ${c.confidence} (analyst assigned) | Priority: ${c.priority}`,`Synthetic records: ${s.timeline.filter(e=>e.synthetic).length}/${s.records}`,'','Prototype analyst workspace. This report is not an attack forecast, designation, determination of guilt, or instruction for operational action. Source labels and review status are analyst-supplied; external files and history are editable. Reviewed does not mean independent agency approval.','',`Question: ${clean(c.question)}`,`Judgment: ${clean(c.judgment)||'Not recorded'}`,`Information gaps: ${clean(c.gaps)||'Not recorded'}`,`Review note: ${clean(c.reviewNote)||'Not recorded'}`,`Cited evidence IDs: ${c.citedEvidence.join(', ')||'None'}`,'','## Evidence timeline',`${s.sourceGroups} analyst-assigned supporting source groups. This count does not establish independence or truth.`,''];
+  for(const e of s.timeline)lines.push(`### ${e.id} — ${clean(e.title)}`,`${e.reportedAt} | ${e.synthetic?'SYNTHETIC':'Analyst-entered public reference'} | ${e.claimState} | ${e.relation}`,`Publisher: ${clean(e.publisher)} | Underlying source group: ${clean(e.originGroup)}`,`Statement: ${clean(e.statement)}`,`Source URL (unverified by application): ${e.url||'Synthetic training record; no publisher claim'}`,'');
+  return lines.join('\n');
+}
+export function demoWorkspace(){
+  const base={judgment:'',gaps:'',confidence:'Insufficient',priority:'Routine',status:'Draft',reviewNote:'',citedEvidence:[],asOf:'2026-10-03'};
+  return validateWorkspace({format:FORMAT,version:1,assessments:[
+    {...base,id:'training-domestic',title:'Domestic incident report — training case',area:'India / fictional district',scope:'Domestic',question:'What is established by these reports, and which claims still need corroboration?',priority:'Priority review'},
+    {...base,id:'training-crossborder',title:'Cross-border reporting — training case',area:'India and a fictional neighboring region',scope:'Cross-border',question:'Does the supplied evidence establish any connection between these separately reported incidents?'},
+    {...base,id:'training-global',title:'International context — training case',area:'Global / fictional region',scope:'International',question:'What additional evidence would be needed before assessing relevance to India?'}
+  ],evidence:[
+    {id:'SYN-001',assessmentId:'training-domestic',title:'Initial local report',publisher:'Fictional publisher A',originGroup:'training-original-A',url:'',reportedAt:'2026-10-01',recordedAt:'2026-10-03',statement:'A fictional public incident was reported. Its cause and attribution are not established.',claimState:'Reported',relation:'Supports',synthetic:true},
+    {id:'SYN-002',assessmentId:'training-domestic',title:'Repost of the initial report',publisher:'Fictional publisher B',originGroup:'training-original-A',url:'',reportedAt:'2026-10-02',recordedAt:'2026-10-03',statement:'This fictional report repeats the same underlying source. It is not independent corroboration.',claimState:'Unverified',relation:'Supports',synthetic:true},
+    {id:'SYN-003',assessmentId:'training-domestic',title:'Conflicting explanation',publisher:'Fictional publisher C',originGroup:'training-original-C',url:'',reportedAt:'2026-10-03',recordedAt:'2026-10-03',statement:'A fictional alternative account disputes the initial interpretation. Analysts must keep this contradiction visible.',claimState:'Disputed',relation:'Challenges',synthetic:true},
+    {id:'SYN-004',assessmentId:'training-crossborder',title:'Separate regional report',publisher:'Fictional publisher D',originGroup:'training-original-D',url:'',reportedAt:'2026-10-02',recordedAt:'2026-10-03',statement:'A separate fictional incident is reported elsewhere. Geographic proximity alone does not establish a shared actor or cause.',claimState:'Unverified',relation:'Context',synthetic:true}
+  ],history:[]});
+}

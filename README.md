@@ -1,48 +1,44 @@
-# Project Ruthless — Exposure Intelligence v0.2
+# Project Ruthless — Threat Analysis v0.3
 
-A working research prototype for prioritizing existing asset/CVE findings using public exploitation evidence. Synthetic demo assets are clearly marked. This is not a scanner or a production-accredited defense system.
+Ruthless is being developed as terrorism intelligence analysis software for government and government-agency customers, covering domestic, cross-border and international developments relevant to India, with broader geographic support. The current release is a manual evidence-analysis prototype using synthetic cases. Prevention effectiveness and customer demand have not been validated.
 
-## Run locally
+## Run
 
-Requires Node.js 20 or later. No dependency installation or API key is required.
+Requires Node.js 20 or later, without dependency installation or an API key.
 
 ```powershell
-cd C:\Users\arhit\Documents\Codex\2026-10-02\ca\outputs\ruthless
 node serve.mjs
 ```
 
-Open http://127.0.0.1:4173/. The server binds only to loopback. To use a different port, set `PORT` before starting it. Stop with Ctrl+C. Opening index.html directly with a file URL will not load JavaScript modules/catalog reliably; use the local server.
+Open http://127.0.0.1:4173/. The local server binds to loopback. The retained cyber exposure module is at `/exposure.html`; its instructions are in `docs/CYBER-EXPOSURE.md`.
 
-## Try the workflow
+## Threat analysis workflow
 
-1. Review the synthetic demo and inspect a finding's evidence and score.
-2. Import findings from the provided CSV template. Required columns: `asset,cve,criticality,internet_exposed`. Optional: `owner,mission`. Criticality is an integer 1–5; exposure is `true` or `false`. Supply one row per asset/CVE pair. Maximum 2,000 findings and 2 MB.
-3. Apply a decision and supporting note. Remediated, Accepted risk, and Not applicable require a note.
-4. Export the filtered CSV or a full Markdown brief.
-5. Choose Save project to download JSON. Open project restores findings, decisions, history, and the exact catalog snapshot. The shared 12 MB UTF-8 limit is checked before accepting changes so a saved project can be reopened. Closing the browser clears unsaved work. Files are not encrypted.
-6. In Sources & method, refresh from the official CISA mirror or open an offline catalog JSON.
+1. Open a synthetic case or create an assessment with a geographic scope and intelligence question.
+2. Add dated evidence records with publisher, source URL, underlying source group and a concise attributed statement. Records can support, challenge or provide context for the assessment. Real public references require HTTPS URLs; the app does not fetch or verify them.
+3. Compare the timeline and contradictions. Reposts sharing a source group count as one supporting group; even distinct group labels do not prove independence.
+4. Record the judgment, information gaps, confidence, citations and review note. Reviewed assessments require all these fields and explicit consideration of conflicting evidence. A reviewed conclusion cannot cite a report published after its as-of date.
+5. Adding evidence reopens a Reviewed assessment. Confidence is analyst-assigned, not an attack probability. Review labels are local workflow status, not agency approval.
+6. Save workspace requests a JSON download. Confirm receipt only after finding the actual saved file. The app keeps the unsaved marker until that acknowledgement and invalidates it if the workspace changes. Open workspace restores a JSON file after validation. Export brief requests a Markdown download.
 
-## Data boundaries
+## Data and limits
 
-There are no customer-data uploads, analytics, AI API calls, or browser-storage persistence in the application code. The only external data request is an explicit public catalog refresh. Opening source links navigates to the publisher. Hosting the application still involves ordinary web delivery and hosting access controls; a private URL is not security certification.
+All evidence in the bundled demonstration is fictional and labeled synthetic. NIA, MHA and UN pages are linked as references; no claim of live ingestion is made. There are no AI calls, customer-data uploads, analytics, browser persistence, automated actions or protected audit records. Files and history are editable and unencrypted. Use synthetic or approved non-sensitive material for evaluation.
 
-Imported CVEs are matched exactly, not guessed from product names. Presence in KEV is evidence of exploitation somewhere, not proof that your specific system is vulnerable or compromised. Absence from KEV does not establish safety. The score is an unvalidated triage heuristic. CISA due dates are not Indian legal deadlines.
+Threat workspace limits: 100 assessments, 1,000 evidence records, 2,000 history entries and 2 MB in UTF-8. Limits are checked before mutations. The original cyber module retains its separate project format and 12 MB limit. The two document formats are not interchangeable.
 
-Project files can be edited outside the app. The UI and reports distinguish the bundled snapshot, a public mirror fetched in this session, and imported files with unverified provenance. Verify externally supplied catalogs against CISA. Review history is not tamper-evident. Use synthetic or approved non-sensitive data for evaluation. A production service would need customer-specific security design and independent review.
+Browser export receipt and file-import round trips are not verified for v0.3. The in-app browser download event timed out, and files were not found at the expected Downloads paths. Do not close a working session before confirming that its file was received. Core serialization and restore validation pass automated tests.
 
-## Verification
+## Checks
 
 ```powershell
-node tests/core.test.mjs
-node --check dist/app.mjs
+node --test tests/core.test.mjs tests/threat.test.mjs
+node --check dist/threat-app.mjs
+node --check dist/threat-core.mjs
 ```
 
-See `docs/RESEARCH-AND-PLAN.md` for sources, commercial hypotheses, discovery questions, and the product roadmap. See `docs/VERIFICATION.md` for tested behaviors and remaining limitations.
+29 tests pass across both modules. See `docs/VERIFICATION.md` for browser evidence and remaining limits. `docs/THREAT-ANALYSIS-DIRECTION.md` is the current product direction and supersedes the earlier cyber-first commercial hypothesis.
 
-## Public data attribution
+## Release record
 
-The bundled catalog is from the [official CISA KEV mirror](https://github.com/cisagov/kev-data), provided under CC0. The upstream version and release date are displayed in the app. The bundled snapshot is not an automatic live feed.
-
-## Release status
-
-v0.2 is locally verified and packaged. Private publication is being resumed after source synchronization was restored. The latest confirmed deployment and exact source commit are recorded in the sibling `ruthless-release-v0.2.json`; absence of that receipt means publication is not confirmed. See `CHECKPOINT.md` for continuation details.
+The same private Site is retained. The latest confirmed v0.3 deployment, source commit and limitations are recorded in sibling `ruthless-release-v0.3.json`. Until that receipt exists with status `succeeded`, v0.3 publication is not confirmed. Public sharing has not been requested.
