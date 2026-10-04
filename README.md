@@ -1,4 +1,4 @@
-# Project Ruthless — Intelligence Workbench v0.9
+# Project Ruthless — Intelligence Workbench v0.10
 
 Ruthless is being developed as terrorism intelligence analysis software for government and government-agency customers, covering domestic, cross-border and international developments relevant to India, with broader geographic support. The intended platform spans threat analysis, intelligence gathering, data integration, operations workflows and AI orchestration. The current release is a manual evidence-analysis, document-intake and research-task and proposal-review and synthetic-evaluation prototype using fictional cases. Prevention effectiveness and customer demand have not been validated.
 
@@ -47,7 +47,13 @@ The offline checker exports input-only fixtures, validates candidate files and c
 
 Open `/ai.html` to inspect the 12 fictional questions and their selected excerpts. Preview excludes authored answers and review guidance. The optional loopback service sends one selected fixture to OpenAI Responses, then validates exact source citations or an explained abstention. Drafts remain outside the assessment workspace and require semantic review. The hosted private Site provides inspection only; API execution requires the configured local runner.
 
-v0.9 passed mocked-provider integration tests and desktop/mobile console checks. No real model call has been made, no inference quality measured and no API charges incurred. Key creation stopped when the proposed local save destination was declined; it has not been retried. Model and paid test allowance also remain to be selected. See `docs/AI-RUNNER.md` for the executable workflow.
+v0.9 passed mocked-provider integration tests and desktop/mobile console checks. A subsequent live experiment configured an approved local key and tested gpt-5.4-mini-2026-03-17 against all 12 fictional cases. The original model-calculated offset failure was retained; quote-only output with deterministic unique-match span resolution passed all 12 structural checks. Semantic quality still requires independent review. The private hosted console remains inspection-only; live API execution uses the local runner. See `docs/AI-RUNNER.md` for the executable workflow.
+
+## Synthetic semantic review
+
+Open `/review.html` from the AI console. Paste a candidate file or version 2 execution result; citations are recomputed and imported report/approval claims are ignored. Compare each draft or abstention with the original excerpts, dates, source groups and authored guidance. Record Pass, Fail or Not assessed for each applicable criterion; assessed criteria require a reviewer label and explanatory note. The label stays fixed once a decision is recorded. Unapplied edits block case navigation, replacement and exports until recorded or discarded.
+
+Recorded reviews use the existing offline review schema and fingerprints; they can be checked with `scripts/evaluate.mjs`. The page makes no network/API calls and writes no assessment evidence. Closing/reloading loses unexported records. The Export button requests a download; receipt is unverified. Real outputs remain semantically unreviewed until a qualified independent reviewer assesses them. This screen does not authenticate reviewers or establish model quality.
 
 ## Data and limits
 
@@ -60,16 +66,16 @@ Browser export receipt and file-import round trips remain unverified in v0.9. Th
 ## Checks
 
 ```powershell
-node --test tests/core.test.mjs tests/threat.test.mjs tests/intake.test.mjs tests/tasks.test.mjs tests/proposals.test.mjs tests/evaluation.test.mjs tests/revisions.test.mjs tests/imports.test.mjs tests/ai-runner.test.mjs tests/ai-service.test.mjs
+node --test tests/core.test.mjs tests/threat.test.mjs tests/intake.test.mjs tests/tasks.test.mjs tests/proposals.test.mjs tests/evaluation.test.mjs tests/revisions.test.mjs tests/imports.test.mjs tests/ai-runner.test.mjs tests/ai-service.test.mjs tests/semantic-review.test.mjs
 node --check dist/threat-app.mjs
 node --check dist/threat-core.mjs
 node --check dist/proposal-core.mjs
 ```
 
-103 tests pass across both modules. See `docs/VERIFICATION.md` for browser evidence and remaining limits. `docs/THREAT-ANALYSIS-DIRECTION.md` is the current product direction and supersedes the earlier cyber-first commercial hypothesis.
+112 tests pass across both modules, including all CLI tests. See `docs/VERIFICATION.md` for browser evidence and remaining limits. `docs/THREAT-ANALYSIS-DIRECTION.md` is the current product direction and supersedes the earlier cyber-first commercial hypothesis.
 
 ## Release record
 
-The same private Site is retained. The latest confirmed v0.9 deployment, source commit and limitations are recorded in sibling `ruthless-release-v0.9.json`. Until that receipt exists with status `succeeded`, v0.9 publication is not confirmed. Public sharing has not been requested.
+The same owner-private Site is retained. v0.10 adds the quote-resolution correction and synthetic semantic-review screen. Publication is confirmed only when the Sites deployment status is succeeded for the exact pushed commit. Public sharing has not been requested.
 
-Current broader company scope and delivery gates are in `docs/PLATFORM-DIRECTION.md`. The practitioner interview/pilot draft is in `docs/PILOT-DISCOVERY.md`. Local research tasks and synthetic fixture proposals are implemented; authenticated collaboration and customer data connectors remain planned; the bounded synthetic API runner is implemented but has not made a real provider call. The first AI proposal/validation design is in `docs/AI-ORCHESTRATION-CONTRACT.md`.
+Current broader company scope and delivery gates are in `docs/PLATFORM-DIRECTION.md`. The practitioner interview/pilot draft is in `docs/PILOT-DISCOVERY.md`. Local research tasks and synthetic fixture proposals are implemented; authenticated collaboration and customer data connectors remain planned; the bounded synthetic API runner has completed fictional model calls; independent semantic review remains outstanding. The first AI proposal/validation design is in `docs/AI-ORCHESTRATION-CONTRACT.md`.

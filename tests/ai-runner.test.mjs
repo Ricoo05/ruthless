@@ -5,11 +5,27 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {execFileSync} from 'node:child_process';
-import {executionPlan,runSyntheticEvaluation,responseOutput,API_ENDPOINT} from '../scripts/ai-runner-core.mjs';
+import {executionPlan,runSyntheticEvaluation,responseOutput,resolveModelCitations,API_ENDPOINT} from '../scripts/ai-runner-core.mjs';
 import {controlCandidates,exportedInputs} from '../dist/evaluation-fixtures.mjs';
 const options={model:'test-model',maxCases:6},key='synthetic-test-key-not-real';
 const response=output=>({status:'completed',id:'resp_test',model:'test-model',usage:{input_tokens:100,output_tokens:50,total_tokens:150},output:[{type:'message',role:'assistant',status:'completed',content:[{type:'output_text',text:JSON.stringify(output)}]}]});
-const mock=(kind='faithful',split='development')=>async(url,req)=>{assert.equal(url,API_ENDPOINT);assert.equal(req.redirect,'error');const body=JSON.parse(req.body),id=JSON.parse(body.input).caseId;return new Response(JSON.stringify(response(controlCandidates(split,kind).responses.find(r=>r.caseId===id).output)),{headers:{'Content-Type':'application/json'}});};
+const wire=output=>({...output,proposals:output.proposals.map(p=>({...p,citations:p.citations.map(c=>({documentId:c.documentId,quote:c.quote}))}))});
+const mock=(kind='faithful',split='development')=>async(url,req)=>{assert.equal(url,API_ENDPOINT);assert.equal(req.redirect,'error');const body=JSON.parse(req.body),id=JSON.parse(body.input).caseId;return new Response(JSON.stringify(response(wire(controlCandidates(split,kind).responses.find(r=>r.caseId===id).output))),{headers:{'Content-Type':'application/json'}});};
+
+test('software resolves unique exact quotes without altering statements or raw output, including Hindi/emoji',()=>{
+  for(const split of ['development','holdout'])for(const c of exportedInputs(split).cases){const raw=wire(controlCandidates(split,'faithful').responses.find(r=>r.caseId===c.id).output),before=structuredClone(raw),resolved=resolveModelCitations(raw,c.documents);assert.deepEqual(raw,before);for(const p of resolved.proposals)for(const q of p.citations)assert.equal(c.documents.find(d=>d.id===q.documentId).excerpt.slice(q.start,q.end),q.quote);}
+});
+test('invented, repeated, overlapping, normalized, surrogate-split and unselected quotes fail closed',()=>{
+  const make=quote=>({proposals:[{id:'P1',draftStatement:'Publisher reports a finding.',limitations:'Unverified.',citations:[{documentId:'D',quote}]}],abstention:''});
+  for(const [excerpt,quote] of [['aaa','aa'],['echo echo','echo'],['cause unknown','cause confirmed'],['a\u0301','á'],['😀','\ud83d'],['x','']])assert.throws(()=>resolveModelCitations(make(quote),[{id:'D',excerpt}]));
+  assert.throws(()=>resolveModelCitations(make('x'),[{id:'Other',excerpt:'x'}]));
+  const v=make('x');v.proposals[0].citations[0].start=0;assert.throws(()=>resolveModelCitations(v,[{id:'D',excerpt:'x'}]),/fields/);
+});
+test('raw model failures remain retained but cannot enter normalized candidates or semantic approval',async()=>{
+  const raw=controlCandidates('development','faithful').responses[0].output;
+  const r=await runSyntheticEvaluation({...options,maxCases:1},{apiKey:key,allowApi:true,fetchImpl:async()=>new Response(JSON.stringify(response(raw)))});
+  assert.deepEqual(r.rawOutputs[0].output,raw);assert.equal(r.candidates.responses.length,0);assert.equal(r.report.counts.structurallyValid,0);assert.match(r.executions[0].citationResolutionError,/fields/);assert.match(r.report.rows[0].error,/fields/);
+});
 
 test('AI plans contain only selected synthetic inputs, strict output schema, no tools and no control answers',()=>{
   for(const split of ['development','holdout']){const plan=executionPlan({...options,split});assert.equal(plan.requests.length,6);assert.equal(plan.maxOutputTokens,4000);for(const r of plan.requests){const c=exportedInputs(split).cases.find(c=>c.id===r.caseId);assert.ok(c);assert.deepEqual(JSON.parse(r.body.input),{caseId:c.id,question:c.question,documents:c.documents});assert.equal(r.body.store,false);assert.equal(r.body.text.format.strict,true);assert.equal(r.body.tools,undefined);assert.equal(JSON.parse(r.body.input).guidance,undefined);assert.equal(JSON.parse(r.body.input).controls,undefined);}}

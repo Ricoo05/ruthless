@@ -1,10 +1,10 @@
-# First synthetic model integration — v0.9
+# First synthetic model integration — v0.10
 
-Implemented 4 October 2026. No real provider call has been made. Transport, validation and console results were tested with authored mocked outputs; they do not measure AI quality. Key creation stopped after the local save destination was declined. No secret was created, written or retried. OpenAI Developers is installed. The next live experiment needs approved credential provisioning, a literal API model identifier and an authorized test allowance.
+Updated 4 October 2026 after live fictional-source tests. User approved secure key creation and a $1 total experiment ceiling; .env.local is configured and Git-ignored. The first real v1 response preserved uncertainty but supplied incorrect citation offsets and was rejected. Prompt ai-attribution-v2 now requests only exact quotes; software derives spans from unique exact occurrences while retaining raw output. Twelve real fixture responses (six development, six visible reserved) passed structural checks. This is not independent semantic validation or an operational readiness claim. A real Hindi result was also checked in the local browser.
 
 ## What executes
 
-The CLI and optional loopback service POST to the fixed OpenAI Responses endpoint. Only bundled fictional questions and selected documents are accepted; authored controls, rubric guidance, workspace files and customer inputs are excluded. A strict JSON schema requests attributed drafts with exact quotes and UTF-16 spans, or an explained abstention. The local validator enforces eight proposals and four citations per proposal. The prompt preserves uncertainty, denials, corrections, shared origins and contradictory accounts, and treats source instructions as data. This is a prompt specification, not a demonstrated model safety or accuracy guarantee.
+The CLI and optional loopback service POST to the fixed OpenAI Responses endpoint. Only bundled fictional questions and selected documents are accepted; authored controls, rubric guidance, workspace files and customer inputs are excluded. A strict JSON schema requests attributed drafts with selected document IDs and exact quotes, or an explained abstention. Software derives UTF-16 spans only when a quote occurs exactly once in its selected excerpt. Missing, repeated (including overlapping), normalized-but-not-exact and surrogate-split matches are rejected. Original raw outputs are retained separately; no statements or quotations are repaired. The local validator enforces eight proposals and four citations per proposal. The prompt preserves uncertainty, denials, corrections, shared origins and contradictory accounts, and treats source instructions as data. This is a prompt specification, not a demonstrated model safety or accuracy guarantee.
 
 No tools, arbitrary URLs, retries, background jobs or assessment writes are enabled. Provider refusals, incomplete outputs and executable fields cannot become drafts. Each request has a 60-second timeout and a 2 MB response bound. HTTP/transport errors are summarized without echoing provider diagnostic bodies. Failed requests consume the local attempt allowance. The server binds only to 127.0.0.1, checks Host and same-origin JSON headers, pins model/token configuration and serializes execution. It is a local development service, not a production authenticated API.
 
@@ -16,11 +16,11 @@ Run from the project directory. Replace `API_MODEL` with a selected, supported A
 node scripts/run-ai.mjs plan --model API_MODEL --max-cases 1 --max-output-tokens 4000 --out ../ruthless-ai-plan.json
 ```
 
-The plan lists the endpoint, prompt, schema and complete fictional payload. Model availability and actual Structured Outputs compatibility remain unverified until a real request. Start with one development case; expand after reviewing its result. `--split holdout` selects the visible reserved fixtures, not independently blinded material.
+The plan lists the endpoint, prompt, schema and complete fictional payload. The gpt-5.4-mini-2026-03-17 snapshot was used successfully with this schema in the first live tests; other models remain unverified. Start with one development case; expand after reviewing its result. `--split holdout` selects the visible reserved fixtures, not independently blinded material.
 
 ## Authorized execution after provisioning
 
-Use the OpenAI Developers key workflow for supported provisioning. Do not paste keys into chat, browser fields, command arguments or source files. The runner reads `OPENAI_API_KEY` from its process environment. `.env` and `.env.*` are ignored by Git; no such file was created for this release. If the user subsequently approves a local `.env.local` destination, Node 20.6+ supports loading it without putting the key in command arguments:
+Use the OpenAI Developers key workflow for supported provisioning. Do not paste keys into chat, browser fields, command arguments or source files. The runner reads `OPENAI_API_KEY` from its process environment. `.env` and `.env.*` are ignored by Git; the approved .env.local exists only locally. Node 20.6+ supports loading it without putting the key in command arguments:
 
 ```powershell
 node --env-file=.env.local scripts/run-ai.mjs run --model API_MODEL --max-cases 1 --max-output-tokens 4000 --out ../ruthless-ai-execution.json --allow-api
@@ -34,7 +34,7 @@ node --env-file=.env.local serve.mjs --enable-ai --model API_MODEL --max-request
 
 Open http://127.0.0.1:4173/ai.html, inspect the chosen input, acknowledge the single request, then generate. The default `node serve.mjs` disables execution. The private hosted static preview also disables execution and contains no credential or backend. The browser sends only a bundled case ID/split/acknowledgement to the local service; the key stays in the Node process. Browser results are transient and separate from the workspace. Use the CLI for a durable execution report.
 
-The allowance is 1–6 attempts per process session and resets on server restart. Output tokens are bounded to 512–8,000 per request. These controls do not establish a monetary spending cap, account budget or total reasoning-token guarantee. Provider-level billing and an agreed paid experiment allowance remain separate decisions. No charge was incurred by the mocked tests.
+The allowance is 1–6 attempts per process session and resets on server restart. Output tokens are bounded to 512–8,000 per request. These controls do not establish a monetary spending cap, account budget or total reasoning-token guarantee. Provider-level billing and an agreed paid experiment allowance remain separate decisions. Mocked tests make no provider calls. Recorded CLI generated-token cost estimate for this live session is $0.013605, plus one short browser request whose token metadata was not persisted. These are pricing estimates, not a billing receipt. No payment or billing-balance check was performed by the agent.
 
 ## Review and retention
 
@@ -43,3 +43,7 @@ Execution reports retain requested/returned model, prompt version, source-input 
 The request uses `store:false`, which disables stored Responses application state; this does **not** establish zero retention. OpenAI documents default abuse-monitoring retention and separately approved retention controls. Only authored fictional data is permitted in this runner. Official references: [Responses migration](https://developers.openai.com/api/docs/guides/migrate-to-responses), [Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs), and [data controls](https://developers.openai.com/api/docs/guides/your-data).
 
 Independent unseen multilingual evaluation, practitioner review, approved customer data, authenticated roles, protected audit, recovery and deployment security remain necessary before operational/customer use. Stay on Sol 6.1 High for this implementation stage.
+
+## Browser semantic review
+
+The AI console links to `/review.html` and a received result offers a candidate-JSON preview for copying into review. Existing CLI execution v2 or candidate JSON can also be pasted. Only bundled synthetic suite candidates are supported. The page recomputes structural checks and ignores imported report/approval claims. Applicable criteria and source context are shown side by side; recorded decisions require a reviewer label and notes for every assessed criterion. Unapplied edits block navigation and export. Records are compatible with the offline checker and bound to its existing source/rubric and complete-output fingerprints. No network calls, model requests, assessment writes or automatic approvals occur. Download receipt is not verified; closing the tab loses unexported reviews. Browser QA notes are in VERIFICATION.md.

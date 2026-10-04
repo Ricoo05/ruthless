@@ -1,6 +1,6 @@
 # First AI assistance contract — fixture implementation and provider design
 
-Updated 4 October 2026. v0.6/v0.7 implement the local synthetic fixture, structural validator and human proposal-review queue described below. It makes no model calls, stores no provider keys and runs no background agent. v0.7 adds a synthetic evaluation lab and offline candidate checker with manual rubric annotations. v0.9 adds a separate synthetic-only Responses runner and local console (`AI-RUNNER.md`), with no provider key or real model call yet. Independent model-quality measurement remains future work.
+Updated 4 October 2026. v0.6/v0.7 implement the local synthetic fixture, structural validator and human proposal-review queue described below. It makes no model calls, stores no provider keys and runs no background agent. v0.7 adds a synthetic evaluation lab and offline candidate checker with manual rubric annotations. v0.9 adds a separate synthetic-only Responses runner and local console (`AI-RUNNER.md`), with an approved local key and completed synthetic-only calls. Quote-only model citations are resolved to UTF-16 spans by unique exact matching; raw outputs and failures are retained. v0.10 adds a separate semantic-review screen using the evaluation rubric and fingerprint-bound annotation format. Live outputs do not enter the fixture proposal queue or assessment evidence. Independent model-quality measurement remains future work.
 
 ## Implemented fixture boundary
 
