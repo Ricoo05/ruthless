@@ -1,6 +1,6 @@
-# Project Ruthless — Intelligence Workbench v0.11
+# Project Ruthless — Intelligence Workbench v0.12
 
-Ruthless is being developed as terrorism intelligence analysis software for government and government-agency customers, covering domestic, cross-border and international developments relevant to India, with broader geographic support. The intended platform spans threat analysis, intelligence gathering, data integration, operations workflows and AI orchestration. The current release is a manual evidence-analysis, document-intake and research-task and proposal-review and synthetic-evaluation prototype using fictional cases. Prevention effectiveness and customer demand have not been validated.
+Ruthless is being developed as terrorism intelligence analysis software for government and government-agency customers, covering domestic, cross-border and international developments relevant to India, with broader geographic support. The intended platform spans threat analysis, intelligence gathering, data integration, operations workflows and AI orchestration. The current release connects case questions, selected fictional reports and cited AI drafts with manual evidence analysis, document intake, research tasks and synthetic semantic review. Prevention effectiveness and customer demand have not been validated.
 
 ## Run
 
@@ -20,6 +20,12 @@ Open http://127.0.0.1:4173/. The local server binds to loopback. The retained cy
 4. Record the judgment, information gaps, confidence, citations and review note. Reviewed assessments require all these fields and explicit consideration of conflicting evidence. A reviewed conclusion cannot cite a report published after its as-of date.
 5. Adding evidence reopens a Reviewed assessment. Confidence is analyst-assigned, not an attack probability. Review labels are local workflow status, not agency approval.
 6. Save workspace requests a JSON download. Confirm receipt only after finding the actual saved file. The app keeps the unsaved marker until that acknowledgement and invalidates it if the workspace changes. Open workspace restores a JSON file after validation. Preview brief displays the applied assessment with linked source excerpts. Export brief requests a Markdown download. Unapplied assessment changes can be discarded explicitly.
+
+## Integrated case analysis
+
+Open **Case analysis**, select a fictional question, inspect its reports and **Create case with selected reports**. Use **Load saved AI draft (no API cost)** to attach the corresponding output retained from the earlier real API experiment. Its citations are checked again; it stays Pending. **Try authored example** is separately labeled and calls no AI. You may also paste a matching candidate JSON file or generate one explicitly approved request on a configured local runner.
+
+Questions, selected original reports and cited drafts now live in the same case. Open assessment returns to its judgment/evidence desk; Inspect cited drafts returns to its inbox. Considered/Rejected require a note and do not change evidence or approve a judgment. Changed case inputs or source corrections make earlier drafts stale and block their consideration. Workspace files and briefs retain these drafts separately from analyst evidence. See `docs/CASE-ANALYSIS.md` for boundaries and version migration.
 
 ## Source integration and correction workflow
 
@@ -45,7 +51,7 @@ The offline checker exports input-only fixtures, validates candidate files and c
 
 ## First AI integration
 
-Open `/ai.html` to inspect the 12 fictional questions and their selected excerpts. Preview excludes authored answers and review guidance. The optional loopback service sends one selected fixture to OpenAI Responses, then validates exact source citations or an explained abstention. Drafts remain outside the assessment workspace and require semantic review. The hosted private Site provides inspection only; API execution requires the configured local runner.
+Open `/ai.html` to inspect the 12 fictional questions and their selected excerpts. Preview excludes authored answers and review guidance. The optional loopback service sends one selected fixture to OpenAI Responses, then validates exact source citations or an explained abstention. The original console remains separate. Case analysis now attaches validated drafts to a corresponding fictional analyst case; semantic review is still required. The hosted private Site provides inspection only; API execution requires the configured local runner.
 
 v0.9 passed mocked-provider integration tests and desktop/mobile console checks. A subsequent live experiment configured an approved local key and tested gpt-5.4-mini-2026-03-17 against all 12 fictional cases. The original model-calculated offset failure was retained; quote-only output with deterministic unique-match span resolution passed all 12 structural checks. Semantic quality still requires independent review. The private hosted console remains inspection-only; live API execution uses the local runner. See `docs/AI-RUNNER.md` for the executable workflow.
 
@@ -55,27 +61,29 @@ Open `/review.html` from the AI console. Paste candidates, a version 2 execution
 
 Export resumable session requests one JSON record containing candidates and recorded review notes. Reopen it by pasting its JSON into the same screen. Preview session provides a read-only JSON alternative. The separate recorded-review export retains the existing offline format for `scripts/evaluate.mjs`; a resumable bundle is not a candidate file for that CLI. The page makes no network/API calls and writes no assessment evidence. Closing/reloading loses unexported records. The Export button requests a download; receipt is unverified. Real outputs remain semantically unreviewed until a qualified independent reviewer assesses them. This screen does not authenticate reviewers or establish model quality.
 
+The review handoff preview recomputes missing, invalid, failed, unassessed and recorded-checks-satisfied cases from the original candidates and annotations. Every selected-suite case remains in the total. Its Markdown export retains notes, original source context, exact citations and fingerprints; export requests do not confirm file receipt. The report writes no case evidence or review decisions.
+
 ## Data and limits
 
-All evidence in the bundled demonstration is fictional and labeled synthetic. NIA, MHA and UN pages are linked as references; no claim of live ingestion is made. The assessment desk makes no AI calls. The separate synthetic-only AI console and CLI can call an explicitly configured local provider; default and hosted static modes make no calls. There are no customer-data uploads, analytics, browser persistence, automated operations or protected audit records. Files and history are editable and unencrypted. Use synthetic or approved non-sensitive material for evaluation.
+All evidence in the bundled demonstration is fictional and labeled synthetic. NIA, MHA and UN pages are linked as references; no claim of live ingestion is made. The Case analysis view can request one explicitly approved call through a configured local runner using only bundled fictional inputs. The separate synthetic-only AI console and CLI can call an explicitly configured local provider; default and hosted static modes make no calls. There are no customer-data uploads, analytics, browser persistence, automated operations or protected audit records. Files and history are editable and unencrypted. Use synthetic or approved non-sensitive material for evaluation.
 
-Threat workspace limits: 100 assessments, 200 retained source excerpts, 500 research tasks, 1,000 evidence records, 40 proposal runs (8 proposals/run, 4 citations/proposal), 2,000 history entries and 2 MB in UTF-8. Limits are checked before mutations. The original cyber module retains its separate project format and 12 MB limit. The two document formats are not interchangeable. Threat workspace format version 5 stores sources, tasks, proposal runs, linked corrections and up to 40 import batches (50 rows per batch). Versions 1–4 migrate without invented revision/import metadata; v4 proposal history is retained. Versions 1–3 migrate with empty proposal queues; versions 1–2 also have no tasks, and version 1 has no retained documents. Older releases cannot read version 5.
+Threat workspace limits: 100 assessments, 200 retained source excerpts, 500 research tasks, 1,000 evidence records, 40 proposal runs, 40 case-linked analytical drafts (8 proposals/run, 4 citations/proposal), 2,000 history entries and 2 MB in UTF-8. Limits are checked before mutations. The original cyber module retains its separate project format and 12 MB limit. The two document formats are not interchangeable. Threat workspace format version 6 adds case-linked analytical drafts to sources, tasks, proposal runs, linked corrections and up to 40 import batches (50 rows per batch). Versions 1–5 migrate with an empty analysis inbox; versions 1–4 migrate without invented revision/import metadata; v4 proposal history is retained. Versions 1–3 migrate with empty proposal queues; versions 1–2 also have no tasks, and version 1 has no retained documents. Older releases cannot read version 6.
 
 Browser export receipt and file-import round trips remain unverified in v0.9. The in-app browser download event previously timed out, and files were not found at the expected Downloads paths. Do not close a working session before confirming that its file was received. Core serialization and restore validation pass automated tests.
 
 ## Checks
 
 ```powershell
-node --test tests/core.test.mjs tests/threat.test.mjs tests/intake.test.mjs tests/tasks.test.mjs tests/proposals.test.mjs tests/evaluation.test.mjs tests/revisions.test.mjs tests/imports.test.mjs tests/ai-runner.test.mjs tests/ai-service.test.mjs tests/semantic-review.test.mjs
+node --test tests/core.test.mjs tests/threat.test.mjs tests/intake.test.mjs tests/tasks.test.mjs tests/proposals.test.mjs tests/evaluation.test.mjs tests/revisions.test.mjs tests/imports.test.mjs tests/ai-runner.test.mjs tests/ai-service.test.mjs tests/semantic-review.test.mjs tests/review-report.test.mjs tests/analysis.test.mjs
 node --check dist/threat-app.mjs
 node --check dist/threat-core.mjs
 node --check dist/proposal-core.mjs
 ```
 
-117 tests pass across both modules, including all CLI tests. See `docs/VERIFICATION.md` for browser evidence and remaining limits. `docs/THREAT-ANALYSIS-DIRECTION.md` is the current product direction and supersedes the earlier cyber-first commercial hypothesis.
+135 tests pass across both modules, including all CLI tests. See `docs/VERIFICATION.md` for browser evidence and remaining limits. `docs/THREAT-ANALYSIS-DIRECTION.md` is the current product direction and supersedes the earlier cyber-first commercial hypothesis.
 
 ## Release record
 
-The same owner-private Site is retained. v0.11 adds resumable synthetic reviews and retains the quote-resolution correction and review screen. Publication is confirmed only when the Sites deployment status is succeeded for the exact pushed commit. Public sharing has not been requested.
+The same owner-private Site is retained. v0.12 connects cited analytical drafts to fictional analyst cases and adds source-linked review handoff reports, while retaining resumable semantic reviews. Publication is confirmed only when the Sites deployment status is succeeded for the exact pushed commit. Public sharing has not been requested.
 
 Current broader company scope and delivery gates are in `docs/PLATFORM-DIRECTION.md`. The practitioner interview/pilot draft is in `docs/PILOT-DISCOVERY.md`. Local research tasks and synthetic fixture proposals are implemented; authenticated collaboration and customer data connectors remain planned; the bounded synthetic API runner has completed fictional model calls; independent semantic review remains outstanding. The first AI proposal/validation design is in `docs/AI-ORCHESTRATION-CONTRACT.md`.

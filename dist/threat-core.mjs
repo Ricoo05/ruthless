@@ -1,7 +1,10 @@
 import {validateProposalRuns,proposalIsCurrent,fixtureRun} from './proposal-core.mjs';
+import {analysisScenario,matchesAnalysisSource,analysisSourceSnapshot,validateAnalysisRuns,analysisIsCurrent} from './analysis-core.mjs';
+import {evaluateCandidates} from './evaluation-core.mjs';
+export {analysisIsCurrent} from './analysis-core.mjs';
 export {proposalIsCurrent} from './proposal-core.mjs';
 export const FORMAT='ruthless-threat-workspace';
-export const WORKSPACE_VERSION=5;
+export const WORKSPACE_VERSION=6;
 export const MAX_BYTES=2_000_000;
 export const SCOPES=['Domestic','Cross-border','International'];
 export const STATES=['Draft','Needs review','Reviewed'];
@@ -67,7 +70,7 @@ function assertReview(c,evidence){
   if(evidence.some(e=>c.citedEvidence.includes(e.id)&&e.reportedAt>c.asOf))fail('Reviewed assessments cannot cite reports later than their as-of date.');
 }
 export function validateWorkspace(v){
-  if(!object(v)||v.format!==FORMAT||![1,2,3,4,WORKSPACE_VERSION].includes(v.version))fail('Unsupported threat workspace format.');
+  if(!object(v)||v.format!==FORMAT||![1,2,3,4,5,WORKSPACE_VERSION].includes(v.version))fail('Unsupported threat workspace format.');
   if(!Array.isArray(v.assessments)||!v.assessments.length||v.assessments.length>100||!Array.isArray(v.evidence)||v.evidence.length>1000||!Array.isArray(v.history)||v.history.length>2000)fail('Workspace limits: 1–100 assessments, 1,000 evidence records, 2,000 history entries.');
   if(v.version>=2&&(!Array.isArray(v.documents)||v.documents.length>200))fail('Workspace limit: 200 source documents.');
   if(v.version>=3&&(!Array.isArray(v.tasks)||v.tasks.length>500))fail('Workspace limit: 500 research tasks.');
@@ -114,7 +117,36 @@ export function validateWorkspace(v){
   }
   for(const e of evidence)if(e.proposalRunId||e.proposalId){const link=proposalLinks.get(`${e.proposalRunId}:${e.proposalId}`);if(!link||link.p.status!=='Accepted'||link.p.evidenceId!==e.id)fail('Evidence proposal lineage is inconsistent.');}
   const history=v.history.map(h=>{if(!object(h)||!caseIDs.has(h.assessmentId))fail('Invalid history reference.');return {assessmentId:id(h.assessmentId),at:day(h.at),action:str(h.action,'History action',150),note:str(h.note,'History note',2000,false)};});
-  const result={format:FORMAT,version:WORKSPACE_VERSION,assessments,evidence,documents,tasks,proposalRuns,importBatches,history};serializeWorkspace(result);return result;
+  const analysisRuns=v.version>=6?validateAnalysisRuns(v.analysisRuns,{assessments,documents},{caseRecord,documentRecord,day}):[];
+  const result={format:FORMAT,version:WORKSPACE_VERSION,assessments,evidence,documents,tasks,proposalRuns,importBatches,analysisRuns,history};serializeWorkspace(result);return result;
+}
+export function createAnalysisCase(workspace,{scenarioId,assessmentId,documentIds,scope,area},at){
+  const scenario=analysisScenario(scenarioId);day(at);
+  if(!Array.isArray(documentIds)||documentIds.length!==scenario.documents.length||new Set(documentIds).size!==documentIds.length)fail('Assign one unique identifier per selected source.');
+  let next=addAssessment(workspace,{id:assessmentId,title:`${scenario.category} — fictional analysis`,area,scope,asOf:at,question:scenario.question,judgment:'',gaps:'',confidence:'Insufficient',priority:'Routine',status:'Draft',reviewNote:'',citedEvidence:[],reviewedRevisionIds:[]},at);
+  for(const [i,d] of scenario.documents.entries())next=stageDocument(next,{...d,id:documentIds[i],assessmentId,title:d.publisher,url:'',recordedAt:at},at);
+  return next;
+}
+export async function attachAnalysisCandidate(workspace,assessmentId,scenarioId,candidates,runId,at,kind='Imported candidate'){
+  // Retain a snapshot before hashing; a caller must apply only to the same workspace.
+  const original=structuredClone(workspace),scenario=analysisScenario(scenarioId),assessment=original.assessments.find(c=>c.id===assessmentId);day(at);
+  if(!assessment||assessment.question!==scenario.question)fail('This assessment does not have the selected fictional intelligence question.');
+  if(candidates.split!==scenario.split)fail('Candidate set does not match this fictional scenario.');
+  const report=await evaluateCandidates(candidates),row=report.rows.find(r=>r.caseId===scenario.id);
+  if(!row?.structuralValid)fail(row?.error||'No valid output for this scenario.');
+  const sources=scenario.documents.map(source=>{
+    const matches=original.documents.filter(d=>d.assessmentId===assessmentId&&documentIsCurrent(original,d.id)&&matchesAnalysisSource(d,source));
+    if(matches.length!==1)fail('Each selected source must have one current matching excerpt in this case.');
+    return {documentId:source.id,document:analysisSourceSnapshot(matches[0])};
+  });
+  const run={id:runId,assessmentId,scenarioId,createdAt:at,kind,candidateLabel:report.candidateLabel,snapshot:{assessment:structuredClone(assessment),sources},output:row.output,status:'Pending',reviewNote:'',reviewedAt:''};
+  return validateWorkspace({...original,analysisRuns:[...original.analysisRuns,run],history:[...original.history,{assessmentId,at,action:'Analytical draft attached',note:`${runId}: ${kind}; all selected sources retained; evidence and judgment unchanged`} ]});
+}
+export function considerAnalysis(workspace,runId,{status,reviewNote},at){
+  day(at);const run=workspace.analysisRuns.find(r=>r.id===runId);if(!run||run.status!=='Pending')fail('Select a pending analytical draft.');
+  choice(status,['Considered','Rejected'],'analysis decision');if(status==='Considered'&&!analysisIsCurrent(workspace,run))fail('Stale draft: the assessment or selected sources changed. Reject it and run a new analysis.');
+  const note=str(reviewNote,'Analysis review note',2000);
+  return validateWorkspace({...workspace,analysisRuns:workspace.analysisRuns.map(r=>r.id===runId?{...r,status,reviewNote:note,reviewedAt:at}:r),history:[...workspace.history,{assessmentId:run.assessmentId,at,action:'Analytical draft considered',note:`${runId}: ${status}; ${note}`} ]});
 }
 export function parseWorkspace(raw){if(typeof raw!=='string'||new TextEncoder().encode(raw).length>MAX_BYTES)fail('Workspace must be no larger than 2 MB in UTF-8.');let v;try{v=JSON.parse(raw);}catch{fail('Workspace is not valid JSON.');}return validateWorkspace(v);}
 export function evidenceSummary(workspace,assessmentId){const rows=workspace.evidence.filter(e=>e.assessmentId===assessmentId),superseded=e=>e.sourceDocumentId&&!documentIsCurrent(workspace,e.sourceDocumentId);return {records:rows.length,supersededRecords:rows.filter(superseded).length,sourceGroups:new Set(rows.filter(e=>e.relation==='Supports'&&!superseded(e)).map(e=>e.originGroup.toLowerCase())).size,challenging:rows.filter(e=>e.relation==='Challenges').length,unverified:rows.filter(e=>e.claimState==='Unverified').length,timeline:[...rows].sort((a,b)=>a.reportedAt.localeCompare(b.reportedAt)||a.id.localeCompare(b.id))};}
@@ -203,6 +235,12 @@ export function exportAssessment(workspace,assessmentId){
   lines.push('## Research follow-up tasks','Owner labels and task completion are analyst-supplied; they do not establish verified identity or approve an assessment.','');
   for(const t of workspace.tasks.filter(t=>t.assessmentId===assessmentId))lines.push(`### ${t.id} — ${clean(t.title)}`,`Status: ${t.status} | Due: ${t.dueAt} | Owner label (unverified): ${clean(t.owner)||'Unassigned'}`,`Permitted research scope: ${clean(t.scope)}`,`Progress note: ${clean(t.note)||'Not recorded'}`,`Result note: ${clean(t.resultNote)||'Not recorded'}`,`Linked evidence: ${t.linkedEvidence.join(', ')||'None'}`,'');
   for(const t of workspace.tasks.filter(t=>t.assessmentId===assessmentId&&workspace.evidence.some(e=>t.linkedEvidence.includes(e.id)&&e.sourceDocumentId&&!documentIsCurrent(workspace,e.sourceDocumentId))))lines.push(`Task ${t.id}: linked evidence has a superseded source; the previous task state/result is retained for analyst follow-up.`);
+  lines.push('## Case-linked analytical drafts','Drafts and consideration notes are separate from assessment evidence and judgment. Origin labels and review notes are unverified. Matching citations do not establish semantic accuracy.','');
+  for(const r of workspace.analysisRuns.filter(r=>r.assessmentId===assessmentId)){
+    lines.push(`### ${r.id} — ${clean(r.kind)}`,`${r.createdAt} | ${r.status} | ${analysisIsCurrent(workspace,r)?'Current inputs':'STALE INPUTS: assessment or selected sources changed'}`,`Candidate label (unverified): ${clean(r.candidateLabel)}`,`Question at draft creation: ${clean(r.snapshot.assessment.question)}`,`Consideration note: ${clean(r.reviewNote)||'Not recorded'}`,'');
+    if(r.output.abstention)lines.push(`Abstention: ${clean(r.output.abstention)}`,'');
+    for(const p of r.output.proposals){lines.push(`Attributed draft: ${clean(p.draftStatement)}`,`Limitations: ${clean(p.limitations)}`);for(const q of p.citations){const d=r.snapshot.sources.find(s=>s.documentId===q.documentId).document;lines.push(`Citation: ${d.id} / ${q.documentId} / UTF-16 [${q.start}, ${q.end}) / ${clean(d.publisher)}`,`> ${quote(q.quote)}`);}lines.push('');}
+  }
   return lines.join('\n');
 }
 export function demoWorkspace(){

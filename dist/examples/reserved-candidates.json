@@ -1,0 +1,153 @@
+{
+  "format": "ruthless-evaluation-candidates",
+  "version": 1,
+  "suiteId": "ruthless-attribution-synthetic",
+  "suiteVersion": 1,
+  "split": "holdout",
+  "candidateLabel": "OpenAI / gpt-5.4-mini-2026-03-17 / ai-attribution-v2",
+  "responses": [
+    {
+      "caseId": "held-hindi",
+      "output": {
+        "proposals": [
+          {
+            "id": "P1",
+            "draftStatement": "The notice says the cause is still unknown and that no independent confirmation of any connection has been made.",
+            "limitations": "This is a single fictional notice and it does not identify a specific event, actor, or relationship; it only states uncertainty about cause and confirmation.",
+            "citations": [
+              {
+                "documentId": "H-A",
+                "start": 0,
+                "end": 62,
+                "quote": "कारण अभी अज्ञात है। किसी संबंध की स्वतंत्र पुष्टि नहीं हुई है।"
+              }
+            ]
+          }
+        ],
+        "abstention": ""
+      }
+    },
+    {
+      "caseId": "held-mixed",
+      "output": {
+        "proposals": [
+          {
+            "id": "A1",
+            "draftStatement": "According to the mixed-language desk, the reported link is not verified and remains unconfirmed.",
+            "limitations": "This is based on a single source statement; no independent corroboration is provided, and the source itself says further corroboration is required.",
+            "citations": [
+              {
+                "documentId": "H-B",
+                "start": 0,
+                "end": 93,
+                "quote": "संबंध अपुष्ट है। The reported link remains unverified 🛰️; further corroboration is required."
+              }
+            ]
+          }
+        ],
+        "abstention": ""
+      }
+    },
+    {
+      "caseId": "held-correction",
+      "output": {
+        "proposals": [
+          {
+            "id": "A1",
+            "draftStatement": "According to the later correction from the same desk, the earlier closure report was withdrawn and the current status is not established.",
+            "limitations": "This rests on a single correction notice from the same origin group, so it is not independent corroboration; the source does not establish what, if anything, is closed now.",
+            "citations": [
+              {
+                "documentId": "H-C2",
+                "start": 0,
+                "end": 94,
+                "quote": "Correction: the earlier closure statement is withdrawn. The current status is not established."
+              }
+            ]
+          },
+          {
+            "id": "A2",
+            "draftStatement": "The only current-source update says the closure claim is no longer being maintained, and the situation remains unresolved in the excerpted record.",
+            "limitations": "The excerpt does not provide a replacement status beyond saying it is not established, and the earlier bulletin is explicitly superseded.",
+            "citations": [
+              {
+                "documentId": "H-C2",
+                "start": 0,
+                "end": 94,
+                "quote": "Correction: the earlier closure statement is withdrawn. The current status is not established."
+              },
+              {
+                "documentId": "H-C1",
+                "start": 0,
+                "end": 50,
+                "quote": "The initial fictional bulletin reported a closure."
+              }
+            ]
+          }
+        ],
+        "abstention": ""
+      }
+    },
+    {
+      "caseId": "held-proximity",
+      "output": {
+        "proposals": [
+          {
+            "id": "P1",
+            "draftStatement": "The two reports do not establish a common cause; each excerpt explicitly says that no cause or connection is established.",
+            "limitations": "This is limited to the text of the two excerpts. The reports are from different origin groups and provide no independent corroboration of a shared cause.",
+            "citations": [
+              {
+                "documentId": "H-D1",
+                "start": 0,
+                "end": 73,
+                "quote": "A fictional interruption occurred in one region. No cause is established."
+              },
+              {
+                "documentId": "H-D2",
+                "start": 0,
+                "end": 93,
+                "quote": "Another fictional interruption occurred nearby on the same day. No connection is established."
+              }
+            ]
+          }
+        ],
+        "abstention": ""
+      }
+    },
+    {
+      "caseId": "held-denial-repost",
+      "output": {
+        "proposals": [
+          {
+            "id": "A1",
+            "draftStatement": "According to the original source, there is no verified corroboration for the alleged connection; the source explicitly denies that it has been verified.",
+            "limitations": "Support is limited to a denial in the original excerpt. The repost does not add independent evidence, and both items share the same originGroup, so they are not independent corroboration.",
+            "citations": [
+              {
+                "documentId": "H-E1",
+                "start": 0,
+                "end": 76,
+                "quote": "The fictional original denies that the alleged connection has been verified."
+              },
+              {
+                "documentId": "H-E2",
+                "start": 0,
+                "end": 74,
+                "quote": "This is a repost of the original denial; no separate evidence is supplied."
+              }
+            ]
+          }
+        ],
+        "abstention": ""
+      }
+    },
+    {
+      "caseId": "held-no-answer",
+      "output": {
+        "proposals": [],
+        "abstention": "The single source does not establish a future incident. It explicitly says the desk announces a routine fictional maintenance schedule and that it supplies no incident forecast, so there is no evidentiary basis for a yes answer."
+      }
+    }
+  ]
+}

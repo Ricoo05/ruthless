@@ -48,8 +48,14 @@ Use `--split holdout` with fresh filenames for the reserved set. Use `--kind mis
 
 ## First model integration
 
-v0.9 implements a separate bounded synthetic Responses runner and local console; see `AI-RUNNER.md`. Only input-only fixtures enter requests. No real provider has been called or measured. Authored controls and mocked transport tests do not establish model quality.
+v0.9 implements a separate bounded synthetic Responses runner and local console; see `AI-RUNNER.md`. Only input-only fixtures enter requests. The later funded experiment generated 12 real synthetic outputs that passed structural checks after deterministic quote-span resolution. All remain semantically unreviewed; no model-quality score is established. Authored controls and mocked transport tests do not establish model quality.
 
 ## Next gate
 
 Review these provisional criteria with a practitioner, obtain an independently authored unseen fixture set, and scope an approved provider/deployment. Keep keys out of the static browser. Sol 6.1 High remains suitable for implementation; a concrete provider/production boundary review is the later Astra handoff.
+
+## v0.12 handoff report and case integration
+
+The semantic-review page can preview or request a Markdown handoff that recomputes outcomes from candidates and matching annotations. Missing output, invalid output, semantic failure, unassessed criteria and recorded checks satisfied remain distinct. The report retains all six cases in the selected split, original excerpts/languages/dates/source groups, exact spans, criterion notes and fingerprints. Imported report claims are ignored. Read-only previews and report exports make no API calls or assessment writes; editable reviewer labels are unverified.
+
+The separate Case analysis inbox can attach a structurally validated candidate to its matching fictional analyst case, retaining all selected source bindings. This adds a Pending draft without inserting evidence or inheriting semantic approval. Its Considered label records a note, not a rubric grade or independent quality assessment. See `CASE-ANALYSIS.md`.
