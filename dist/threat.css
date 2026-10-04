@@ -11,3 +11,8 @@
 #import-assessment{width:100%}#import-preview,#source-parent-context{line-height:1.6;overflow-wrap:anywhere}
 
 .analysis-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr)}.analysis-work{border-left:1px solid var(--line)}.analysis-source,.analysis-run{border-top:1px solid var(--line);padding-top:16px;margin-top:20px;overflow-wrap:anywhere}.analysis-work details{margin:24px 0}.analysis-work summary{cursor:pointer}.analysis-run textarea{width:100%}@media(max-width:1000px){.analysis-layout{grid-template-columns:1fr}.analysis-work{border-left:0;border-top:1px solid var(--line)}}
+
+#judgment-preview-text,#judgment-preview-gaps{width:100%}#judgment-preview-context,#judgment-existing-context{overflow-wrap:anywhere;line-height:1.6}.analysis-source button{margin-bottom:16px}
+
+#workspace-json-text{width:100%;font-family:ui-monospace,monospace;font-size:.875rem}
+dialog .checkline[hidden]{display:none}

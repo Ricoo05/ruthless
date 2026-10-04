@@ -73,5 +73,5 @@ test('restore rejects forged acceptance, broken reciprocal lineage and altered a
 test('version 3 migration preserves sources and tasks and invents no proposal lineage',()=>{
   const current=addTask(staged(),{id:'TASK-F',assessmentId,title:'Verify permitted source',scope:'Compare fictional records.',owner:'',dueAt:at},at);
   const legacy={...current,version:3,proposalRuns:[{id:'forged'}]};legacy.evidence[0].proposalRunId='forged';legacy.evidence[0].proposalId='forged';
-  const migrated=parseWorkspace(JSON.stringify(legacy));assert.equal(migrated.version,6);assert.deepEqual(migrated.proposalRuns,[]);assert.equal(migrated.evidence[0].proposalRunId,'');assert.deepEqual(migrated.documents,current.documents);assert.deepEqual(migrated.tasks,current.tasks);
+  const migrated=parseWorkspace(JSON.stringify(legacy));assert.equal(migrated.version,7);assert.deepEqual(migrated.proposalRuns,[]);assert.equal(migrated.evidence[0].proposalRunId,'');assert.deepEqual(migrated.documents,current.documents);assert.deepEqual(migrated.tasks,current.tasks);
 });

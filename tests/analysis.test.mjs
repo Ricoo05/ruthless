@@ -32,7 +32,7 @@ test('restoration rejects forged source bindings, output citations, invalid stat
   assert.throws(()=>considerAnalysis(w,'RUN-1',{status:'Considered',reviewNote:''},at));assert.throws(()=>considerAnalysis(w,'RUN-1',{status:'Rejected',reviewNote:'Reason'},'2026-10-03'));
 });
 test('old workspace versions migrate with an empty analysis inbox and existing records retained',()=>{
-  const w=demoWorkspace();for(const version of [1,2,3,4,5]){const previous={...w,version};delete previous.analysisRuns;const restored=validateWorkspace(previous);assert.equal(restored.version,6);assert.deepEqual(restored.analysisRuns,[]);assert.deepEqual(restored.evidence,w.evidence);}
+  const w=demoWorkspace();for(const version of [1,2,3,4,5]){const previous={...w,version};delete previous.analysisRuns;const restored=validateWorkspace(previous);assert.equal(restored.version,7);assert.deepEqual(restored.analysisRuns,[]);assert.deepEqual(restored.evidence,w.evidence);}
 });
 test('Hindi, repost groups, abstentions and source instructions remain attributed data',async()=>{
   for(const scenarioId of ['held-hindi','dev-repost','dev-no-answer','dev-instructions']){const w=await attach(create(scenarioId),scenarioId),r=w.analysisRuns[0],s=analysisScenario(scenarioId);assert.deepEqual(r.output,controlCandidates(s.split,'faithful').responses.find(x=>x.caseId===scenarioId).output);assert.equal(r.snapshot.sources.length,s.documents.length);assert.deepEqual(w.evidence,demoWorkspace().evidence);assert.equal(w.assessments.at(-1).status,'Draft');}

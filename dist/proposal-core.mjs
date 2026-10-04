@@ -4,7 +4,7 @@ const identifier=v=>{if(typeof v!=='string'||!/^[a-zA-Z0-9_-]{1,60}$/.test(v))fa
 const text=(v,label,max,empty=false)=>{if(typeof v!=='string'||(!empty&&!v.trim())||v.length>max)fail(`Invalid ${label}.`);return v;};
 const date=v=>{if(typeof v!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(v)||!Number.isFinite(Date.parse(v))||new Date(v).toISOString().slice(0,10)!==v)fail('Invalid proposal date.');return v;};
 const keys=(v,allowed,label)=>{if(!object(v)||Object.keys(v).some(k=>!allowed.includes(k)))fail(`Unexpected fields in ${label}; executable and tool fields are not allowed.`);};
-const caseKeys=['id','title','area','scope','asOf','question','judgment','gaps','confidence','priority','status','reviewNote','citedEvidence','reviewedRevisionIds'];
+const caseKeys=['id','title','area','scope','asOf','question','judgment','gaps','confidence','priority','status','reviewNote','citedEvidence','reviewedRevisionIds','judgmentOrigin'];
 const documentKeys=['id','assessmentId','title','publisher','originGroup','url','reportedAt','recordedAt','language','locator','accessNote','excerpt','synthetic'];
 export function proposalSnapshot(assessment,document){return {assessment:structuredClone(assessment),document:Object.fromEntries(documentKeys.map(k=>[k,document[k]]))};}
 const splitSurrogate=(s,i)=>i>0&&i<s.length&&s.charCodeAt(i-1)>=0xD800&&s.charCodeAt(i-1)<=0xDBFF&&s.charCodeAt(i)>=0xDC00&&s.charCodeAt(i)<=0xDFFF;

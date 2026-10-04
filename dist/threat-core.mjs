@@ -1,10 +1,11 @@
 import {validateProposalRuns,proposalIsCurrent,fixtureRun} from './proposal-core.mjs';
 import {analysisScenario,matchesAnalysisSource,analysisSourceSnapshot,validateAnalysisRuns,analysisIsCurrent} from './analysis-core.mjs';
 import {evaluateCandidates} from './evaluation-core.mjs';
+import {assessmentDraft,draftEvidenceIds} from './assessment-draft.mjs';
 export {analysisIsCurrent} from './analysis-core.mjs';
 export {proposalIsCurrent} from './proposal-core.mjs';
 export const FORMAT='ruthless-threat-workspace';
-export const WORKSPACE_VERSION=6;
+export const WORKSPACE_VERSION=7;
 export const MAX_BYTES=2_000_000;
 export const SCOPES=['Domestic','Cross-border','International'];
 export const STATES=['Draft','Needs review','Reviewed'];
@@ -21,12 +22,18 @@ const id=v=>{if(typeof v!=='string'||!/^[a-zA-Z0-9_-]{1,60}$/.test(v))fail('Inva
 export function day(v){if(typeof v!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(v)||!Number.isFinite(Date.parse(v))||new Date(v).toISOString().slice(0,10)!==v)fail('Use a real date in YYYY-MM-DD format.');return v;}
 export function sourceURL(v){const s=str(v,'Source URL',2000,false);if(!s)return '';let u;try{u=new URL(s);}catch{fail('Source URL must be a valid HTTPS URL.');}if(u.protocol!=='https:'||u.username||u.password)fail('Source URL must use HTTPS without embedded credentials.');return u.href;}
 export function serializeWorkspace(v){const raw=JSON.stringify(v);if(new TextEncoder().encode(raw).length>MAX_BYTES)fail('Workspace exceeds the 2 MB save/open limit. Current work is unchanged.');return raw;}
+function judgmentOriginRecord(v){
+  if(v===null||v===undefined)return null;
+  if(!object(v)||Object.keys(v).sort().join(',')!=='analysisRunId,preparedAt,proposalId,sourceEvidenceIds'||!Array.isArray(v.sourceEvidenceIds)||!v.sourceEvidenceIds.length||v.sourceEvidenceIds.length>4)fail('Invalid judgment starting-point lineage.');
+  const sourceEvidenceIds=v.sourceEvidenceIds.map(id);if(new Set(sourceEvidenceIds).size!==sourceEvidenceIds.length)fail('Duplicate judgment starting-point evidence.');
+  return {analysisRunId:id(v.analysisRunId),proposalId:id(v.proposalId),preparedAt:day(v.preparedAt),sourceEvidenceIds};
+}
 function caseRecord(v){
   if(!object(v))fail('Invalid assessment record.');
   if(!Array.isArray(v.citedEvidence)||v.citedEvidence.length>1000)fail('Invalid evidence citations.');
   const citedEvidence=v.citedEvidence.map(id);if(new Set(citedEvidence).size!==citedEvidence.length)fail('Duplicate evidence citations.');
   const revisionIDs=v.reviewedRevisionIds??[];if(!Array.isArray(revisionIDs)||revisionIDs.length>200)fail('Invalid reviewed revision identifiers.');const reviewedRevisionIds=revisionIDs.map(id);if(new Set(reviewedRevisionIds).size!==reviewedRevisionIds.length)fail('Duplicate reviewed revision identifiers.');
-  return {id:id(v.id),title:str(v.title,'Title',180),area:str(v.area,'Area',150),scope:choice(v.scope,SCOPES,'scope'),asOf:day(v.asOf),question:str(v.question,'Intelligence question',1500),judgment:str(v.judgment,'Assessment',4000,false),gaps:str(v.gaps,'Information gaps',2000,false),confidence:choice(v.confidence,CONFIDENCE,'confidence'),priority:choice(v.priority,PRIORITIES,'review priority'),status:choice(v.status,STATES,'review status'),reviewNote:str(v.reviewNote,'Review note',2000,false),citedEvidence,reviewedRevisionIds};
+  return {id:id(v.id),title:str(v.title,'Title',180),area:str(v.area,'Area',150),scope:choice(v.scope,SCOPES,'scope'),asOf:day(v.asOf),question:str(v.question,'Intelligence question',1500),judgment:str(v.judgment,'Assessment',4000,false),gaps:str(v.gaps,'Information gaps',2000,false),confidence:choice(v.confidence,CONFIDENCE,'confidence'),priority:choice(v.priority,PRIORITIES,'review priority'),status:choice(v.status,STATES,'review status'),reviewNote:str(v.reviewNote,'Review note',2000,false),citedEvidence,reviewedRevisionIds,judgmentOrigin:judgmentOriginRecord(v.judgmentOrigin)};
 }
 function evidenceRecord(v){
   if(!object(v)||typeof v.synthetic!=='boolean')fail('Invalid evidence record.');
@@ -70,11 +77,11 @@ function assertReview(c,evidence){
   if(evidence.some(e=>c.citedEvidence.includes(e.id)&&e.reportedAt>c.asOf))fail('Reviewed assessments cannot cite reports later than their as-of date.');
 }
 export function validateWorkspace(v){
-  if(!object(v)||v.format!==FORMAT||![1,2,3,4,5,WORKSPACE_VERSION].includes(v.version))fail('Unsupported threat workspace format.');
+  if(!object(v)||v.format!==FORMAT||![1,2,3,4,5,6,WORKSPACE_VERSION].includes(v.version))fail('Unsupported threat workspace format.');
   if(!Array.isArray(v.assessments)||!v.assessments.length||v.assessments.length>100||!Array.isArray(v.evidence)||v.evidence.length>1000||!Array.isArray(v.history)||v.history.length>2000)fail('Workspace limits: 1–100 assessments, 1,000 evidence records, 2,000 history entries.');
   if(v.version>=2&&(!Array.isArray(v.documents)||v.documents.length>200))fail('Workspace limit: 200 source documents.');
   if(v.version>=3&&(!Array.isArray(v.tasks)||v.tasks.length>500))fail('Workspace limit: 500 research tasks.');
-  const normalizeCase=c=>caseRecord({...c,...(v.version<5?{reviewedRevisionIds:[]}:{})});
+  const normalizeCase=c=>caseRecord({...c,...(v.version<5?{reviewedRevisionIds:[]}:{}),...(v.version<7?{judgmentOrigin:null}:{})});
   const assessments=v.assessments.map(normalizeCase),evidence=v.evidence.map(e=>evidenceRecord({...e,...(v.version===1?{sourceDocumentId:''}:{}),...(v.version<4?{proposalRunId:'',proposalId:''}:{})})),documents=v.version===1?[]:v.documents.map(d=>documentRecord({...d,...(v.version<5?{supersedesDocumentId:'',revisionNote:'',importBatchId:'',externalRecordId:''}:{})}));unique(assessments);unique(evidence);unique(documents);
   const tasks=v.version>=3?v.tasks.map(taskRecord):[];unique(tasks);
   const proposalRuns=v.version>=4?validateProposalRuns(v.proposalRuns,normalizeCase,documentRecord):[];
@@ -118,6 +125,12 @@ export function validateWorkspace(v){
   for(const e of evidence)if(e.proposalRunId||e.proposalId){const link=proposalLinks.get(`${e.proposalRunId}:${e.proposalId}`);if(!link||link.p.status!=='Accepted'||link.p.evidenceId!==e.id)fail('Evidence proposal lineage is inconsistent.');}
   const history=v.history.map(h=>{if(!object(h)||!caseIDs.has(h.assessmentId))fail('Invalid history reference.');return {assessmentId:id(h.assessmentId),at:day(h.at),action:str(h.action,'History action',150),note:str(h.note,'History note',2000,false)};});
   const analysisRuns=v.version>=6?validateAnalysisRuns(v.analysisRuns,{assessments,documents},{caseRecord,documentRecord,day}):[];
+  for(const c of assessments)if(c.judgmentOrigin){
+    const origin=c.judgmentOrigin,run=analysisRuns.find(r=>r.id===origin.analysisRunId),proposal=run?.output.proposals.find(p=>p.id===origin.proposalId);
+    if(!run||!proposal||run.assessmentId!==c.id||c.question!==run.snapshot.assessment.question||run.status!=='Considered'||origin.preparedAt<run.reviewedAt)fail('Judgment starting point must reference a considered draft in this assessment.');
+    const sourceEvidenceIds=draftEvidenceIds({evidence},run,proposal);
+    if(sourceEvidenceIds.length!==origin.sourceEvidenceIds.length||sourceEvidenceIds.some(e=>!origin.sourceEvidenceIds.includes(e)||!c.citedEvidence.includes(e)))fail('Judgment starting-point citations must retain every cited source binding.');
+  }
   const result={format:FORMAT,version:WORKSPACE_VERSION,assessments,evidence,documents,tasks,proposalRuns,importBatches,analysisRuns,history};serializeWorkspace(result);return result;
 }
 export function createAnalysisCase(workspace,{scenarioId,assessmentId,documentIds,scope,area},at){
@@ -148,11 +161,15 @@ export function considerAnalysis(workspace,runId,{status,reviewNote},at){
   const note=str(reviewNote,'Analysis review note',2000);
   return validateWorkspace({...workspace,analysisRuns:workspace.analysisRuns.map(r=>r.id===runId?{...r,status,reviewNote:note,reviewedAt:at}:r),history:[...workspace.history,{assessmentId:run.assessmentId,at,action:'Analytical draft considered',note:`${runId}: ${status}; ${note}`} ]});
 }
+export function prepareAssessmentFromAnalysis(workspace,runId,proposalId,at){day(at);return assessmentDraft(validateWorkspace(workspace),runId,proposalId,at);}
 export function parseWorkspace(raw){if(typeof raw!=='string'||new TextEncoder().encode(raw).length>MAX_BYTES)fail('Workspace must be no larger than 2 MB in UTF-8.');let v;try{v=JSON.parse(raw);}catch{fail('Workspace is not valid JSON.');}return validateWorkspace(v);}
 export function evidenceSummary(workspace,assessmentId){const rows=workspace.evidence.filter(e=>e.assessmentId===assessmentId),superseded=e=>e.sourceDocumentId&&!documentIsCurrent(workspace,e.sourceDocumentId);return {records:rows.length,supersededRecords:rows.filter(superseded).length,sourceGroups:new Set(rows.filter(e=>e.relation==='Supports'&&!superseded(e)).map(e=>e.originGroup.toLowerCase())).size,challenging:rows.filter(e=>e.relation==='Challenges').length,unverified:rows.filter(e=>e.claimState==='Unverified').length,timeline:[...rows].sort((a,b)=>a.reportedAt.localeCompare(b.reportedAt)||a.id.localeCompare(b.id))};}
 export function updateAssessment(workspace,assessmentId,changes,at){
   day(at);const original=workspace.assessments.find(c=>c.id===assessmentId);if(!original)fail('Assessment no longer exists.');
-  let next=caseRecord({...original,...changes,id:original.id});
+  const contentChanged=['judgment','gaps'].some(k=>Object.hasOwn(changes,k)&&changes[k]?.trim()!==original[k])||(Object.hasOwn(changes,'citedEvidence')&&JSON.stringify([...changes.citedEvidence].sort())!==JSON.stringify([...original.citedEvidence].sort()));
+  const origin=Object.hasOwn(changes,'judgmentOrigin')?judgmentOriginRecord(changes.judgmentOrigin):contentChanged?null:original.judgmentOrigin;
+  if(origin&&Object.hasOwn(changes,'judgmentOrigin')){const run=workspace.analysisRuns.find(r=>r.id===origin.analysisRunId);if(!run||!analysisIsCurrent(workspace,run))fail('The judgment starting point became stale before application. Prepare a current draft again.');if(origin.preparedAt>at)fail('Judgment application cannot precede preparation.');}
+  let next=caseRecord({...original,...changes,judgmentOrigin:origin,id:original.id});
   const revisions=requiredRevisionIds(workspace,next);if(next.status==='Reviewed'){if(revisions.length&&changes.revisionsAcknowledged!==true)fail('Acknowledge revisions to cited sources before marking Reviewed.');next={...next,reviewedRevisionIds:revisions};}
   const previousEvidence=workspace.evidence.filter(e=>e.assessmentId===assessmentId);
   if(next.status==='Reviewed'&&previousEvidence.some(e=>e.relation==='Challenges')&&!changes.challengesAcknowledged)fail('Acknowledge that conflicting evidence was considered before marking Reviewed.');
@@ -225,6 +242,7 @@ export function exportAssessment(workspace,assessmentId){
   const c=workspace.assessments.find(c=>c.id===assessmentId);if(!c)fail('Unknown assessment.');const s=evidenceSummary(workspace,c.id);const clean=v=>String(v).replace(/[\r\n]+/g,' ').replace(/[\\`*_{}\[\]<>#]/g,'');
   const quote=v=>String(v).replace(/[\\`*_{}\[\]#]/g,'\\$&').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\r?\n/g,'\n> ');
   const lines=['# Ruthless — analyst assessment',`Title: ${clean(c.title)}`,`Area: ${clean(c.area)} | Scope: ${c.scope} | As of: ${c.asOf}`,`Status: ${c.status} | Confidence: ${c.confidence} (analyst assigned) | Priority: ${c.priority}`,`Synthetic records: ${s.timeline.filter(e=>e.synthetic).length}/${s.records}`,'','Prototype analyst workspace. This report is not an attack forecast, designation, determination of guilt, or instruction for operational action. Source labels and review status are analyst-supplied; external files and history are editable. Reviewed does not mean independent agency approval.','',`Question: ${clean(c.question)}`,`Judgment: ${clean(c.judgment)||'Not recorded'}`,`Information gaps: ${clean(c.gaps)||'Not recorded'}`,`Review note: ${clean(c.reviewNote)||'Not recorded'}`,`Cited evidence IDs: ${c.citedEvidence.join(', ')||'None'}`,'','## Evidence timeline',`${s.sourceGroups} analyst-assigned supporting source groups. This count does not establish independence or truth.`,''];
+  if(c.judgmentOrigin)lines.push('## Judgment starting-point lineage',`Draft: ${c.judgmentOrigin.analysisRunId} / ${c.judgmentOrigin.proposalId} | Prepared ${c.judgmentOrigin.preparedAt}`,`Source-linked evidence: ${c.judgmentOrigin.sourceEvidenceIds.join(', ')}`,'This records the considered draft used to start the analyst form. The applied judgment may include analyst edits; this is not an independent semantic grade or agency approval.','');
   for(const e of s.timeline){lines.push(`### ${e.id} — ${clean(e.title)}`,`${e.reportedAt} | ${e.synthetic?'SYNTHETIC':'Analyst-entered public reference'} | ${e.claimState} | ${e.relation}`,`Publisher: ${clean(e.publisher)} | Underlying source group: ${clean(e.originGroup)}`,`Statement: ${clean(e.statement)}`,`Source URL (unverified by application): ${e.url||'Synthetic training record; no publisher claim'}`);
     if(e.sourceDocumentId&&!documentIsCurrent(workspace,e.sourceDocumentId))lines.push('SOURCE SUPERSEDED: earlier evidence retained as history; inspect source revisions before relying on this statement.');
     if(e.proposalRunId)lines.push(`Proposal lineage: ${e.proposalRunId} / ${e.proposalId} — local synthetic fixture, no AI called; analyst accepted`);
