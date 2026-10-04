@@ -16,3 +16,5 @@
 
 #workspace-json-text{width:100%;font-family:ui-monospace,monospace;font-size:.875rem}
 dialog .checkline[hidden]{display:none}
+
+.backend-panel{margin-top:20px}.backend-panel .actions{margin-top:14px}.backend-panel select{max-width:100%;margin:8px 0}#backend-status{overflow-wrap:anywhere}#backend-preview-json,#backend-credential{width:100%}#backend-preview-context{overflow-wrap:anywhere}

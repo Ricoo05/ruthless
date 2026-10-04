@@ -34,7 +34,7 @@ Checked 4 October 2026: the [NIA copyright policy](https://nia.gov.in/copyright-
 
 ## Backend foundation review
 
-The first local repository/API slice now enforces configured identity, tenant, workspace and action permissions. It stores encrypted SQLite versions with revision-conflict protection and atomic server save receipts. A local HTTP demo proves save and exact recovery after reopening. The design selects dedicated per-organization resources and keeps browser review claims unverified. Real SSO, browser transport, authoritative review commands, complete security logging and external rollback protection are subsequent work. See `BACKEND.md`. The static Site remains v0.13.
+The first local repository/API slice now enforces configured identity, tenant, workspace and action permissions. It stores encrypted SQLite versions with revision-conflict protection and atomic server save receipts. A local HTTP demo proves save and exact recovery after reopening. The design selects dedicated per-organization resources and keeps browser review claims unverified. v0.14 connects the same-origin local browser with explicit loading/creation, revision-bound saves and edit-preserving conflict handling. Real SSO, authoritative review commands, complete security logging and external rollback protection are subsequent work. See `BACKEND.md`. The hosted Site remains static; no cloud backend is deployed.
 
 ## Development models
 

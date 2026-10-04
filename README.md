@@ -1,4 +1,4 @@
-# Project Ruthless — Intelligence Workbench v0.13
+# Project Ruthless — Intelligence Workbench v0.14
 
 Ruthless is being developed as terrorism intelligence analysis software for government and government-agency customers, covering domestic, cross-border and international developments relevant to India, with broader geographic support. The intended platform spans threat analysis, intelligence gathering, data integration, operations workflows and AI orchestration. The current release connects case questions, selected fictional reports and cited AI drafts with manual evidence analysis, document intake, research tasks and synthetic semantic review. Prevention effectiveness and customer demand have not been validated.
 
@@ -65,7 +65,7 @@ The review handoff preview recomputes missing, invalid, failed, unassessed and r
 
 ## Data and limits
 
-All evidence in the bundled demonstration is fictional and labeled synthetic. NIA, MHA and UN pages are linked as references; no claim of live ingestion is made. The Case analysis view can request one explicitly approved call through a configured local runner using only bundled fictional inputs. The separate synthetic-only AI console and CLI can call an explicitly configured local provider; default and hosted static modes make no calls. There are no customer-data uploads, analytics, browser persistence, automated operations or protected audit records. Files and history are editable and unencrypted. Use synthetic or approved non-sensitive material for evaluation.
+All evidence in the bundled demonstration is fictional and labeled synthetic. NIA, MHA and UN pages are linked as references; no claim of live ingestion is made. The Case analysis view can request one explicitly approved call through a configured local runner using only bundled fictional inputs. The separate synthetic-only AI console and CLI can call an explicitly configured local provider; default and hosted static modes make no calls. There are no customer-data uploads, analytics, browser persistence or automated operations. Exported JSON and client history remain editable and unencrypted. The optional configured local backend encrypts payloads and records server save receipts with the limitations described below. Use synthetic or approved non-sensitive material for evaluation.
 
 Threat workspace limits: 100 assessments, 200 retained source excerpts, 500 research tasks, 1,000 evidence records, 40 proposal runs, 40 case-linked analytical drafts (8 proposals/run, 4 citations/proposal), 2,000 history entries and 2 MB in UTF-8. Limits are checked before mutations. The original cyber module retains its separate project format and 12 MB limit. The two document formats are not interchangeable. Threat workspace format version 7 adds judgment starting-point lineage to the version 6 case-linked analytical drafts to sources, tasks, proposal runs, linked corrections and up to 40 import batches (50 rows per batch). Versions 1–5 migrate with an empty analysis inbox; versions 1–4 migrate without invented revision/import metadata; v4 proposal history is retained. Versions 1–3 migrate with empty proposal queues; versions 1–2 also have no tasks, and version 1 has no retained documents. Versions 1–6 restore without invented judgment lineage. Older releases cannot read version 7.
 
@@ -74,17 +74,16 @@ Browser export receipt and file-import round trips remain unverified in v0.9. Th
 ## Checks
 
 ```powershell
-node --test tests/core.test.mjs tests/threat.test.mjs tests/intake.test.mjs tests/tasks.test.mjs tests/proposals.test.mjs tests/evaluation.test.mjs tests/revisions.test.mjs tests/imports.test.mjs tests/ai-runner.test.mjs tests/ai-service.test.mjs tests/semantic-review.test.mjs tests/review-report.test.mjs tests/analysis.test.mjs
-node --check dist/threat-app.mjs
-node --check dist/threat-core.mjs
-node --check dist/proposal-core.mjs
+npm test
+npm run check
+npm run backend:demo
 ```
 
-163 tests pass across both modules, including all CLI tests. See `docs/VERIFICATION.md` for browser evidence and remaining limits. `docs/THREAT-ANALYSIS-DIRECTION.md` is the current product direction and supersedes the earlier cyber-first commercial hypothesis.
+173 tests pass across both modules, including all CLI tests. See `docs/VERIFICATION.md` for browser evidence and remaining limits. `docs/THREAT-ANALYSIS-DIRECTION.md` is the current product direction and supersedes the earlier cyber-first commercial hypothesis.
 
 ## Release record
 
-The same owner-private Site is retained. v0.13 connects considered cited drafts to manually applied analyst judgments and adds validated pasted workspace recovery, while retaining case analysis and semantic-review handoff reports. Publication is confirmed only when the Sites deployment status is succeeded for the exact pushed commit. Public sharing has not been requested.
+The same owner-private Site is retained. v0.14 adds explicit browser connection to a same-origin local backend, validated loading/creation, confirmed revision saves and conflict recovery. It retains the earlier AI draft, judgment and manual JSON workflows. Publication is confirmed only when the Sites deployment status is succeeded for the exact pushed commit. Public sharing has not been requested.
 
 Current broader company scope and delivery gates are in `docs/PLATFORM-DIRECTION.md`. The practitioner interview/pilot draft is in `docs/PILOT-DISCOVERY.md`. Local research tasks and synthetic fixture proposals are implemented; authenticated collaboration and customer data connectors remain planned; the bounded synthetic API runner has completed fictional model calls; independent semantic review remains outstanding. The first AI proposal/validation design is in `docs/AI-ORCHESTRATION-CONTRACT.md`.
 
@@ -93,4 +92,4 @@ Current broader company scope and delivery gates are in `docs/PLATFORM-DIRECTION
 
 The separate backend now implements server-controlled local credentials and workspace permissions, encrypted SQLite versions, mandatory revision preconditions, and atomic server save receipts. Run `node scripts/backend-demo.mjs` to exercise unauthenticated denial, a successful save, stale-write rejection and exact recovery after the database/server reopens. The demonstration uses fictional data and temporary in-memory credentials; it makes no paid calls and retains no user work.
 
-The browser Site remains v0.13 and is not yet connected to this backend. The local credential adapter does not authenticate real organizational identities. Imported Reviewed labels remain client assertions; the audit chain cannot detect complete database rollback without an external anchor. See `docs/BACKEND.md` for the executable server configuration, implemented boundaries and next integration slice.
+The v0.14 browser can connect when served by the configured loopback backend (`npm run backend:start`). It keeps the local credential only in memory, validates a stored version before explicit loading, and saves against that confirmed revision. Conflict or unconfirmed outcomes block another save without losing local edits. Workspace selection and manual restoration detach the old server binding. Reader access cannot save. The hosted Site remains static: no cloud backend is deployed, and connection is unavailable there. The local credential adapter does not authenticate real organizational identities. Imported Reviewed labels remain client assertions; the audit chain cannot detect complete database rollback without an external anchor. See `docs/BACKEND.md` for the executable server configuration, implemented boundaries and next integration slice.

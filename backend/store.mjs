@@ -71,6 +71,7 @@ export function openWorkspaceStore({file,tenantId,key,now=()=>Date.now()}) {
   }
   return Object.freeze({
     tenantId,
+    storageMode:file===':memory:'?'temporary_test_database':'encrypted_local_database',
     checkAccess(principal,workspaceId,action) { authorize(principal,tenantId,workspaceId,action,now()); },
     read(principal,workspaceId) {
       authorize(principal,tenantId,workspaceId,'read',now());

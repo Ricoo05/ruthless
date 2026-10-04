@@ -2,7 +2,7 @@ import http from 'node:http';
 import {BackendError,reject} from './auth.mjs';
 import {MAX_BYTES} from '../dist/threat-core.mjs';
 
-export function createBackendServer({store,authenticate}) {
+export function createBackendServer({store,authenticate,serveAssets=null}) {
   if(!store||typeof authenticate!=='function') throw new Error('Backend authentication is required.');
   const server=http.createServer(async(req,res)=>{
     const send=(status,body,headers={})=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff',...headers});res.end(JSON.stringify(body));};
@@ -10,8 +10,13 @@ export function createBackendServer({store,authenticate}) {
       const origin=`http://127.0.0.1:${server.address().port}`;
       if(req.socket.localAddress!=='127.0.0.1'||req.socket.remoteAddress!=='127.0.0.1'||req.headers.host!==new URL(origin).host||(req.headers.origin&&req.headers.origin!==origin)||
         (req.headers['sec-fetch-site']&&req.headers['sec-fetch-site']!=='same-origin'&&req.headers['sec-fetch-site']!=='none')) reject(403,'origin_rejected');
+      if(!req.url.startsWith('/api/')) {if(serveAssets&&await serveAssets(req,res))return;reject(404,'route_not_found');}
       if(req.headersDistinct.authorization?.length!==1) reject(401,'unauthenticated');
       let principal=authenticate(req.headers.authorization);
+      if(req.url==='/api/session'&&req.method==='GET') {
+        if(principal.tenantId!==store.tenantId)reject(403,'forbidden');
+        return send(200,{subject:principal.subject,tenantId:principal.tenantId,role:principal.role,workspaceIds:[...principal.workspaceIds],expiresAt:principal.expiresAt,mode:'local_credential_adapter',storageMode:store.storageMode});
+      }
       const route=/^\/api\/workspaces\/([a-zA-Z0-9_-]{1,60})(\/audit)?$/.exec(req.url);
       if(!route) reject(404,'route_not_found');
       const [,id,audit]=route;

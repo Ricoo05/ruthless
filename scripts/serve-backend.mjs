@@ -3,9 +3,11 @@ import {fileURLToPath} from 'node:url';
 import {localTokenAuthenticator} from '../backend/auth.mjs';
 import {openWorkspaceStore} from '../backend/store.mjs';
 import {createBackendServer} from '../backend/http.mjs';
+import {serveFrontend} from '../backend/static.mjs';
 
 // Explicit local-only integration server. It does not use OPENAI_API_KEY, serve
-// frontend assets, register real users, or enable provider requests.
+// register real users or enable provider requests. It serves the existing UI
+// from the same origin; there is no proxy, cross-origin grant or cookie session.
 let store,server;
 try {
   if(process.argv.length!==2) throw new Error('No command-line credentials or options accepted.');
@@ -21,9 +23,9 @@ try {
   const key=Buffer.from(keyHex,'hex');
   try {store=openWorkspaceStore({file:fileURLToPath(new URL('../.backend-runtime/workspaces.sqlite',import.meta.url)),tenantId,key});}
   finally {key.fill(0);}
-  server=createBackendServer({store,authenticate});
+  server=createBackendServer({store,authenticate,serveAssets:serveFrontend});
   await new Promise((resolve,reject)=>{server.once('error',reject);server.listen(port,'127.0.0.1',resolve);});
-  console.log(`Synthetic backend: http://127.0.0.1:${port} · local credential adapter · no frontend connection`);
+  console.log(`Synthetic workspace: http://127.0.0.1:${port} · local credential adapter`);
   let stopping=false;
   const stop=()=>{if(stopping)return;stopping=true;server.closeAllConnections();server.close(()=>{store.close();process.exitCode=0;});};
   process.once('SIGINT',stop);process.once('SIGTERM',stop);
