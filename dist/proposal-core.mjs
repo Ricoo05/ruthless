@@ -8,6 +8,15 @@ const caseKeys=['id','title','area','scope','asOf','question','judgment','gaps',
 const documentKeys=['id','assessmentId','title','publisher','originGroup','url','reportedAt','recordedAt','language','locator','accessNote','excerpt','synthetic'];
 export function proposalSnapshot(assessment,document){return {assessment:structuredClone(assessment),document:Object.fromEntries(documentKeys.map(k=>[k,document[k]]))};}
 const splitSurrogate=(s,i)=>i>0&&i<s.length&&s.charCodeAt(i-1)>=0xD800&&s.charCodeAt(i-1)<=0xDBFF&&s.charCodeAt(i)>=0xDC00&&s.charCodeAt(i)<=0xDFFF;
+export function validateSourceCitations(input,documents){
+  if(!Array.isArray(input)||!input.length||input.length>4)fail('Each proposal requires 1–4 exact source citations.');
+  const seen=new Set();return input.map(c=>{
+    keys(c,['documentId','start','end','quote'],'citation');const d=documents.find(d=>d.id===c.documentId);if(!d)fail('Citation refers to an unselected document.');
+    const source=d.excerpt;if(!Number.isInteger(c.start)||!Number.isInteger(c.end)||c.start<0||c.end<=c.start||c.end>source.length||splitSurrogate(source,c.start)||splitSurrogate(source,c.end))fail('Citation offsets must be valid UTF-16 boundaries.');
+    const quote=text(c.quote,'source quote',4000);if(source.slice(c.start,c.end)!==quote)fail('Citation quote does not match the retained source span.');
+    const key=`${c.documentId}:${c.start}:${c.end}`;if(seen.has(key))fail('Duplicate source citation.');seen.add(key);return {documentId:c.documentId,start:c.start,end:c.end,quote};
+  });
+}
 export function proposalIsCurrent(workspace,run){
   const c=workspace.assessments.find(c=>c.id===run.assessmentId),d=workspace.documents.find(d=>d.id===run.snapshot.document.id);
   return !!c&&!!d&&JSON.stringify(proposalSnapshot(c,d))===JSON.stringify(run.snapshot);
@@ -29,13 +38,7 @@ export function validateProposalRuns(input,normalizeAssessment,normalizeDocument
       keys(p,['id','assessmentId','draftStatement','limitations','citations','status','reviewNote','reviewedAt','evidenceId'],'proposal');
       const pid=identifier(p.id);if(proposalIDs.has(pid))fail('Duplicate proposal identifier.');proposalIDs.add(pid);
       if(p.assessmentId!==assessmentId)fail('Proposal assessment does not match the run.');
-      if(!Array.isArray(p.citations)||!p.citations.length||p.citations.length>4)fail('Each proposal requires 1–4 exact source citations.');
-      const seen=new Set(),citations=p.citations.map(c=>{
-        keys(c,['documentId','start','end','quote'],'citation');if(c.documentId!==snapshot.document.id)fail('Citation refers to an unselected document.');
-        const source=snapshot.document.excerpt;if(!Number.isInteger(c.start)||!Number.isInteger(c.end)||c.start<0||c.end<=c.start||c.end>source.length||splitSurrogate(source,c.start)||splitSurrogate(source,c.end))fail('Citation offsets must be valid UTF-16 boundaries.');
-        const quote=text(c.quote,'source quote',4000);if(source.slice(c.start,c.end)!==quote)fail('Citation quote does not match the retained source span.');
-        const key=`${c.start}:${c.end}`;if(seen.has(key))fail('Duplicate source citation.');seen.add(key);return {documentId:c.documentId,start:c.start,end:c.end,quote};
-      });
+      const citations=validateSourceCitations(p.citations,[snapshot.document]);
       if(!['Proposed','Accepted','Rejected'].includes(p.status))fail('Invalid proposal review state.');
       const reviewNote=text(p.reviewNote,'proposal review note',2000,true),reviewedAt=text(p.reviewedAt,'proposal review date',10,true),evidenceId=p.evidenceId?identifier(p.evidenceId):'';
       if(p.status==='Proposed'&&(reviewNote||reviewedAt||evidenceId))fail('Unreviewed proposals cannot claim review or evidence.');

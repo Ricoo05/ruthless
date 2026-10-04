@@ -5,3 +5,5 @@
 @media(max-width:650px){.rail nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}.rail .nav,.rail .nav-link{min-width:0;width:100%;font-size:.8125rem;padding:10px 6px;text-align:center;overflow-wrap:anywhere}.intake-record{overflow-wrap:anywhere}}
 .task-overdue-filter{display:flex;align-items:center;gap:8px;font-size:.875rem;color:var(--muted)}.task-overdue-filter input{width:auto}.tag.overdue{color:var(--orange);border-color:#66513c}#task-new-form input,#task-new-form textarea,#task-new-form select,#task-update-form input:not([type="checkbox"]),#task-update-form textarea,#task-update-form select{width:100%}#task-update-form fieldset{border:1px solid var(--line);padding:12px;margin-top:16px}#task-context{overflow-wrap:anywhere}
 .proposal-statement{white-space:pre-wrap;overflow-wrap:anywhere}#fixture-document,#proposal-review-note,#proposal-review-form select{width:100%}#proposal-review-details{line-height:1.6;overflow-wrap:anywhere}button:disabled{opacity:.5;cursor:not-allowed}
+
+#evaluation-split,#evaluation-control,#evaluation-report-text{width:100%}#evaluation-report-text{font-family:ui-monospace,monospace;font-size:.875rem}

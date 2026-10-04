@@ -14,7 +14,7 @@ These capabilities share an evidence model and permission boundaries. They shoul
 
 ## Delivery sequence and acceptance gates
 
-**Delivered through v0.6:** synthetic assessment desk, manual source intake, immutable source metadata during incorporation, source-linked briefs, review reopening, bounded workspace validation, research follow-up tasks and a synthetic proposal-review queue. Imported files, local history and analyst rights acknowledgements remain untrusted.
+**Delivered through v0.7:** synthetic assessment desk, manual source intake, immutable source metadata during incorporation, source-linked briefs, review reopening, bounded workspace validation, research follow-up tasks, a synthetic proposal-review queue and an evaluation lab with an offline checker. Imported files, local history and analyst rights acknowledgements remain untrusted.
 
 **Recovery gate before sustained use:** verify actual file receipt and restore in an approved browser, then choose explicit local persistence or customer-controlled storage with a tested recovery workflow. The current in-app browser download event timed out; do not interpret a download request as durable storage. Do not bypass the previous browser file-upload denial.
 
@@ -22,7 +22,7 @@ These capabilities share an evidence model and permission boundaries. They shoul
 
 **Operations validation gate:** test the implemented research-task queue with a practitioner before expanding coordination. Next, scope authenticated assignment, handoff and protected review history to actual customer requirements. Labels in a local file cannot establish the identity of an approver.
 
-**AI design gate:** the first proposal and validation contract is recorded in `AI-ORCHESTRATION-CONTRACT.md`. Define the accepted task, permitted dataset and provider/deployment before wiring any API key. Structural source-span validation and local recorded human acceptance are implemented with synthetic fixtures. Next, define a held-out semantic evaluation set, abstention and uncertainty criteria, and source-instruction cases before selecting a live provider. Agree a measurable quality threshold with the pilot owner. No percentage improvement or prediction effectiveness is assumed.
+**AI design gate:** the first proposal and validation contract is recorded in `AI-ORCHESTRATION-CONTRACT.md`. Define the accepted task, permitted dataset and provider/deployment before wiring any API key. Structural source-span validation and local recorded human acceptance are implemented with synthetic fixtures. v0.7 adds 12 authored scenarios, provisional review criteria and fingerprint-bound manual annotations; the reserved split is visible, not independently blinded. Obtain fresh unseen cases and independent reviewer findings before selecting a live provider. See `EVALUATION.md`. Agree a measurable quality threshold with the pilot owner. No percentage improvement or prediction effectiveness is assumed.
 
 **Production gate:** customer-scoped deployment architecture, authenticated roles, least privilege, encrypted storage, protected history, retention, reliable backup/restore, tenant isolation where relevant and independent security evaluation. A private hosted prototype does not establish these properties.
 

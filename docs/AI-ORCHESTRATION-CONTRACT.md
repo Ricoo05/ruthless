@@ -1,6 +1,6 @@
 # First AI assistance contract — fixture implementation and provider design
 
-Updated 4 October 2026. v0.6 implements the local synthetic fixture, structural validator and human proposal-review queue described below. It makes no model calls, stores no provider keys and runs no background agent. Live provider integration and semantic evaluation remain design work.
+Updated 4 October 2026. v0.6/v0.7 implement the local synthetic fixture, structural validator and human proposal-review queue described below. It makes no model calls, stores no provider keys and runs no background agent. v0.7 adds a synthetic evaluation lab and offline candidate checker with manual rubric annotations. Live provider integration and independent model-quality measurement remain future work.
 
 ## Implemented fixture boundary
 
@@ -42,8 +42,8 @@ For a future live provider, record provider, model, prompt version, submitted so
 
 ## Evaluation fixtures and release gate
 
-Start with distinct synthetic fixtures for an attributed allegation, a denial, a repost sharing its underlying source, contradictory accounts, no supported answer, source-embedded instructions, Hindi text, mixed scripts and an astral Unicode character. Include invalid citations, oversized output, fabricated identifiers and stale results.
+The suite in `EVALUATION.md` now supplies distinct synthetic fixtures for an attributed allegation, a denial, a repost sharing its underlying source, contradictory accounts, no supported answer, source-embedded instructions, Hindi text, mixed scripts and an astral Unicode character. Include invalid citations, oversized output, fabricated identifiers and stale results.
 
-Test deterministic structural rejection separately from semantic fidelity. Have a reviewer judge attribution, uncertainty, translation and unsupported inference on a held-out set. Define task-specific quality criteria before testing; no numeric accuracy or improvement claim has been established. Keep examples and failures, not only aggregate scores.
+Test deterministic structural rejection separately from semantic fidelity. The six reserved cases are visible with authored controls and are not an independently blinded holdout. Have independent reviewers judge attribution, uncertainty, translation and unsupported inference on a fresh unseen set. Define task-specific quality criteria before testing; no numeric accuracy or improvement claim has been established. Keep examples and failures, not only aggregate scores.
 
 Sol 6.1 High remains suitable for the validator, fixtures and proposal-review implementation. A concrete production/provider trust-boundary review is a later Astra High handoff. No paid provider integration or broader agent permissions should be introduced merely to demonstrate orchestration.
