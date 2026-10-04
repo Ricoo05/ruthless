@@ -1,0 +1,29 @@
+# Forecasting research baseline — v0.18
+
+## Implemented experiment
+
+`dist/forecast-core.mjs` implements binary logistic regression with training-only feature standardization, gradient descent and L2 regularization. Four experimental features describe authored warning groups, reposts, contradicting groups and coverage. A deterministic generator creates 240 fictional weekly records and noisy outcomes known seven days later. These relationships are authored assumptions, not established predictors of terrorism.
+
+The first 160 records train the model. One intervening record is excluded. All training outcomes are available by 2024-01-26, before the first test forecast on 2024-02-02. The 79 later rows are never used for fitting or scaling. Fixed settings are 600 epochs, step size 0.08, L2 coefficient 0.02, review threshold 0.35 and coverage gate 0.40. They are toy defaults, without tuning or operational meaning. Inputs are bounded and restricted to fictional regions; real-source workspace documents are not inputs.
+
+Low coverage produces an abstention with a null probability. The default run scores 63 rows and abstains on 16, including two later positive outcomes. On scored rows it finds three positives, raises three false alarms and misses seven positives: precision 50%, recall 30%. Its Brier score is about 0.121 versus 0.134 for the training-prevalence baseline over identical scored rows. Log loss is about 0.406 versus 0.438. These are results on the authored generator, not evidence of real detection effectiveness. The reliability bins are sparse and do not establish calibration. Abstentions are reported separately rather than counted as successful negatives.
+
+The interface runs explicitly on button press, computes locally, makes no API request and changes no analyst evidence or response workflow. Test-label changes cannot change fitted parameters or forecast probabilities. The fixture and later outcomes are visible in source, so this is neither independent nor blinded evaluation.
+
+## Research decisions and implementation status
+
+Palantir's public [Ontology documentation](https://www.palantir.com/docs/foundry/ontology/overview/) describes linked objects, properties, datasets and models alongside governed actions. Its [model integration documentation](https://www.palantir.com/docs/foundry/model-integration/overview/) describes model lifecycle integration. Our engineering interpretation is to connect versioned reports, events, cases and model runs through retained provenance. Those documents do not reveal a proprietary attack-prediction algorithm or validate Ruthless.
+
+- **Deduplication now:** capture hashes, stable IDs and explicitly recorded source groups. Reposts are not independent corroboration. Content similarity must not silently merge distinct events or establish truth.
+- **Report retrieval candidate:** sentence embeddings compared with cosine similarity, informed by [Sentence-BERT](https://aclanthology.org/D19-1410/). Embeddings are not yet installed or evaluated. Select a language-appropriate model using labeled English/Hindi and other relevant-language report pairs, including negation, corrections and same-topic/different-event controls. Treat similarity as a review suggestion.
+- **Event-linkage candidate:** supervised event coreference with temporal/context constraints. [Tran et al.](https://aclanthology.org/2021.acl-long.374/) study document structure and cluster consistency. Benchmark false merges and missed links before changing provenance groups. A paper's benchmark result is not India deployment evidence. No learned coreference model is implemented.
+- **Forecasting now:** logistic and training base-rate baselines with a chronological split and label-availability gap. [TimeSeriesSplit documentation](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.TimeSeriesSplit.html) motivates later-time evaluation and gaps; this code uses its own fixed split, not scikit-learn.
+- **Forecasting challenger:** [XGBoost](https://arxiv.org/abs/1603.02754) for nonlinear tabular relationships once permitted historical features and independently checked outcomes exist. Not installed or tested. Compare with simple baselines on the same chronological folds, regions and abstention population before adopting it. A more complex model is not presumed better.
+- **Uncertainty now:** probability errors, reliability bins and explicit missing-coverage abstention. [Calibration documentation](https://scikit-learn.org/stable/modules/calibration.html) explains why lower Brier loss alone does not prove better calibration. No calibrated operational probability is claimed.
+- **Uncertainty research candidate:** [adaptive conformal time-series methods](https://proceedings.mlr.press/v162/zaffran22a.html). Ordinary exchangeability assumptions do not fit dependent time series. The cited study evaluates electricity forecasting; it does not establish terrorism coverage guarantees. No conformal method or prediction interval is implemented here.
+
+## Next evidence required
+
+Define an aggregate public-safety outcome, geographic scope, forecast horizon and label timing with qualified users. Retain permitted source snapshots as known at issuance, source-dependence/correction metadata, and independently verified later outcomes including uneventful periods. Build chronological development, calibration and untouched external-test periods. Evaluate precision/recall, missed events, false alarms per analyst workload, probability errors, reliability, abstention coverage and regional/language drift together. Require a reviewed response process and separately measure whether intervention improves outcomes. Synthetic scores cannot substitute for these checks.
+
+The 3D replay remains an authored exercise and is not driven by these forecasts. No live social/CCTV sources, operational alerts, individual intent prediction or agency decisions are connected to this experiment.

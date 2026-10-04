@@ -1,4 +1,4 @@
-# Project Ruthless — Intelligence Workbench v0.16
+# Project Ruthless — Intelligence Workbench v0.18
 
 Ruthless is being developed as terrorism intelligence analysis software for government and government-agency customers, covering domestic, cross-border and international developments relevant to India, with broader geographic support. The intended platform spans threat analysis, intelligence gathering, data integration, operations workflows and AI orchestration. The current release connects case questions, selected fictional reports and cited AI drafts with manual evidence analysis, document intake, research tasks and synthetic semantic review. Prevention effectiveness and customer demand have not been validated.
 
@@ -11,6 +11,12 @@ node serve.mjs
 ```
 
 Open http://127.0.0.1:4173/. The local server binds to loopback. The retained cyber exposure module is at `/exposure.html`; its instructions are in `docs/CYBER-EXPOSURE.md`.
+
+## Forecasting research and 3D replay
+
+The release entry now links to `/forecast.html` and `/scenario.html`. In Forecast research, **Train & test baseline** fits a regularized logistic model to 160 earlier authored records, leaves a time gap, then scores 79 later records. Inspect false alarms, missed incidents, abstentions, probability errors and reliability bins against a training base-rate baseline. This is executable statistical forecasting research on fictional data, not validated attack prediction. No provider call is made. See `docs/FORECAST-RESEARCH.md` for algorithms, results and primary research references.
+
+In 3D Scenario replay, choose a fictional aerial-object alert or unverified explosive-threat report, use the timeline/playback/orbit controls, and compare authored benign or unresolved continuations. XYZ geometry is rendered with perspective projection. Reports become available over the timeline; assumptions and possible site disruption stay labeled. Prepare analyst workspace JSON stages only currently available fictional reports for manual workbench recovery, adding no scenario evidence or reviewed assessment. This module is a separate authored illustration; it does not animate the forecasting model's output. See `docs/SCENARIO-REPLAY.md`.
 
 ## Threat analysis workflow
 
