@@ -4,3 +4,8 @@ node_modules/
 *.zip
 .env
 .env.*
+.backend-runtime/
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm

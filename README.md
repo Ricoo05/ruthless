@@ -4,7 +4,7 @@ Ruthless is being developed as terrorism intelligence analysis software for gove
 
 ## Run
 
-Requires Node.js 20 or later, without dependency installation or an API key.
+Requires Node.js 24 or later, without dependency installation or an API key.
 
 ```powershell
 node serve.mjs
@@ -80,10 +80,17 @@ node --check dist/threat-core.mjs
 node --check dist/proposal-core.mjs
 ```
 
-142 tests pass across both modules, including all CLI tests. See `docs/VERIFICATION.md` for browser evidence and remaining limits. `docs/THREAT-ANALYSIS-DIRECTION.md` is the current product direction and supersedes the earlier cyber-first commercial hypothesis.
+163 tests pass across both modules, including all CLI tests. See `docs/VERIFICATION.md` for browser evidence and remaining limits. `docs/THREAT-ANALYSIS-DIRECTION.md` is the current product direction and supersedes the earlier cyber-first commercial hypothesis.
 
 ## Release record
 
 The same owner-private Site is retained. v0.13 connects considered cited drafts to manually applied analyst judgments and adds validated pasted workspace recovery, while retaining case analysis and semantic-review handoff reports. Publication is confirmed only when the Sites deployment status is succeeded for the exact pushed commit. Public sharing has not been requested.
 
 Current broader company scope and delivery gates are in `docs/PLATFORM-DIRECTION.md`. The practitioner interview/pilot draft is in `docs/PILOT-DISCOVERY.md`. Local research tasks and synthetic fixture proposals are implemented; authenticated collaboration and customer data connectors remain planned; the bounded synthetic API runner has completed fictional model calls; independent semantic review remains outstanding. The first AI proposal/validation design is in `docs/AI-ORCHESTRATION-CONTRACT.md`.
+
+
+## Local backend foundation
+
+The separate backend now implements server-controlled local credentials and workspace permissions, encrypted SQLite versions, mandatory revision preconditions, and atomic server save receipts. Run `node scripts/backend-demo.mjs` to exercise unauthenticated denial, a successful save, stale-write rejection and exact recovery after the database/server reopens. The demonstration uses fictional data and temporary in-memory credentials; it makes no paid calls and retains no user work.
+
+The browser Site remains v0.13 and is not yet connected to this backend. The local credential adapter does not authenticate real organizational identities. Imported Reviewed labels remain client assertions; the audit chain cannot detect complete database rollback without an external anchor. See `docs/BACKEND.md` for the executable server configuration, implemented boundaries and next integration slice.
