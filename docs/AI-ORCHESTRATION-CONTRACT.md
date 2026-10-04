@@ -1,6 +1,16 @@
-# First AI assistance contract — design draft
+# First AI assistance contract — fixture implementation and provider design
 
-Prepared 4 October 2026. This is a proposed development contract, not an implemented AI capability. v0.5 makes no model calls, stores no provider keys and runs no background agent.
+Updated 4 October 2026. v0.6 implements the local synthetic fixture, structural validator and human proposal-review queue described below. It makes no model calls, stores no provider keys and runs no background agent. Live provider integration and semantic evaluation remain design work.
+
+## Implemented fixture boundary
+
+Select one staged, unincorporated synthetic document. A deterministic fixture copies up to the first 1,800 UTF-16 units into an attributed draft, avoiding split surrogate pairs. It retains a snapshot of the assessment and source metadata/excerpt, run/proposal IDs, fixture kind, provider label, model `None`, prompt version and creation date. This is not semantic extraction or translation.
+
+Workspace schema v4 retains at most 40 runs, 8 proposals per run and 4 citations per proposal within the existing 2 MB UTF-8 limit. The fixture UI generates one proposal per run; the validator also permits an explained abstention. Unexpected output/tool fields, unsupported provider metadata, duplicate identifiers, invalid source references and inconsistent exact quotes/offsets are rejected. Versions 1–3 migrate with empty proposal queues and no invented proposal lineage.
+
+Acceptance requires a current assessment/source snapshot, an unincorporated source, explicit source-conditions acknowledgement, review note and analyst-selected claim state/relation. It records the exact draft through the existing incorporation path, keeps reciprocal run/proposal/evidence links and reopens Reviewed assessments. Rejection requires a note, is permitted for stale drafts and adds no evidence. A rejected source can be used for a new fixture. Reviewed proposals cannot be reviewed a second time. Accepted source snapshots must continue matching retained documents on restore. All records remain editable local file content, not authenticated approvals.
+
+Tests include Hindi, mixed scripts, an astral character, source-embedded instructions, denials/contradictions, invalid quotes and boundaries, fabricated IDs, unexpected executable fields, oversized fields, abstention, stale results, rejected acceptance and reciprocal lineage. Embedded-instruction tests exercise data handling and structural validation; they do not establish prompt-injection resistance of a model. Browser checks cover pending/accepted/rejected states and blocked stale acceptance. No inference accuracy or prevention effectiveness has been established.
 
 ## First bounded task
 
@@ -28,7 +38,7 @@ An abstention records why a supported proposal could not be made. Missing suppor
 
 Proposed → Analyst accepted or Analyst rejected. Acceptance requires an explicit source review and retains the original run/proposal references. It should use the existing evidence incorporation path so a Reviewed assessment reopens when new evidence is accepted. A failed validation changes no workspace records. Reject stale results if the source snapshot or assessment changed during the run; do not replace newer analyst work.
 
-Record provider, model, prompt version, submitted source IDs, start/end time, validation outcome and review outcome. This proposed run ledger will be editable in a local prototype; protected audit and authenticated reviewer identity require production architecture. Do not call an editable ledger an accredited audit trail.
+For a future live provider, record provider, model, prompt version, submitted source IDs, start/end time, validation outcome and review outcome. The fixture ledger currently records creation/review dates and successful review states; failed attempts return errors without a retained failure ledger or execution timestamps. Protected audit and authenticated reviewer identity require production architecture. Do not call an editable ledger an accredited audit trail.
 
 ## Evaluation fixtures and release gate
 

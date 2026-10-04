@@ -1,3 +1,7 @@
+## Work continued — v0.6, 4 October 2026
+
+Local synthetic proposal generation, exact source citation validation and analyst acceptance/rejection are implemented. Stale snapshots block acceptance; accepted records retain reciprocal lineage and reopen Reviewed assessments. Workspace v4 migrates v1–v3 without invented proposal history. 56 tests pass; browser and mobile checks are in `docs/VERIFICATION.md`. Publication receipt is sibling `ruthless-release-v0.6.json`; only `succeeded` confirms deployment. No AI provider is connected. Next: held-out synthetic semantic evaluation criteria and permission-aware adapter fixtures, with production/provider design still a later review. Remain on Sol 6.1 High. Usage checks are disabled; this release record does not pause development. Historical notes follow.
+
 ## Work continued — v0.5, 4 October 2026
 
 Research-task creation, states, scoped follow-up, owner labels, due dates, evidence-linked completion and reopening are implemented. Workspace schema v3 migrates v1/v2 without inventing tasks. 45 tests pass; browser checks are in `docs/VERIFICATION.md`. Current release receipt is sibling `ruthless-release-v0.5.json`; only `succeeded` confirms publication. First AI proposal contract is in `docs/AI-ORCHESTRATION-CONTRACT.md`. Stay on Sol 6.1 High for bounded implementation. Usage checks remain disabled; no pause or checkpoint request is inferred. Historical notes below are retained.

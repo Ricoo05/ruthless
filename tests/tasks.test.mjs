@@ -44,7 +44,7 @@ test('v1 and v2 migration invent no tasks and preserve v2 incorporated sources',
   const legacy1={...demoWorkspace(),version:1};delete legacy1.documents;delete legacy1.tasks;assert.deepEqual(parseWorkspace(JSON.stringify(legacy1)).tasks,[]);
   const d={id:'DOC-1',assessmentId:caseID,title:'Training',publisher:'Fictional',originGroup:'training-original-A',url:'',reportedAt:at,recordedAt:at,language:'English',locator:'Paragraph 1',accessNote:'Synthetic author text.',excerpt:'Fictional uncertainty.',synthetic:true};
   const current=incorporateDocument(stageDocument(demoWorkspace(),d,at),d.id,{id:'EV-1',statement:'A fictional statement.',claimState:'Reported',relation:'Context',reviewNote:'Attribution preserved.',accessAcknowledged:true},at);
-  const legacy2={...current,version:2};delete legacy2.tasks;const migrated=parseWorkspace(JSON.stringify(legacy2));assert.deepEqual(migrated.documents,current.documents);assert.deepEqual(migrated.evidence,current.evidence);assert.deepEqual(migrated.tasks,[]);assert.equal(migrated.version,3);
+  const legacy2={...current,version:2};delete legacy2.tasks;const migrated=parseWorkspace(JSON.stringify(legacy2));assert.deepEqual(migrated.documents,current.documents);assert.deepEqual(migrated.evidence,current.evidence);assert.deepEqual(migrated.tasks,[]);assert.equal(migrated.version,4);
   assert.throws(()=>validateWorkspace({...migrated,tasks:undefined}),/500 research/);
 });
 test('task round trips retain results but drop trust claims; briefs include tasks with unverified owner labels',()=>{
