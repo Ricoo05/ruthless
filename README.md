@@ -39,7 +39,7 @@ Document intake now stages a built-in synthetic batch containing an original, sh
 
 ## Local public-advisory collection
 
-Run `node scripts/collect-advisory.mjs --collect` locally to retrieve three sections of the official GOV.UK India travel advisory into ignored `.collection-runtime/`. Open **Source collection**, paste its report JSON, and inspect scope, source dates, failures and freshness. The UI validates selected hashes and extracts plain text safely. Choose an assessment and exact passage, record source conditions, and explicitly stage it in Document intake. Repeated passages skip; corrections require an earlier excerpt and explanation. Evidence incorporation remains a separate review. The hosted Site provides this review UI, while collection runs locally. See `docs/COLLECTION-REVIEW.md` and `docs/COLLECTION-ARCHITECTURE.md`.
+Run `node scripts/collect-advisory.mjs --collect` locally to retrieve three sections of the official GOV.UK India travel advisory into ignored `.collection-runtime/`. Start `node scripts/serve-collection.mjs`, open `http://127.0.0.1:4175/`, choose **Source collection** and **Load local captures**, and inspect scope, source dates, failures and freshness. The UI validates selected hashes and extracts plain text safely. Choose an assessment and exact passage, record source conditions, and explicitly stage it in Document intake. Repeated passages skip; corrections require an earlier excerpt and explanation. Evidence incorporation remains a separate review. The hosted Site provides this review UI, while collection runs locally. See `docs/COLLECTION-REVIEW.md` and `docs/COLLECTION-ARCHITECTURE.md`.
 
 Loaded collection reports and unapplied selections are session-only. Staged passages, capture identity, content hash and source conditions follow workspace JSON save/recovery. These real public excerpts cannot enter the existing synthetic-only backend or AI runner. No source truth, complete coverage or detection effectiveness is established by a successful fetch.
 
@@ -91,11 +91,11 @@ npm run check
 npm run backend:demo
 ```
 
-219 tests pass across the application and local collection modules, including the existing CLI tests. See `docs/VERIFICATION.md` for browser evidence and remaining limits. `docs/THREAT-ANALYSIS-DIRECTION.md` is the current product direction and supersedes the earlier cyber-first commercial hypothesis.
+230 tests pass across the application and local collection modules, including the existing CLI tests. See `docs/VERIFICATION.md` for browser evidence and remaining limits. `docs/THREAT-ANALYSIS-DIRECTION.md` is the current product direction and supersedes the earlier cyber-first commercial hypothesis.
 
 ## Release record
 
-The same owner-private Site is retained. v0.15 adds literal indicator triage, a clearly fictional regional uncertainty exercise and source-linked verification tasks. It retains v0.14 local backend loading, creation and revision-conflict recovery. It retains the earlier AI draft, judgment and manual JSON workflows. Publication is confirmed only when the Sites deployment status is succeeded for the exact pushed commit. Public sharing has not been requested.
+The same owner-private Site is retained. v0.17 adds a read-only same-origin local capture connection and a visible release panel with direct workflow entries. The hosted edition remains static; live collection is local. v0.16 added safe capture inspection and exact-passage intake. v0.15 adds literal indicator triage, a clearly fictional regional uncertainty exercise and source-linked verification tasks. It retains v0.14 local backend loading, creation and revision-conflict recovery. It retains the earlier AI draft, judgment and manual JSON workflows. Publication is confirmed only when the Sites deployment status is succeeded for the exact pushed commit. Public sharing has not been requested.
 
 Current broader company scope and delivery gates are in `docs/PLATFORM-DIRECTION.md`. The practitioner interview/pilot draft is in `docs/PILOT-DISCOVERY.md`. Local research tasks and synthetic fixture proposals are implemented; authenticated collaboration and customer data connectors remain planned; the bounded synthetic API runner has completed fictional model calls; independent semantic review remains outstanding. The first AI proposal/validation design is in `docs/AI-ORCHESTRATION-CONTRACT.md`.
 

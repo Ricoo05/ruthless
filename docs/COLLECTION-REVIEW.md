@@ -1,4 +1,4 @@
-# Source collection review — v0.16
+# Source collection review — v0.17
 
 The local collector and browser review now form a working source-to-intake path. Run `node scripts/collect-advisory.mjs --collect`, open Source collection, and paste the resulting report JSON. The hosted private UI can inspect pasted reports but does not run the collector. No file-upload mechanism or cross-origin exception was added.
 
@@ -14,4 +14,15 @@ Unfinished pasted JSON and passage selections block navigation, saving or replac
 
 The current local backend and AI runner remain synthetic-only. Real-source workspaces cannot be saved to that backend and cannot become bundled AI inputs. Use the existing workspace JSON preview/pasted recovery or verified file receipt to retain staged material. Loaded collection reports, freshness context and unapplied selections are session-only; workspace JSON contains staged passages and their lineage, not the full captured HTML or coverage ledger. No paid API request or hosted ingestion worker is added.
 
-Source access decisions, coverage limits, licensing references and future worker requirements remain in `COLLECTION-ARCHITECTURE.md`. The next useful slice is a controlled local bridge for collector reports and a broader permitted institutional-source inventory; unattended collection still requires rate/retention/storage limits. No internet-wide recall, attack-prediction accuracy or prevention-effectiveness claim has been measured.
+Source access decisions, coverage limits, licensing references and future worker requirements remain in `COLLECTION-ARCHITECTURE.md`. The local bridge described below is implemented; the next useful slice is broader permitted institutional-source collection and cross-source analysis; unattended collection still requires rate/retention/storage limits. No internet-wide recall, attack-prediction accuracy or prevention-effectiveness claim has been measured.
+
+
+## Direct local capture loading
+
+Start `node scripts/serve-collection.mjs`, open `http://127.0.0.1:4175/`, choose Source collection and **Load local captures**. This separate process serves the same UI and a read-only bridge; it never initializes the AI provider, reads its key, executes a collector, or changes a workspace. The original AI server on 4173 is separate. The hosted edition never probes localhost. Pasted-report inspection remains available in both editions.
+
+The bridge reads only UUID-named JSON reports in the fixed ignored `.collection-runtime/` directory. It bounds scanning to 100 directory entries, 2 MiB per report and 16 MiB total. Every matching report must pass schema, timestamp, source and selected-content hash validation, and its ID must match its filename. A corrupt matching file fails the whole load visibly rather than hiding a possibly newer attempt behind an old success. The newest failed attempt remains separate from the most recent successful capture; equal timestamps prioritize the failure. An empty scan retains any already-loaded context with a clear message. Files remain editable and unauthenticated.
+
+Directory/file type and symlink checks, file identity/size/mtime checks around bounded reads, and a directory identity/mtime check detect common accidental changes. They do not isolate a malicious local administrator or provide an authenticated ledger. The server binds to IPv4 loopback and requires an exact Host, same-origin Origin and explicit review request marker. It rejects cross-site requests, credentials, arbitrary path inputs and unrelated API routes. It serves no collector files directly and has no CORS allowance. The browser bounds and revalidates the response before changing source context. Pending pasted reports or selections block replacement.
+
+`GET /api/collection/status` exposes capability only. `POST /api/collection/latest` accepts the exact JSON body `{}` with `X-Ruthless-Request: collection-review-v1`. The catalog includes the latest attempt and, if that attempt failed, an earlier validated success; full HTML remains local and is parsed inertly by the browser. All capture loading is explicit; there is no polling, scheduling, automatic intake or paid API call. Staged real excerpts continue to use workspace JSON and remain excluded from the synthetic-only backend and AI runner.
