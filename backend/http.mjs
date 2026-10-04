@@ -17,26 +17,28 @@ export function createBackendServer({store,authenticate,serveAssets=null}) {
         if(principal.tenantId!==store.tenantId)reject(403,'forbidden');
         return send(200,{subject:principal.subject,tenantId:principal.tenantId,role:principal.role,workspaceIds:[...principal.workspaceIds],expiresAt:principal.expiresAt,mode:'local_credential_adapter',storageMode:store.storageMode});
       }
-      const route=/^\/api\/workspaces\/([a-zA-Z0-9_-]{1,60})(\/audit)?$/.exec(req.url);
+      const route=/^\/api\/workspaces\/([a-zA-Z0-9_-]{1,60})(\/audit|\/reviews)?$/.exec(req.url);
       if(!route) reject(404,'route_not_found');
-      const [,id,audit]=route;
+      const [,id,suffix]=route,audit=suffix==='/audit',review=suffix==='/reviews';
       if(req.method==='GET') {
-        const result=audit?store.audit(principal,id):store.read(principal,id);
+        const result=audit?store.audit(principal,id):review?store.reviews(principal,id):store.read(principal,id);
         return send(200,result,audit?{}:{ETag:`"${result.revision}"`});
       }
-      if(req.method!=='PUT'||audit) reject(405,'method_not_allowed');
-      store.checkAccess(principal,id,'write');
+      if(req.method!==(review?'POST':'PUT')||audit) reject(405,'method_not_allowed');
+      store.checkAccess(principal,id,review?'review':'write');
       if(req.headers['content-type']!=='application/json'||req.headers['content-encoding']) reject(415,'json_required');
       if(!/^"(?:0|[1-9][0-9]{0,8})"$/.test(req.headers['if-match']??'')) reject(428,'revision_required');
-      if(Number(req.headers['content-length']??0)>MAX_BYTES+32) reject(413,'body_too_large');
+      const bound=review?16_384:MAX_BYTES+32;
+      if(Number(req.headers['content-length']??0)>bound) reject(413,'body_too_large');
       let size=0;const parts=[];
-      for await(const part of req) { size+=part.length; if(size>MAX_BYTES+32) reject(413,'body_too_large'); parts.push(part); }
+      for await(const part of req) { size+=part.length; if(size>bound) reject(413,'body_too_large'); parts.push(part); }
       let body;
       try { body=JSON.parse(Buffer.concat(parts).toString('utf8')); } catch { reject(400,'invalid_json'); }
-      if(!body||typeof body!=='object'||Array.isArray(body)||Object.keys(body).join(',')!=='workspace') reject(400,'invalid_request');
+      if(!review&&(!body||typeof body!=='object'||Array.isArray(body)||Object.keys(body).join(',')!=='workspace')) reject(400,'invalid_request');
       // Reading the request body yields. Reauthenticate before applying a write.
       principal=authenticate(req.headers.authorization);
-      const result=store.save(principal,id,Number(req.headers['if-match'].slice(1,-1)),body.workspace);
+      const expected=Number(req.headers['if-match'].slice(1,-1));
+      const result=review?store.decide(principal,id,expected,body):store.save(principal,id,expected,body.workspace);
       return send(200,result,{ETag:`"${result.revision}"`});
     } catch(error) { if(!res.headersSent) send(error instanceof BackendError?error.status:503,{error:error instanceof BackendError?error.code:'backend_unavailable'}); else res.end(); }
   });

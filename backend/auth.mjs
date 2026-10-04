@@ -5,7 +5,7 @@ export class BackendError extends Error {
 }
 export const reject=(status,code)=>{ throw new BackendError(status,code); };
 export const validId=value=>typeof value==='string'&&/^[a-zA-Z0-9_-]{1,60}$/.test(value);
-const roles=new Set(['reader','analyst','auditor']);
+const roles=new Set(['reader','analyst','reviewer','auditor']);
 
 // A local integration adapter. Production authentication must supply verified IdP
 // identities and server-side memberships; browser claims never enter this map.
@@ -32,7 +32,7 @@ export function localTokenAuthenticator(grants,{now=()=>Date.now()}={}) {
 export function authorize(principal,tenantId,workspaceId,action,now=Date.now()) {
   if(!principal||!validId(principal.subject)||!validId(principal.tenantId)||
     !Number.isSafeInteger(principal.expiresAt)||principal.expiresAt<=now) reject(401,'unauthenticated');
-  const allowed={read:['reader','analyst'],write:['analyst'],audit:['auditor']}[action]??[];
+  const allowed={read:['reader','analyst','reviewer'],write:['analyst'],review:['reviewer'],audit:['auditor']}[action]??[];
   if(!validId(workspaceId)||principal.tenantId!==tenantId||!allowed.includes(principal.role)||
     !Array.isArray(principal.workspaceIds)||!principal.workspaceIds.includes(workspaceId)) reject(403,'forbidden');
 }

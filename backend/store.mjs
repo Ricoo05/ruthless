@@ -4,6 +4,7 @@ import {parseWorkspace,serializeWorkspace} from '../dist/threat-core.mjs';
 import {authorize,validId,reject} from './auth.mjs';
 
 export const MAX_SAVED_VERSIONS=64;
+export const MAX_REVIEW_DECISIONS=128;
 const hash=value=>createHash('sha256').update(value).digest('hex');
 const same=(a,b)=>typeof a==='string'&&typeof b==='string'&&/^[a-f0-9]{64}$/.test(a)&&/^[a-f0-9]{64}$/.test(b)&&timingSafeEqual(Buffer.from(a),Buffer.from(b));
 const integrity=()=>reject(503,'storage_integrity_failure');
@@ -13,8 +14,12 @@ export function openWorkspaceStore({file,tenantId,key,now=()=>Date.now()}) {
   if(!validId(tenantId)||!Buffer.isBuffer(key)||key.length!==32||typeof file!=='string'||!file) throw new Error('Invalid store configuration.');
   const encryptionKey=Buffer.from(hkdfSync('sha256',key,tenantId,'ruthless-snapshot-v1',32));
   const auditKey=Buffer.from(hkdfSync('sha256',key,tenantId,'ruthless-audit-v1',32));
+  const reviewKey=Buffer.from(hkdfSync('sha256',key,tenantId,'ruthless-review-content-v1',32));
+  const reviewAuditKey=Buffer.from(hkdfSync('sha256',key,tenantId,'ruthless-review-audit-v1',32));
   const mac=value=>createHmac('sha256',auditKey).update(value).digest('hex');
+  const reviewMac=value=>createHmac('sha256',reviewAuditKey).update(value).digest('hex');
   const seal=mac(encode(['ruthless-store',1,tenantId]));
+  const reviewSeal=reviewMac(encode(['ruthless-review-ledger',1,tenantId]));
   const db=new DatabaseSync(file,{timeout:3000});
   let closed=false;
   function transaction(fn) {
@@ -28,7 +33,7 @@ export function openWorkspaceStore({file,tenantId,key,now=()=>Date.now()}) {
   function eventPayload(row) {
     return encode([row.seq,row.tenant_id,row.workspace_id,row.revision,row.actor,row.at,row.digest,row.previous]);
   }
-  function verify() {
+  function verifySaved() {
     const metadata=db.prepare('SELECT tenant_id,seal FROM metadata').all();
     if(metadata.length!==1||metadata[0].tenant_id!==tenantId||!same(metadata[0].seal,seal)) integrity();
     const events=db.prepare('SELECT * FROM audit ORDER BY seq').all();
@@ -47,6 +52,23 @@ export function openWorkspaceStore({file,tenantId,key,now=()=>Date.now()}) {
     for(const row of versions) if(row.tenant_id!==tenantId||!same(expected.get(`${row.workspace_id}:${row.revision}`),hash(envelope(row)))) integrity();
     return events;
   }
+  function reviewPayload(row) { return encode([row.seq,row.tenant_id,row.workspace_id,row.revision,row.assessment_id,row.actor,row.at,row.decision,row.version_digest,row.note_digest,row.previous]); }
+  function reviewAssociated(row) { return encode(['ruthless-review-v1',tenantId,row.seq,row.workspace_id,row.revision,row.assessment_id,row.actor,row.at,row.decision,row.version_digest]); }
+  function noteEnvelope(row) { return encode([row.seq,Buffer.from(row.nonce).toString('hex'),Buffer.from(row.ciphertext).toString('hex'),Buffer.from(row.tag).toString('hex')]); }
+  function verifyReviews() {
+    const metadata=db.prepare('SELECT tenant_id,seal FROM review_metadata').all();
+    if(metadata.length!==1||metadata[0].tenant_id!==tenantId||!same(metadata[0].seal,reviewSeal)) integrity();
+    const rows=db.prepare('SELECT * FROM review_audit ORDER BY seq').all(),notes=db.prepare('SELECT * FROM review_notes ORDER BY seq').all();
+    if(rows.length!==notes.length||rows.length>MAX_REVIEW_DECISIONS) integrity();
+    let previous=reviewSeal;
+    for(let i=0;i<rows.length;i++) {
+      const row=rows[i],note=notes[i],version=db.prepare('SELECT * FROM versions WHERE workspace_id=? AND revision=?').get(row.workspace_id,row.revision);
+      if(row.seq!==i+1||note.seq!==row.seq||row.tenant_id!==tenantId||!validId(row.assessment_id)||!['approve','reject'].includes(row.decision)||row.previous!==previous||!same(row.mac,reviewMac(reviewPayload(row)))||!same(row.note_digest,hash(noteEnvelope(note)))||!version||!same(row.version_digest,hash(envelope(version)))) integrity();
+      previous=row.mac;
+    }
+    return rows;
+  }
+  function verify() { const events=verifySaved();verifyReviews();return events; }
   try {
     db.exec('PRAGMA foreign_keys=ON; PRAGMA journal_mode=DELETE; PRAGMA synchronous=FULL; PRAGMA trusted_schema=OFF;');
     const version=db.prepare('PRAGMA user_version').get().user_version;
@@ -57,9 +79,17 @@ export function openWorkspaceStore({file,tenantId,key,now=()=>Date.now()}) {
         PRAGMA user_version=1;`);
       db.prepare('INSERT INTO metadata VALUES(?,?)').run(tenantId,seal);
     });
-    else if(version!==1) throw new Error('Unsupported backend schema.');
+    else if(![1,2].includes(version)) throw new Error('Unsupported backend schema.');
+    if(version<2) transaction(()=>{
+      verifySaved();
+      db.exec(`CREATE TABLE review_metadata(tenant_id TEXT NOT NULL PRIMARY KEY,seal TEXT NOT NULL) STRICT;
+        CREATE TABLE review_notes(seq INTEGER PRIMARY KEY,nonce BLOB NOT NULL,ciphertext BLOB NOT NULL,tag BLOB NOT NULL) STRICT;
+        CREATE TABLE review_audit(seq INTEGER PRIMARY KEY REFERENCES review_notes(seq),tenant_id TEXT NOT NULL,workspace_id TEXT NOT NULL,revision INTEGER NOT NULL,assessment_id TEXT NOT NULL,actor TEXT NOT NULL,at TEXT NOT NULL,decision TEXT NOT NULL CHECK(decision IN ('approve','reject')),version_digest TEXT NOT NULL,note_digest TEXT NOT NULL,previous TEXT NOT NULL,mac TEXT NOT NULL,UNIQUE(workspace_id,revision,assessment_id),FOREIGN KEY(workspace_id,revision) REFERENCES versions(workspace_id,revision)) STRICT;
+        PRAGMA user_version=2;`);
+      db.prepare('INSERT INTO review_metadata VALUES(?,?)').run(tenantId,reviewSeal);
+    });
     verify();
-  } catch(error) { db.close(); encryptionKey.fill(0); auditKey.fill(0); throw error; }
+  } catch(error) { db.close(); encryptionKey.fill(0); auditKey.fill(0); reviewKey.fill(0); reviewAuditKey.fill(0); throw error; }
   function current(workspaceId) { return db.prepare('SELECT * FROM versions WHERE workspace_id=? ORDER BY revision DESC LIMIT 1').get(workspaceId); }
   function readRow(row) {
     try {
@@ -69,6 +99,16 @@ export function openWorkspaceStore({file,tenantId,key,now=()=>Date.now()}) {
       return parseWorkspace(Buffer.concat([decipher.update(row.ciphertext),decipher.final()]).toString('utf8'));
     } catch { integrity(); }
   }
+  function readNote(row) {
+    try {
+      const note=db.prepare('SELECT * FROM review_notes WHERE seq=?').get(row.seq),decipher=createDecipheriv('aes-256-gcm',reviewKey,note.nonce);
+      decipher.setAAD(Buffer.from(reviewAssociated(row)));decipher.setAuthTag(note.tag);
+      const content=JSON.parse(Buffer.concat([decipher.update(note.ciphertext),decipher.final()]).toString('utf8'));
+      if(typeof content.note!=='string'||!content.note.trim()||content.note.length>2000||content.sourcesConsidered!==true) integrity();
+      return content.note;
+    } catch { integrity(); }
+  }
+  function reviewReceipt(row) { return {sequence:row.seq,workspaceId:row.workspace_id,revision:row.revision,assessmentId:row.assessment_id,actor:row.actor,at:row.at,decision:row.decision,action:'assessment.reviewed',versionDigest:row.version_digest,noteDigest:row.note_digest}; }
   return Object.freeze({
     tenantId,
     storageMode:file===':memory:'?'temporary_test_database':'encrypted_local_database',
@@ -102,8 +142,39 @@ export function openWorkspaceStore({file,tenantId,key,now=()=>Date.now()}) {
     },
     audit(principal,workspaceId) {
       authorize(principal,tenantId,workspaceId,'audit',now());
-      return transaction(()=>({events:verify().filter(e=>e.workspace_id===workspaceId).map(e=>({sequence:e.seq,workspaceId:e.workspace_id,revision:e.revision,actor:e.actor,at:e.at,action:'workspace.saved',digest:e.digest})),integrity:'verified_local_chain',rollbackProtection:false}));
+      return transaction(()=>({events:verify().filter(e=>e.workspace_id===workspaceId).map(e=>({sequence:e.seq,workspaceId:e.workspace_id,revision:e.revision,actor:e.actor,at:e.at,action:'workspace.saved',digest:e.digest})),reviewEvents:verifyReviews().filter(e=>e.workspace_id===workspaceId).map(reviewReceipt),integrity:'verified_local_chain',rollbackProtection:false}));
     },
-    close() { if(!closed) { db.close(); encryptionKey.fill(0); auditKey.fill(0); closed=true; } }
+    reviews(principal,workspaceId) {
+      authorize(principal,tenantId,workspaceId,'read',now());
+      return transaction(()=>{verify();const row=current(workspaceId);if(!row)reject(404,'workspace_not_found');return {revision:row.revision,identityMode:'local_credential_adapter',scope:'exact_workspace_revision',rollbackProtection:false,decisions:verifyReviews().filter(r=>r.workspace_id===workspaceId).map(r=>({...reviewReceipt(r),note:readNote(r),current:r.revision===row.revision}))};});
+    },
+    decide(principal,workspaceId,expectedRevision,input) {
+      authorize(principal,tenantId,workspaceId,'review',now());
+      if(!Number.isSafeInteger(expectedRevision)||expectedRevision<1) reject(400,'invalid_revision');
+      if(!input||typeof input!=='object'||Array.isArray(input)||Object.keys(input).sort().join(',')!=='assessmentId,decision,note,sourcesConsidered'||!validId(input.assessmentId)||!['approve','reject'].includes(input.decision)||typeof input.note!=='string'||!input.note.trim()||input.note.length>2000||input.sourcesConsidered!==true) reject(400,'invalid_review');
+      const {assessmentId,decision}=input,note=input.note.trim();
+      return transaction(()=>{
+        authorize(principal,tenantId,workspaceId,'review',now());
+        const events=verify(),existing=current(workspaceId);
+        if(!existing)reject(404,'workspace_not_found');
+        if(existing.revision!==expectedRevision)reject(409,'revision_conflict');
+        // Conservative separation: any saved-version contributor to this
+        // workspace cannot review it, even with a second credential/role.
+        if(events.some(e=>e.workspace_id===workspaceId&&e.actor===principal.subject))reject(403,'self_review_forbidden');
+        const workspace=readRow(existing),assessment=workspace.assessments.find(a=>a.id===assessmentId);
+        if(!assessment)reject(404,'assessment_not_found');
+        if(decision==='approve'&&assessment.status!=='Reviewed')reject(400,'assessment_not_ready');
+        if(db.prepare('SELECT seq FROM review_audit WHERE workspace_id=? AND revision=? AND assessment_id=?').get(workspaceId,expectedRevision,assessmentId))reject(409,'review_already_recorded');
+        const reviews=verifyReviews();if(reviews.length>=MAX_REVIEW_DECISIONS)reject(507,'prototype_review_limit');
+        const row={seq:reviews.length+1,tenant_id:tenantId,workspace_id:workspaceId,revision:expectedRevision,assessment_id:assessmentId,actor:principal.subject,at:new Date(now()).toISOString(),decision,version_digest:hash(envelope(existing)),previous:reviews.at(-1)?.mac??reviewSeal};
+        const nonce=randomBytes(12),cipher=createCipheriv('aes-256-gcm',reviewKey,nonce);cipher.setAAD(Buffer.from(reviewAssociated(row)));
+        const ciphertext=Buffer.concat([cipher.update(encode({note,sourcesConsidered:true}),'utf8'),cipher.final()]),tag=cipher.getAuthTag();
+        row.note_digest=hash(noteEnvelope({seq:row.seq,nonce,ciphertext,tag}));const reviewEventMac=reviewMac(reviewPayload(row));
+        db.prepare('INSERT INTO review_notes VALUES(?,?,?,?)').run(row.seq,nonce,ciphertext,tag);
+        db.prepare('INSERT INTO review_audit VALUES(?,?,?,?,?,?,?,?,?,?,?,?)').run(row.seq,tenantId,workspaceId,expectedRevision,assessmentId,row.actor,row.at,decision,row.version_digest,row.note_digest,row.previous,reviewEventMac);
+        return {...reviewReceipt(row),current:true,identityMode:'local_credential_adapter',scope:'exact_workspace_revision'};
+      });
+    },
+    close() { if(!closed) { db.close(); encryptionKey.fill(0); auditKey.fill(0); reviewKey.fill(0); reviewAuditKey.fill(0); closed=true; } }
   });
 }

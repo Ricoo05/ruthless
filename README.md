@@ -1,4 +1,4 @@
-# Project Ruthless — Intelligence Workbench v0.14
+# Project Ruthless — Intelligence Workbench v0.15
 
 Ruthless is being developed as terrorism intelligence analysis software for government and government-agency customers, covering domestic, cross-border and international developments relevant to India, with broader geographic support. The intended platform spans threat analysis, intelligence gathering, data integration, operations workflows and AI orchestration. The current release connects case questions, selected fictional reports and cited AI drafts with manual evidence analysis, document intake, research tasks and synthetic semantic review. Prevention effectiveness and customer demand have not been validated.
 
@@ -20,6 +20,12 @@ Open http://127.0.0.1:4173/. The local server binds to loopback. The retained cy
 4. Record the judgment, information gaps, confidence, citations and review note. Reviewed assessments require all these fields and explicit consideration of conflicting evidence. A reviewed conclusion cannot cite a report published after its as-of date.
 5. Adding evidence reopens a Reviewed assessment. Confidence is analyst-assigned, not an attack probability. Review labels are local workflow status, not agency approval.
 6. Save workspace requests a JSON download. Confirm receipt only after finding the actual saved file. The app keeps the unsaved marker until that acknowledgement and invalidates it if the workspace changes. Open workspace restores a JSON file after validation. Preview workspace JSON provides the complete applied session for manual copying; Paste workspace JSON validates it before restoration and requires acknowledgement before replacing unsaved work. Browser recovery by pasted JSON is verified. Preview brief displays the applied assessment with linked source excerpts and judgment starting-point lineage. Export brief requests a Markdown download. Unapplied assessment changes can be discarded explicitly.
+
+## Indicator triage and regional uncertainty exercise
+
+Open **Indicator triage** and **Load fictional regional exercise**. Acknowledge its authored controls to add two fictional geographic cases and four staged excerpts without replacing existing work. Query `threat` with a known-by date of 2026-10-05 or later. Inspect the unverified warning, same-source repost, benign negation and overseas repost. Three regional reports represent two recorded source groups, not three independent confirmations. The overseas repost identifies shared reporting, not an actor link.
+
+Queries match up to eight literal terms, with any/every-term rules, date and geographic filters and a recorded source-group threshold for analyst review. Corrections known by the selected date supersede earlier excerpts. Results show exact spans and source context. A benign or negated statement can match; a missing match is not proof of safety. Prepare verification task opens the existing task form with case, query and permitted source-verification scope; explicitly create it after review. Nothing becomes assessment evidence or an approval automatically. Rules/results are session-only; the fictional cases, staged sources and created tasks follow normal workspace save/recovery. See `docs/INDICATOR-TRIAGE.md`.
 
 ## Integrated case analysis
 
@@ -79,11 +85,11 @@ npm run check
 npm run backend:demo
 ```
 
-173 tests pass across both modules, including all CLI tests. See `docs/VERIFICATION.md` for browser evidence and remaining limits. `docs/THREAT-ANALYSIS-DIRECTION.md` is the current product direction and supersedes the earlier cyber-first commercial hypothesis.
+198 tests pass across both modules, including all CLI tests. See `docs/VERIFICATION.md` for browser evidence and remaining limits. `docs/THREAT-ANALYSIS-DIRECTION.md` is the current product direction and supersedes the earlier cyber-first commercial hypothesis.
 
 ## Release record
 
-The same owner-private Site is retained. v0.14 adds explicit browser connection to a same-origin local backend, validated loading/creation, confirmed revision saves and conflict recovery. It retains the earlier AI draft, judgment and manual JSON workflows. Publication is confirmed only when the Sites deployment status is succeeded for the exact pushed commit. Public sharing has not been requested.
+The same owner-private Site is retained. v0.15 adds literal indicator triage, a clearly fictional regional uncertainty exercise and source-linked verification tasks. It retains v0.14 local backend loading, creation and revision-conflict recovery. It retains the earlier AI draft, judgment and manual JSON workflows. Publication is confirmed only when the Sites deployment status is succeeded for the exact pushed commit. Public sharing has not been requested.
 
 Current broader company scope and delivery gates are in `docs/PLATFORM-DIRECTION.md`. The practitioner interview/pilot draft is in `docs/PILOT-DISCOVERY.md`. Local research tasks and synthetic fixture proposals are implemented; authenticated collaboration and customer data connectors remain planned; the bounded synthetic API runner has completed fictional model calls; independent semantic review remains outstanding. The first AI proposal/validation design is in `docs/AI-ORCHESTRATION-CONTRACT.md`.
 
@@ -93,3 +99,6 @@ Current broader company scope and delivery gates are in `docs/PLATFORM-DIRECTION
 The separate backend now implements server-controlled local credentials and workspace permissions, encrypted SQLite versions, mandatory revision preconditions, and atomic server save receipts. Run `node scripts/backend-demo.mjs` to exercise unauthenticated denial, a successful save, stale-write rejection and exact recovery after the database/server reopens. The demonstration uses fictional data and temporary in-memory credentials; it makes no paid calls and retains no user work.
 
 The v0.14 browser can connect when served by the configured loopback backend (`npm run backend:start`). It keeps the local credential only in memory, validates a stored version before explicit loading, and saves against that confirmed revision. Conflict or unconfirmed outcomes block another save without losing local edits. Workspace selection and manual restoration detach the old server binding. Reader access cannot save. The hosted Site remains static: no cloud backend is deployed, and connection is unavailable there. The local credential adapter does not authenticate real organizational identities. Imported Reviewed labels remain client assertions; the audit chain cannot detect complete database rollback without an external anchor. See `docs/BACKEND.md` for the executable server configuration, implemented boundaries and next integration slice.
+
+
+The local review API now records a separate configured-reviewer decision against an exact saved assessment/workspace revision. Contributors cannot review their own workspace. Notes are encrypted and receipts are server-selected. A later save makes previous decisions stale. Run `node scripts/review-demo.mjs` for the executable fictional demonstration. This command is not yet exposed in the browser; real identity-provider integration and agency approval remain unimplemented.

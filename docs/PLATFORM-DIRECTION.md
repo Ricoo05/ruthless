@@ -47,3 +47,12 @@ The development model and a future customer-facing inference provider are differ
 ## Working preferences
 
 The founder is studying for GATE. Continue authorized work during active runs. Raise required decisions in chat; push delivery depends on app/system notification settings. No unattended worker or notification automation is configured. As of 4 October, do not check usage: the founder will request checkpoints. Do not spawn subagents or contact outside parties without authorization.
+
+
+## Current priority — regional uncertainty and broad source collection
+
+Founder requested a demonstrable threat-detection workflow, a clearly fictional geographic uncertainty exercise, and broad internet/social-media coverage on 5 October 2026. v0.15 implements explicit literal indicator queries over retained sources, duplicate/source-group handling, dates, geography, source-linked contexts and preparation of verification tasks. It includes benign/negated controls and a cross-case repost to expose false alarms and misleading apparent corroboration. It does not classify intent, forecast attacks or validate prevention effectiveness.
+
+Next collection design: approved public websites and feeds, curated public institutional/social sources through supported APIs, and customer-authorized exports. Coverage must be disclosed by source, access method, time window and gaps. Complete internet/social-platform coverage is not a realistic promise. No connector, crawler, social login, purchase or paid API experiment has been enabled by this request. Avoid unrestricted personal monitoring; scope collection to authorized institutional sources and incident reports rather than profiling private people. Platform access, licensing and retention rules must be verified before choosing each connector.
+
+The next design review should use Astra High for source access, scale, ingestion trust boundaries, multilingual fidelity and evaluation; implementation/test work remains Sol 6.1 High. The founder wants explicit model guidance at each stage. Maintain the existing synthetic-only API budget and do not check usage.
