@@ -51,3 +51,18 @@ Use GPT-6.1 Sol High for routine work after this review. Finish the blocked brow
 - After a later small change, opening a workspace clears any stale save acknowledgement; that file-import branch remains browser-unverified because of the existing permission restriction.
 - Screenshots are sibling files `ruthless-threat-desktop-v0.3.png` and `ruthless-threat-mobile-v0.3.png`. Browser testing used synthetic records only.
 - Hosted publication status and exact commit are recorded in sibling `ruthless-release-v0.3.json`. No independent security assessment, live source connector, validated attack forecast or government acceptance is claimed.
+
+
+## v0.4 document intake — 4 October 2026
+
+- 37 tests passed: 17 cyber, 12 assessment and 8 intake tests. New coverage includes version 1-to-2 migration, source provenance, staged text remaining data, source conditions, duplicates and limits, atomic rejection, mandatory acknowledgement, review reopening, conflicting/cross-case document links and Markdown/HTML escaping.
+- Syntax checks passed for all four app/core modules. This environment has Node but no `npm` command on PATH; checks were run directly with Node.
+- Browser synthetic workflow: empty intake queue; staging retained an excerpt without increasing evidence count; a cited case was marked Reviewed; incorporation without access acknowledgement was blocked; valid incorporation increased evidence to five and reopened the case to Needs review with its prior judgment preserved.
+- Source text containing script markup and embedded instructions was displayed literally. This is an HTML rendering check, not an AI prompt-injection evaluation: no model executes in this prototype.
+- Draft preview was blocked; Discard unapplied changes restored the last applied judgment; the read-only brief preview contained linked source metadata. A later core change preserves excerpt wording using Markdown escaping rather than stripping markup characters; the escaping path passed the new core test. It has not been separately checked in a rendered Markdown viewer.
+- A Hindi synthetic excerpt retained its original wording. No translation quality or multilingual semantic extraction claim is made.
+- The first mobile check exposed navigation overflow (433 vs 375 CSS px). After correction, the final build at 390×844 had equal client/scroll width of 375 CSS px. Viewport override was reset. No browser errors/warnings were reported during the main intake test.
+- JSON download event timed out after eight seconds. Receipt was not acknowledged. Browser file restore remains unverified, and the earlier file-upload permission denial was not bypassed. Core serialization/migration/restore tests pass. Before using the prototype for sustained work, verify an actual file receipt and recovery in an approved browser.
+- The unsaved synthetic QA session resisted reload; a fresh tab in the same in-app browser was used to check the final CSS build. No alternate browser or upload workaround was used.
+- Screenshots are sibling `ruthless-intake-desktop-v0.4.png` (incorporated synthetic source) and `ruthless-intake-mobile-v0.4.png` (Hindi synthetic document awaiting review). QA documents are session-only and are not bundled into the release.
+- Exact source/deployment status is in sibling `ruthless-release-v0.4.json`. Private publication is not a hosted browser compatibility or independent security assessment.

@@ -1,6 +1,6 @@
 # Ruthless — terrorism threat analysis product direction
 
-Updated 3 October 2026. This document supersedes the earlier cyber-first company plan.
+Updated 4 October 2026. The broader five-capability company scope is in `PLATFORM-DIRECTION.md`; this document retains the first terrorism-analysis workflow. This document supersedes the earlier cyber-first company plan.
 
 ## Founder’s intended company
 
@@ -62,3 +62,7 @@ Government deployment needs an agreed threat model, access control, protected au
 - [UN counter-terrorism strategy](https://www.un.org/counterterrorism/en/un-global-counter-terrorism-strategy): linked for analyst reference; direct retrieval failed during this pass. No claims were extracted into the product.
 
 No classified access, government affiliation, customer interviews, grant, accreditation or prevention outcome is claimed.
+
+## v0.4 integration foundation
+
+Manual document intake now records the original excerpt, language, excerpt location, source group and access/reuse conditions. Incorporation requires an analyst statement, review note and access acknowledgement; metadata comes from the staged document. Evidence links to the retained source, and new evidence reopens Reviewed judgments. No automated source collection or AI is implemented. Read `PLATFORM-DIRECTION.md` for the revised sequence and source-policy findings.

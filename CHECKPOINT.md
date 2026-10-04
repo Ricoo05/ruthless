@@ -1,3 +1,7 @@
+## Resume update — 4 October 2026
+
+Work resumed on Sol 6.1 High. The founder expanded the company scope to threat analysis, intelligence gathering, data integration, operations and AI orchestration. Read `docs/PLATFORM-DIRECTION.md` first. v0.4 adds manual document staging/incorporation and source-linked briefs; 37 tests pass. Publication receipt is sibling `ruthless-release-v0.4.json`; only `succeeded` confirms deployment. No pause is being requested or inferred. The older v0.3 checkpoint below is retained as history.
+
 # Project Ruthless — v0.3 checkpoint
 
 Updated 3 October 2026. The user resumed work and changed the core product direction to terrorism threat analysis for government and government-agency buyers, covering domestic/international developments relevant to India and wider regions. This direction supersedes the earlier cyber-first commercial plan. Read `docs/THREAT-ANALYSIS-DIRECTION.md` first.
@@ -36,7 +40,7 @@ Updated 3 October 2026. The user resumed work and changed the core product direc
 ## Persistent preferences
 
 - Founder studies for GATE; assistant performs authorized research, implementation and tests during active runs. No unattended automation is configured.
-- Check account usage and stop/checkpoint at 5% remaining relevant allowance; resume only when user instructs.
+- Superseded 4 October 2026: do not check usage. The founder will request a checkpoint when needed.
 - No spending, contracts or outreach without specific authorization. No subagents authorized.
 - Government cyber testing may be designed only for explicitly authorized systems/scope; the request to attack enemy systems was not accepted.
 - No company incorporation, customer, funding award or government affiliation has been created.

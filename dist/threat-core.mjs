@@ -1,4 +1,5 @@
 export const FORMAT='ruthless-threat-workspace';
+export const WORKSPACE_VERSION=2;
 export const MAX_BYTES=2_000_000;
 export const SCOPES=['Domestic','Cross-border','International'];
 export const STATES=['Draft','Needs review','Reviewed'];
@@ -24,7 +25,14 @@ function evidenceRecord(v){
   if(!object(v)||typeof v.synthetic!=='boolean')fail('Invalid evidence record.');
   const reportedAt=day(v.reportedAt),recordedAt=day(v.recordedAt);if(recordedAt<reportedAt)fail('Recorded date cannot precede report date.');
   const url=sourceURL(v.url);if(!v.synthetic&&!url)fail('Non-synthetic evidence requires a source URL.');
-  return {id:id(v.id),assessmentId:id(v.assessmentId),title:str(v.title,'Evidence title',200),publisher:str(v.publisher,'Publisher',150),originGroup:str(v.originGroup,'Underlying source group',150),url,reportedAt,recordedAt,statement:str(v.statement,'Evidence statement',4000),claimState:choice(v.claimState,CLAIM_STATES,'claim state'),relation:choice(v.relation,RELATIONS,'relation'),synthetic:v.synthetic};
+  return {id:id(v.id),assessmentId:id(v.assessmentId),title:str(v.title,'Evidence title',200),publisher:str(v.publisher,'Publisher',150),originGroup:str(v.originGroup,'Underlying source group',150),url,reportedAt,recordedAt,statement:str(v.statement,'Evidence statement',4000),claimState:choice(v.claimState,CLAIM_STATES,'claim state'),relation:choice(v.relation,RELATIONS,'relation'),synthetic:v.synthetic,sourceDocumentId:v.sourceDocumentId?id(v.sourceDocumentId):''};
+}
+function documentRecord(v){
+  if(!object(v)||typeof v.synthetic!=='boolean')fail('Invalid source document.');
+  const reportedAt=day(v.reportedAt),recordedAt=day(v.recordedAt),url=sourceURL(v.url);
+  if(recordedAt<reportedAt)fail('Recorded date cannot precede report date.');
+  if(!v.synthetic&&!url)fail('Non-synthetic documents require a source URL.');
+  return {id:id(v.id),assessmentId:id(v.assessmentId),title:str(v.title,'Document title',200),publisher:str(v.publisher,'Publisher',150),originGroup:str(v.originGroup,'Underlying source group',150),url,reportedAt,recordedAt,language:str(v.language,'Original language',80),locator:str(v.locator,'Excerpt location',200),accessNote:str(v.accessNote,'Access and reuse conditions',1500),excerpt:str(v.excerpt,'Source excerpt',4000),synthetic:v.synthetic,reviewNote:str(v.reviewNote??'','Intake review note',2000,false)};
 }
 function unique(records){if(new Set(records.map(v=>v.id)).size!==records.length)fail('Duplicate record identifiers.');}
 function assertReview(c,evidence){
@@ -34,14 +42,23 @@ function assertReview(c,evidence){
   if(evidence.some(e=>c.citedEvidence.includes(e.id)&&e.reportedAt>c.asOf))fail('Reviewed assessments cannot cite reports later than their as-of date.');
 }
 export function validateWorkspace(v){
-  if(!object(v)||v.format!==FORMAT||v.version!==1)fail('Unsupported threat workspace format.');
+  if(!object(v)||v.format!==FORMAT||![1,WORKSPACE_VERSION].includes(v.version))fail('Unsupported threat workspace format.');
   if(!Array.isArray(v.assessments)||!v.assessments.length||v.assessments.length>100||!Array.isArray(v.evidence)||v.evidence.length>1000||!Array.isArray(v.history)||v.history.length>2000)fail('Workspace limits: 1–100 assessments, 1,000 evidence records, 2,000 history entries.');
-  const assessments=v.assessments.map(caseRecord),evidence=v.evidence.map(evidenceRecord);unique(assessments);unique(evidence);
+  if(v.version===WORKSPACE_VERSION&&(!Array.isArray(v.documents)||v.documents.length>200))fail('Workspace limit: 200 source documents.');
+  const assessments=v.assessments.map(caseRecord),evidence=v.evidence.map(e=>evidenceRecord(v.version===1?{...e,sourceDocumentId:''}:e)),documents=v.version===1?[]:v.documents.map(documentRecord);unique(assessments);unique(evidence);unique(documents);
   const caseIDs=new Set(assessments.map(c=>c.id)),evidenceIDs=new Map(evidence.map(e=>[e.id,e.assessmentId]));
   for(const e of evidence)if(!caseIDs.has(e.assessmentId))fail('Evidence refers to an unknown assessment.');
+  for(const d of documents)if(!caseIDs.has(d.assessmentId))fail('Document refers to an unknown assessment.');
+  const documentIDs=new Map(documents.map(d=>[d.id,d])),linked=new Set();
+  for(const e of evidence)if(e.sourceDocumentId){
+    const d=documentIDs.get(e.sourceDocumentId);if(!d||d.assessmentId!==e.assessmentId)fail('Evidence must reference a document in the same assessment.');
+    if(linked.has(d.id))fail('A source document can be incorporated only once.');linked.add(d.id);
+    if(!d.reviewNote)fail('Incorporated documents require an intake review note.');
+    if(['publisher','originGroup','url','reportedAt','recordedAt','synthetic'].some(k=>e[k]!==d[k]))fail('Evidence provenance must match its source document.');
+  }
   for(const c of assessments){if(c.citedEvidence.some(e=>evidenceIDs.get(e)!==c.id))fail('Citations must refer to evidence in the same assessment.');assertReview(c,evidence);}
   const history=v.history.map(h=>{if(!object(h)||!caseIDs.has(h.assessmentId))fail('Invalid history reference.');return {assessmentId:id(h.assessmentId),at:day(h.at),action:str(h.action,'History action',150),note:str(h.note,'History note',2000,false)};});
-  const result={format:FORMAT,version:1,assessments,evidence,history};serializeWorkspace(result);return result;
+  const result={format:FORMAT,version:WORKSPACE_VERSION,assessments,evidence,documents,history};serializeWorkspace(result);return result;
 }
 export function parseWorkspace(raw){if(typeof raw!=='string'||new TextEncoder().encode(raw).length>MAX_BYTES)fail('Workspace must be no larger than 2 MB in UTF-8.');let v;try{v=JSON.parse(raw);}catch{fail('Workspace is not valid JSON.');}return validateWorkspace(v);}
 export function evidenceSummary(workspace,assessmentId){const rows=workspace.evidence.filter(e=>e.assessmentId===assessmentId);return {records:rows.length,sourceGroups:new Set(rows.filter(e=>e.relation==='Supports').map(e=>e.originGroup.toLowerCase())).size,challenging:rows.filter(e=>e.relation==='Challenges').length,unverified:rows.filter(e=>e.claimState==='Unverified').length,timeline:[...rows].sort((a,b)=>a.reportedAt.localeCompare(b.reportedAt)||a.id.localeCompare(b.id))};}
@@ -58,11 +75,29 @@ export function addEvidence(workspace,input,at){
   return validateWorkspace({...workspace,evidence:[...workspace.evidence,evidence],assessments:workspace.assessments.map(c=>c.id===evidence.assessmentId?{...c,status:c.status==='Reviewed'?'Needs review':c.status}:c),history:[...workspace.history,{assessmentId:evidence.assessmentId,at,action:'Evidence added',note:`${evidence.id}: prior reviewed conclusions reopened`} ]});
 }
 export function addAssessment(workspace,input,at){day(at);return validateWorkspace({...workspace,assessments:[...workspace.assessments,caseRecord(input)],history:[...workspace.history,{assessmentId:input.id,at,action:'Assessment created',note:'Analyst-defined intelligence question'}]});}
+export function stageDocument(workspace,input,at){
+  day(at);const d=documentRecord({...input,reviewNote:''});
+  if(workspace.documents.some(x=>x.id===d.id))fail('Document identifier already exists.');
+  if(workspace.documents.some(x=>x.assessmentId===d.assessmentId&&x.url===d.url&&x.excerpt===d.excerpt&&x.publisher===d.publisher))fail('This source excerpt is already in the intake queue for this assessment.');
+  return validateWorkspace({...workspace,documents:[...workspace.documents,d],history:[...workspace.history,{assessmentId:d.assessmentId,at,action:'Document staged',note:`${d.id}: awaiting analyst intake review`} ]});
+}
+export function incorporateDocument(workspace,documentId,input,at){
+  day(at);const d=workspace.documents.find(x=>x.id===documentId);if(!d)fail('Unknown source document.');
+  if(workspace.evidence.some(e=>e.sourceDocumentId===d.id))fail('This document has already been incorporated.');
+  if(input.accessAcknowledged!==true)fail('Confirm the source access and reuse conditions before incorporation.');
+  const reviewNote=str(input.reviewNote,'Intake review note',2000);
+  const result=addEvidence({...workspace,documents:workspace.documents.map(x=>x.id===d.id?{...x,reviewNote}:x)},{...d,id:input.id,sourceDocumentId:d.id,statement:input.statement,claimState:input.claimState,relation:input.relation},at);
+  result.history[result.history.length-1]={assessmentId:d.assessmentId,at,action:'Document incorporated',note:`${d.id} → ${input.id}: analyst reviewed source conditions and statement; not independent verification`};
+  return validateWorkspace(result);
+}
 export function searchAssessments(workspace,{query='',scope='All',status='All'}={}){const q=query.toLowerCase().trim();return workspace.assessments.filter(c=>(scope==='All'||c.scope===scope)&&(status==='All'||c.status===status)&&(!q||[c.title,c.area,c.question].join(' ').toLowerCase().includes(q)));}
 export function exportAssessment(workspace,assessmentId){
   const c=workspace.assessments.find(c=>c.id===assessmentId);if(!c)fail('Unknown assessment.');const s=evidenceSummary(workspace,c.id);const clean=v=>String(v).replace(/[\r\n]+/g,' ').replace(/[\\`*_{}\[\]<>#]/g,'');
+  const quote=v=>String(v).replace(/[\\`*_{}\[\]#]/g,'\\$&').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\r?\n/g,'\n> ');
   const lines=['# Ruthless — analyst assessment',`Title: ${clean(c.title)}`,`Area: ${clean(c.area)} | Scope: ${c.scope} | As of: ${c.asOf}`,`Status: ${c.status} | Confidence: ${c.confidence} (analyst assigned) | Priority: ${c.priority}`,`Synthetic records: ${s.timeline.filter(e=>e.synthetic).length}/${s.records}`,'','Prototype analyst workspace. This report is not an attack forecast, designation, determination of guilt, or instruction for operational action. Source labels and review status are analyst-supplied; external files and history are editable. Reviewed does not mean independent agency approval.','',`Question: ${clean(c.question)}`,`Judgment: ${clean(c.judgment)||'Not recorded'}`,`Information gaps: ${clean(c.gaps)||'Not recorded'}`,`Review note: ${clean(c.reviewNote)||'Not recorded'}`,`Cited evidence IDs: ${c.citedEvidence.join(', ')||'None'}`,'','## Evidence timeline',`${s.sourceGroups} analyst-assigned supporting source groups. This count does not establish independence or truth.`,''];
-  for(const e of s.timeline)lines.push(`### ${e.id} — ${clean(e.title)}`,`${e.reportedAt} | ${e.synthetic?'SYNTHETIC':'Analyst-entered public reference'} | ${e.claimState} | ${e.relation}`,`Publisher: ${clean(e.publisher)} | Underlying source group: ${clean(e.originGroup)}`,`Statement: ${clean(e.statement)}`,`Source URL (unverified by application): ${e.url||'Synthetic training record; no publisher claim'}`,'');
+  for(const e of s.timeline){lines.push(`### ${e.id} — ${clean(e.title)}`,`${e.reportedAt} | ${e.synthetic?'SYNTHETIC':'Analyst-entered public reference'} | ${e.claimState} | ${e.relation}`,`Publisher: ${clean(e.publisher)} | Underlying source group: ${clean(e.originGroup)}`,`Statement: ${clean(e.statement)}`,`Source URL (unverified by application): ${e.url||'Synthetic training record; no publisher claim'}`);
+    const d=workspace.documents.find(d=>d.id===e.sourceDocumentId);if(d)lines.push(`Source document: ${d.id} | Language: ${clean(d.language)} | Excerpt location: ${clean(d.locator)}`,'Retained excerpt (escaped for Markdown display; original preserved in workspace):',`> ${quote(d.excerpt)}`,`Access/reuse conditions (analyst recorded): ${clean(d.accessNote)}`,`Intake review note: ${clean(d.reviewNote)}`);lines.push('');
+  }
   return lines.join('\n');
 }
 export function demoWorkspace(){
