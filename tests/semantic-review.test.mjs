@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {controlCandidates} from '../dist/evaluation-fixtures.mjs';
 import {evaluationJSON,evaluateCandidates} from '../dist/evaluation-core.mjs';
-import {prepareSemanticReview,recordSemanticReview} from '../dist/review-core.mjs';
+import {prepareSemanticReview,recordSemanticReview,semanticReviewSessionJSON,semanticReviewHasRecords} from '../dist/review-core.mjs';
 const prepared=()=>prepareSemanticReview(evaluationJSON(controlCandidates('holdout','faithful')));
 const decision=s=>({caseId:s.report.rows[0].caseId,reviewerLabel:'Fictional reviewer',criteria:s.review.reviews[0].criteria.map(c=>({...c,result:'Pass',note:'Synthetic test annotation only; not a human quality assessment.'}))});
 
@@ -37,4 +37,37 @@ test('wrong suite, unsupported execution, executable candidate fields and over-l
   await assert.rejects(prepareSemanticReview(JSON.stringify({format:'ruthless-ai-execution',version:1,candidates:value})));
   await assert.rejects(prepareSemanticReview(' '.repeat(2_000_001)),/2 MB/);
   const wrong=controlCandidates('holdout','faithful');wrong.suiteVersion=99;await assert.rejects(prepareSemanticReview(evaluationJSON(wrong)),/Unsupported/);
+});
+
+test('resumable review round trip preserves partial decisions, notes, Hindi sources and reviewer label',async()=>{
+  const initial=await prepared(),input=decision(initial);input.criteria[0].result='Fail';input.criteria[1].result='Not assessed';input.criteria[1].note='Awaiting an independent reviewer; synthetic test record.';
+  const recorded=await recordSemanticReview(initial,input),raw=await semanticReviewSessionJSON(recorded),restored=await prepareSemanticReview(raw);
+  assert.deepEqual(restored,recorded);assert.equal(restored.report.counts.semanticReviewFailed,1);assert.equal(restored.report.counts.needsSemanticReview,5);
+  const changed=decision(restored);changed.criteria[0].result='Not assessed';const continued=await recordSemanticReview(restored,changed);assert.equal(continued.report.counts.reviewerChecksSatisfied,0);assert.equal(continued.report.counts.needsSemanticReview,6);
+});
+test('old separate review files can be resumed only with the exact candidates and source fingerprint',async()=>{
+  const recorded=await recordSemanticReview(await prepared(),decision(await prepared()));
+  const restored=await prepareSemanticReview(evaluationJSON(recorded.candidates),evaluationJSON(recorded.review));assert.deepEqual(restored,recorded);
+  for(const mutation of [v=>v.review.inputFingerprint='0'.repeat(64),v=>v.candidates.responses[0].output.proposals[0].draftStatement+=' Changed.']){
+    const altered=structuredClone(recorded);mutation(altered);await assert.rejects(prepareSemanticReview(evaluationJSON(altered.candidates),evaluationJSON(altered.review)),/Stale or mismatched/);
+  }
+  assert.equal(recorded.report.counts.reviewerChecksSatisfied,1);
+});
+test('review-session import is atomic and rejects injected claims, ambiguous reviews and invalid decisions',async()=>{
+  const initial=await prepared(),bundle=JSON.parse(await semanticReviewSessionJSON(initial));
+  for(const patch of [{version:2},{approved:true},{report:{approved:true}},{review:null}])await assert.rejects(prepareSemanticReview(evaluationJSON({...bundle,...patch})));
+  await assert.rejects(prepareSemanticReview(evaluationJSON(bundle),evaluationJSON(initial.review)),/already contains/);
+  await assert.rejects(prepareSemanticReview(evaluationJSON(initial.candidates),'null'),/review object/);
+  const invalid=structuredClone(bundle);invalid.review.reviews[0].criteria[0].result='Pass';await assert.rejects(prepareSemanticReview(evaluationJSON(invalid)),/reviewer label/);
+  assert.deepEqual(await prepareSemanticReview(evaluationJSON(bundle)),initial);
+});
+test('serialized sessions revalidate fingerprints and enforce a combined UTF-8 limit',async()=>{
+  const stale=await prepared();stale.review.candidateFingerprint='0'.repeat(64);await assert.rejects(semanticReviewSessionJSON(stale),/Stale or mismatched/);
+  const valid=await prepared(),raw=await semanticReviewSessionJSON(valid);assert.ok(Buffer.byteLength(raw)<2_000_000);
+  await assert.rejects(prepareSemanticReview(' '.repeat(2_000_001)),/2 MB/);
+});
+test('unassessed notes and reviewer labels require loss protection, empty templates do not',async()=>{
+  const initial=await prepared();assert.equal(semanticReviewHasRecords(initial),false);assert.equal(semanticReviewHasRecords(null),false);
+  const notes=structuredClone(initial);notes.review.reviews[0].criteria[0].note='Pending linguistic review.';assert.equal(semanticReviewHasRecords(notes),true);
+  notes.review.reviews[0].criteria[0].note='';notes.review.reviewerLabel='A reviewer';assert.equal(semanticReviewHasRecords(notes),true);
 });

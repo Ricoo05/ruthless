@@ -1,4 +1,4 @@
-# First synthetic model integration — v0.10
+# First synthetic model integration — v0.11
 
 Updated 4 October 2026 after live fictional-source tests. User approved secure key creation and a $1 total experiment ceiling; .env.local is configured and Git-ignored. The first real v1 response preserved uncertainty but supplied incorrect citation offsets and was rejected. Prompt ai-attribution-v2 now requests only exact quotes; software derives spans from unique exact occurrences while retaining raw output. Twelve real fixture responses (six development, six visible reserved) passed structural checks. This is not independent semantic validation or an operational readiness claim. A real Hindi result was also checked in the local browser.
 
@@ -47,3 +47,11 @@ Independent unseen multilingual evaluation, practitioner review, approved custom
 ## Browser semantic review
 
 The AI console links to `/review.html` and a received result offers a candidate-JSON preview for copying into review. Existing CLI execution v2 or candidate JSON can also be pasted. Only bundled synthetic suite candidates are supported. The page recomputes structural checks and ignores imported report/approval claims. Applicable criteria and source context are shown side by side; recorded decisions require a reviewer label and notes for every assessed criterion. Unapplied edits block navigation and export. Records are compatible with the offline checker and bound to its existing source/rubric and complete-output fingerprints. No network calls, model requests, assessment writes or automatic approvals occur. Download receipt is not verified; closing the tab loses unexported reviews. Browser QA notes are in VERIFICATION.md.
+
+## Resume a recorded review — v0.11
+
+Export resumable session requests a JSON record with format `ruthless-semantic-review-session`, version 1, and exactly `candidates` and `review`. It is bounded to 2 MB UTF-8 and is revalidated before serialization. It intentionally excludes the execution report, raw provider responses and credentials. Record provenance/provider labels remain unverified.
+
+Paste that record into Open or resume a review. The importer rechecks the bundled candidates against the current authored suite, recomputes the source/rubric and candidate fingerprints, validates every review criterion and then replaces state atomically. Altered drafts, wrong suite versions, mismatched hashes, missing notes, injected approval fields and conflicting separate annotations are rejected. Unassessed notes and reviewer labels also trigger loss protection. No restored reviewer label authenticates identity, and no new semantic decision is inferred.
+
+Older separate review exports can be restored by pasting their exact candidates above and the recorded review in the optional field. Keep that field empty for a resumable session. The offline evaluation CLI continues accepting separate candidate/review files; it does not directly ingest the combined session format. Successful loading collapses import inputs while leaving the restore message and review context visible. Browser fresh-tab JSON recovery was checked; actual download receipt/file recovery remains unverified.

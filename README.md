@@ -1,4 +1,4 @@
-# Project Ruthless — Intelligence Workbench v0.10
+# Project Ruthless — Intelligence Workbench v0.11
 
 Ruthless is being developed as terrorism intelligence analysis software for government and government-agency customers, covering domestic, cross-border and international developments relevant to India, with broader geographic support. The intended platform spans threat analysis, intelligence gathering, data integration, operations workflows and AI orchestration. The current release is a manual evidence-analysis, document-intake and research-task and proposal-review and synthetic-evaluation prototype using fictional cases. Prevention effectiveness and customer demand have not been validated.
 
@@ -51,9 +51,9 @@ v0.9 passed mocked-provider integration tests and desktop/mobile console checks.
 
 ## Synthetic semantic review
 
-Open `/review.html` from the AI console. Paste a candidate file or version 2 execution result; citations are recomputed and imported report/approval claims are ignored. Compare each draft or abstention with the original excerpts, dates, source groups and authored guidance. Record Pass, Fail or Not assessed for each applicable criterion; assessed criteria require a reviewer label and explanatory note. The label stays fixed once a decision is recorded. Unapplied edits block case navigation, replacement and exports until recorded or discarded.
+Open `/review.html` from the AI console. Paste candidates, a version 2 execution result, or a version 1 resumable review session. An optional input accepts an older separate review alongside its matching candidates. Citation checks and input/output fingerprints are recomputed; stale or mismatched reviews reject without changing the active session. Import fields collapse after a successful load, leaving review context visible. Compare each draft or abstention with the original excerpts, dates, source groups and authored guidance. Record Pass, Fail or Not assessed for each applicable criterion; assessed criteria require a reviewer label and explanatory note. The label stays fixed once a decision is recorded. Unapplied edits block case navigation, replacement and exports until recorded or discarded.
 
-Recorded reviews use the existing offline review schema and fingerprints; they can be checked with `scripts/evaluate.mjs`. The page makes no network/API calls and writes no assessment evidence. Closing/reloading loses unexported records. The Export button requests a download; receipt is unverified. Real outputs remain semantically unreviewed until a qualified independent reviewer assesses them. This screen does not authenticate reviewers or establish model quality.
+Export resumable session requests one JSON record containing candidates and recorded review notes. Reopen it by pasting its JSON into the same screen. Preview session provides a read-only JSON alternative. The separate recorded-review export retains the existing offline format for `scripts/evaluate.mjs`; a resumable bundle is not a candidate file for that CLI. The page makes no network/API calls and writes no assessment evidence. Closing/reloading loses unexported records. The Export button requests a download; receipt is unverified. Real outputs remain semantically unreviewed until a qualified independent reviewer assesses them. This screen does not authenticate reviewers or establish model quality.
 
 ## Data and limits
 
@@ -72,10 +72,10 @@ node --check dist/threat-core.mjs
 node --check dist/proposal-core.mjs
 ```
 
-112 tests pass across both modules, including all CLI tests. See `docs/VERIFICATION.md` for browser evidence and remaining limits. `docs/THREAT-ANALYSIS-DIRECTION.md` is the current product direction and supersedes the earlier cyber-first commercial hypothesis.
+117 tests pass across both modules, including all CLI tests. See `docs/VERIFICATION.md` for browser evidence and remaining limits. `docs/THREAT-ANALYSIS-DIRECTION.md` is the current product direction and supersedes the earlier cyber-first commercial hypothesis.
 
 ## Release record
 
-The same owner-private Site is retained. v0.10 adds the quote-resolution correction and synthetic semantic-review screen. Publication is confirmed only when the Sites deployment status is succeeded for the exact pushed commit. Public sharing has not been requested.
+The same owner-private Site is retained. v0.11 adds resumable synthetic reviews and retains the quote-resolution correction and review screen. Publication is confirmed only when the Sites deployment status is succeeded for the exact pushed commit. Public sharing has not been requested.
 
 Current broader company scope and delivery gates are in `docs/PLATFORM-DIRECTION.md`. The practitioner interview/pilot draft is in `docs/PILOT-DISCOVERY.md`. Local research tasks and synthetic fixture proposals are implemented; authenticated collaboration and customer data connectors remain planned; the bounded synthetic API runner has completed fictional model calls; independent semantic review remains outstanding. The first AI proposal/validation design is in `docs/AI-ORCHESTRATION-CONTRACT.md`.
