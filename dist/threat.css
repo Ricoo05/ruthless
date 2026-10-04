@@ -7,3 +7,5 @@
 .proposal-statement{white-space:pre-wrap;overflow-wrap:anywhere}#fixture-document,#proposal-review-note,#proposal-review-form select{width:100%}#proposal-review-details{line-height:1.6;overflow-wrap:anywhere}button:disabled{opacity:.5;cursor:not-allowed}
 
 #evaluation-split,#evaluation-control,#evaluation-report-text{width:100%}#evaluation-report-text{font-family:ui-monospace,monospace;font-size:.875rem}
+
+#import-assessment{width:100%}#import-preview,#source-parent-context{line-height:1.6;overflow-wrap:anywhere}

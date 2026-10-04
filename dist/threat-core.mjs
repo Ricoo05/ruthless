@@ -1,7 +1,7 @@
 import {validateProposalRuns,proposalIsCurrent,fixtureRun} from './proposal-core.mjs';
 export {proposalIsCurrent} from './proposal-core.mjs';
 export const FORMAT='ruthless-threat-workspace';
-export const WORKSPACE_VERSION=4;
+export const WORKSPACE_VERSION=5;
 export const MAX_BYTES=2_000_000;
 export const SCOPES=['Domestic','Cross-border','International'];
 export const STATES=['Draft','Needs review','Reviewed'];
@@ -22,7 +22,8 @@ function caseRecord(v){
   if(!object(v))fail('Invalid assessment record.');
   if(!Array.isArray(v.citedEvidence)||v.citedEvidence.length>1000)fail('Invalid evidence citations.');
   const citedEvidence=v.citedEvidence.map(id);if(new Set(citedEvidence).size!==citedEvidence.length)fail('Duplicate evidence citations.');
-  return {id:id(v.id),title:str(v.title,'Title',180),area:str(v.area,'Area',150),scope:choice(v.scope,SCOPES,'scope'),asOf:day(v.asOf),question:str(v.question,'Intelligence question',1500),judgment:str(v.judgment,'Assessment',4000,false),gaps:str(v.gaps,'Information gaps',2000,false),confidence:choice(v.confidence,CONFIDENCE,'confidence'),priority:choice(v.priority,PRIORITIES,'review priority'),status:choice(v.status,STATES,'review status'),reviewNote:str(v.reviewNote,'Review note',2000,false),citedEvidence};
+  const revisionIDs=v.reviewedRevisionIds??[];if(!Array.isArray(revisionIDs)||revisionIDs.length>200)fail('Invalid reviewed revision identifiers.');const reviewedRevisionIds=revisionIDs.map(id);if(new Set(reviewedRevisionIds).size!==reviewedRevisionIds.length)fail('Duplicate reviewed revision identifiers.');
+  return {id:id(v.id),title:str(v.title,'Title',180),area:str(v.area,'Area',150),scope:choice(v.scope,SCOPES,'scope'),asOf:day(v.asOf),question:str(v.question,'Intelligence question',1500),judgment:str(v.judgment,'Assessment',4000,false),gaps:str(v.gaps,'Information gaps',2000,false),confidence:choice(v.confidence,CONFIDENCE,'confidence'),priority:choice(v.priority,PRIORITIES,'review priority'),status:choice(v.status,STATES,'review status'),reviewNote:str(v.reviewNote,'Review note',2000,false),citedEvidence,reviewedRevisionIds};
 }
 function evidenceRecord(v){
   if(!object(v)||typeof v.synthetic!=='boolean')fail('Invalid evidence record.');
@@ -35,7 +36,18 @@ function documentRecord(v){
   const reportedAt=day(v.reportedAt),recordedAt=day(v.recordedAt),url=sourceURL(v.url);
   if(recordedAt<reportedAt)fail('Recorded date cannot precede report date.');
   if(!v.synthetic&&!url)fail('Non-synthetic documents require a source URL.');
-  return {id:id(v.id),assessmentId:id(v.assessmentId),title:str(v.title,'Document title',200),publisher:str(v.publisher,'Publisher',150),originGroup:str(v.originGroup,'Underlying source group',150),url,reportedAt,recordedAt,language:str(v.language,'Original language',80),locator:str(v.locator,'Excerpt location',200),accessNote:str(v.accessNote,'Access and reuse conditions',1500),excerpt:str(v.excerpt,'Source excerpt',4000),synthetic:v.synthetic,reviewNote:str(v.reviewNote??'','Intake review note',2000,false)};
+  return {id:id(v.id),assessmentId:id(v.assessmentId),title:str(v.title,'Document title',200),publisher:str(v.publisher,'Publisher',150),originGroup:str(v.originGroup,'Underlying source group',150),url,reportedAt,recordedAt,language:str(v.language,'Original language',80),locator:str(v.locator,'Excerpt location',200),accessNote:str(v.accessNote,'Access and reuse conditions',1500),excerpt:str(v.excerpt,'Source excerpt',4000),synthetic:v.synthetic,reviewNote:str(v.reviewNote??'','Intake review note',2000,false),supersedesDocumentId:v.supersedesDocumentId?id(v.supersedesDocumentId):'',revisionNote:str(v.revisionNote??'','Source revision note',2000,false),importBatchId:v.importBatchId?id(v.importBatchId):'',externalRecordId:v.externalRecordId?id(v.externalRecordId):''};
+}
+export function normalizeSourceDocument(input){return documentRecord(input);}
+function importBatchRecord(v){
+  if(!object(v)||!Array.isArray(v.documentIds)||!v.documentIds.length||v.documentIds.length>50)fail('Invalid import batch: 1–50 new documents required.');const documentIds=v.documentIds.map(id);if(new Set(documentIds).size!==documentIds.length)fail('Duplicate import document identifiers.');
+  return {id:id(v.id),sourceSystem:id(v.sourceSystem),label:str(v.label,'Import label',200),stagedAt:day(v.stagedAt),permissionNote:str(v.permissionNote,'Import permission review',1500),documentIds};
+}
+export function documentIsCurrent(workspace,documentId){return workspace.documents.some(d=>d.id===documentId)&&!workspace.documents.some(d=>d.supersedesDocumentId===documentId);}
+export function requiredRevisionIds(workspace,c){
+  const starts=workspace.evidence.filter(e=>c.citedEvidence.includes(e.id)&&e.sourceDocumentId).map(e=>e.sourceDocumentId),ids=new Set();
+  for(const start of starts){let current=start;const visited=new Set([start]);while(true){const next=workspace.documents.find(d=>d.supersedesDocumentId===current);if(!next)break;if(visited.has(next.id))fail('Source revision cycle.');visited.add(next.id);ids.add(next.id);current=next.id;}}
+  return [...ids].sort();
 }
 function taskRecord(v){
   if(!object(v)||!Array.isArray(v.linkedEvidence)||v.linkedEvidence.length>1000)fail('Invalid research task.');
@@ -55,24 +67,38 @@ function assertReview(c,evidence){
   if(evidence.some(e=>c.citedEvidence.includes(e.id)&&e.reportedAt>c.asOf))fail('Reviewed assessments cannot cite reports later than their as-of date.');
 }
 export function validateWorkspace(v){
-  if(!object(v)||v.format!==FORMAT||![1,2,3,WORKSPACE_VERSION].includes(v.version))fail('Unsupported threat workspace format.');
+  if(!object(v)||v.format!==FORMAT||![1,2,3,4,WORKSPACE_VERSION].includes(v.version))fail('Unsupported threat workspace format.');
   if(!Array.isArray(v.assessments)||!v.assessments.length||v.assessments.length>100||!Array.isArray(v.evidence)||v.evidence.length>1000||!Array.isArray(v.history)||v.history.length>2000)fail('Workspace limits: 1–100 assessments, 1,000 evidence records, 2,000 history entries.');
   if(v.version>=2&&(!Array.isArray(v.documents)||v.documents.length>200))fail('Workspace limit: 200 source documents.');
   if(v.version>=3&&(!Array.isArray(v.tasks)||v.tasks.length>500))fail('Workspace limit: 500 research tasks.');
-  const assessments=v.assessments.map(caseRecord),evidence=v.evidence.map(e=>evidenceRecord({...e,...(v.version===1?{sourceDocumentId:''}:{}),...(v.version<4?{proposalRunId:'',proposalId:''}:{})})),documents=v.version===1?[]:v.documents.map(documentRecord);unique(assessments);unique(evidence);unique(documents);
+  const normalizeCase=c=>caseRecord({...c,...(v.version<5?{reviewedRevisionIds:[]}:{})});
+  const assessments=v.assessments.map(normalizeCase),evidence=v.evidence.map(e=>evidenceRecord({...e,...(v.version===1?{sourceDocumentId:''}:{}),...(v.version<4?{proposalRunId:'',proposalId:''}:{})})),documents=v.version===1?[]:v.documents.map(d=>documentRecord({...d,...(v.version<5?{supersedesDocumentId:'',revisionNote:'',importBatchId:'',externalRecordId:''}:{})}));unique(assessments);unique(evidence);unique(documents);
   const tasks=v.version>=3?v.tasks.map(taskRecord):[];unique(tasks);
-  const proposalRuns=v.version===WORKSPACE_VERSION?validateProposalRuns(v.proposalRuns,caseRecord,documentRecord):[];
+  const proposalRuns=v.version>=4?validateProposalRuns(v.proposalRuns,normalizeCase,documentRecord):[];
+  if(v.version>=5&&(!Array.isArray(v.importBatches)||v.importBatches.length>40))fail('Workspace limit: 40 import batches.');const importBatches=v.version>=5?v.importBatches.map(importBatchRecord):[];unique(importBatches);
   const caseIDs=new Set(assessments.map(c=>c.id)),evidenceIDs=new Map(evidence.map(e=>[e.id,e.assessmentId]));
   for(const e of evidence)if(!caseIDs.has(e.assessmentId))fail('Evidence refers to an unknown assessment.');
   for(const d of documents)if(!caseIDs.has(d.assessmentId))fail('Document refers to an unknown assessment.');
   const documentIDs=new Map(documents.map(d=>[d.id,d])),linked=new Set();
+  const parents=new Set();
+  for(const d of documents){
+    if(!d.supersedesDocumentId){if(d.revisionNote)fail('Revision notes require an earlier source document.');continue;}
+    const parent=documentIDs.get(d.supersedesDocumentId);if(!parent||parent.id===d.id||parent.assessmentId!==d.assessmentId)fail('A source revision requires an earlier document in the same assessment.');
+    if(parents.has(parent.id))fail('Source revisions cannot branch.');parents.add(parent.id);
+    if(['publisher','originGroup','synthetic'].some(k=>d[k]!==parent[k]))fail('Source revisions must retain publisher, underlying source group and synthetic status.');
+    if(d.reportedAt<parent.reportedAt||d.recordedAt<parent.recordedAt||!d.revisionNote||d.excerpt===parent.excerpt)fail('Source revisions require changed wording, a note and nondecreasing source dates.');
+    const visited=new Set([d.id]);let current=parent;while(current){if(visited.has(current.id))fail('Source revision cycle.');visited.add(current.id);current=documentIDs.get(current.supersedesDocumentId);}
+  }
+  const batchIDs=new Map(importBatches.map(b=>[b.id,b])),externalKeys=new Set();
+  for(const b of importBatches)for(const documentId of b.documentIds){const d=documentIDs.get(documentId);if(!d||d.importBatchId!==b.id||!d.externalRecordId||b.stagedAt<d.recordedAt)fail('Import batch must match its retained source documents and dates.');}
+  for(const d of documents)if(d.importBatchId||d.externalRecordId){const b=batchIDs.get(d.importBatchId);if(!b||!b.documentIds.includes(d.id)||!d.externalRecordId)fail('Document import lineage is inconsistent.');const key=`${b.sourceSystem}:${d.externalRecordId}`;if(externalKeys.has(key))fail('Duplicate external source record identity.');externalKeys.add(key);}
   for(const e of evidence)if(e.sourceDocumentId){
     const d=documentIDs.get(e.sourceDocumentId);if(!d||d.assessmentId!==e.assessmentId)fail('Evidence must reference a document in the same assessment.');
     if(linked.has(d.id))fail('A source document can be incorporated only once.');linked.add(d.id);
     if(!d.reviewNote)fail('Incorporated documents require an intake review note.');
     if(['publisher','originGroup','url','reportedAt','recordedAt','synthetic'].some(k=>e[k]!==d[k]))fail('Evidence provenance must match its source document.');
   }
-  for(const c of assessments){if(c.citedEvidence.some(e=>evidenceIDs.get(e)!==c.id))fail('Citations must refer to evidence in the same assessment.');assertReview(c,evidence);}
+  for(const c of assessments){if(c.citedEvidence.some(e=>evidenceIDs.get(e)!==c.id))fail('Citations must refer to evidence in the same assessment.');if(c.reviewedRevisionIds.some(id=>documentIDs.get(id)?.assessmentId!==c.id||!documentIDs.get(id)?.supersedesDocumentId))fail('Reviewed revisions must belong to this assessment.');assertReview(c,evidence);if(c.status==='Reviewed'){const required=requiredRevisionIds({documents,evidence},c);if(required.some(id=>!c.reviewedRevisionIds.includes(id)))fail('Reviewed assessments must acknowledge revisions to their cited sources.');if(required.some(id=>documentIDs.get(id).reportedAt>c.asOf))fail('Reviewed assessments cannot acknowledge source revisions later than their as-of date.');}}
   for(const t of tasks){
     if(!caseIDs.has(t.assessmentId))fail('Task refers to an unknown assessment.');
     if(t.linkedEvidence.some(e=>evidenceIDs.get(e)!==t.assessmentId))fail('Task evidence must belong to the same assessment.');
@@ -88,13 +114,14 @@ export function validateWorkspace(v){
   }
   for(const e of evidence)if(e.proposalRunId||e.proposalId){const link=proposalLinks.get(`${e.proposalRunId}:${e.proposalId}`);if(!link||link.p.status!=='Accepted'||link.p.evidenceId!==e.id)fail('Evidence proposal lineage is inconsistent.');}
   const history=v.history.map(h=>{if(!object(h)||!caseIDs.has(h.assessmentId))fail('Invalid history reference.');return {assessmentId:id(h.assessmentId),at:day(h.at),action:str(h.action,'History action',150),note:str(h.note,'History note',2000,false)};});
-  const result={format:FORMAT,version:WORKSPACE_VERSION,assessments,evidence,documents,tasks,proposalRuns,history};serializeWorkspace(result);return result;
+  const result={format:FORMAT,version:WORKSPACE_VERSION,assessments,evidence,documents,tasks,proposalRuns,importBatches,history};serializeWorkspace(result);return result;
 }
 export function parseWorkspace(raw){if(typeof raw!=='string'||new TextEncoder().encode(raw).length>MAX_BYTES)fail('Workspace must be no larger than 2 MB in UTF-8.');let v;try{v=JSON.parse(raw);}catch{fail('Workspace is not valid JSON.');}return validateWorkspace(v);}
-export function evidenceSummary(workspace,assessmentId){const rows=workspace.evidence.filter(e=>e.assessmentId===assessmentId);return {records:rows.length,sourceGroups:new Set(rows.filter(e=>e.relation==='Supports').map(e=>e.originGroup.toLowerCase())).size,challenging:rows.filter(e=>e.relation==='Challenges').length,unverified:rows.filter(e=>e.claimState==='Unverified').length,timeline:[...rows].sort((a,b)=>a.reportedAt.localeCompare(b.reportedAt)||a.id.localeCompare(b.id))};}
+export function evidenceSummary(workspace,assessmentId){const rows=workspace.evidence.filter(e=>e.assessmentId===assessmentId),superseded=e=>e.sourceDocumentId&&!documentIsCurrent(workspace,e.sourceDocumentId);return {records:rows.length,supersededRecords:rows.filter(superseded).length,sourceGroups:new Set(rows.filter(e=>e.relation==='Supports'&&!superseded(e)).map(e=>e.originGroup.toLowerCase())).size,challenging:rows.filter(e=>e.relation==='Challenges').length,unverified:rows.filter(e=>e.claimState==='Unverified').length,timeline:[...rows].sort((a,b)=>a.reportedAt.localeCompare(b.reportedAt)||a.id.localeCompare(b.id))};}
 export function updateAssessment(workspace,assessmentId,changes,at){
   day(at);const original=workspace.assessments.find(c=>c.id===assessmentId);if(!original)fail('Assessment no longer exists.');
-  const next=caseRecord({...original,...changes,id:original.id});
+  let next=caseRecord({...original,...changes,id:original.id});
+  const revisions=requiredRevisionIds(workspace,next);if(next.status==='Reviewed'){if(revisions.length&&changes.revisionsAcknowledged!==true)fail('Acknowledge revisions to cited sources before marking Reviewed.');next={...next,reviewedRevisionIds:revisions};}
   const previousEvidence=workspace.evidence.filter(e=>e.assessmentId===assessmentId);
   if(next.status==='Reviewed'&&previousEvidence.some(e=>e.relation==='Challenges')&&!changes.challengesAcknowledged)fail('Acknowledge that conflicting evidence was considered before marking Reviewed.');
   const result={...workspace,assessments:workspace.assessments.map(c=>c.id===assessmentId?next:c),history:[...workspace.history,{assessmentId,at,action:'Assessment updated',note:`${original.status} → ${next.status}; ${next.confidence} confidence (analyst assigned)`}]};
@@ -107,12 +134,15 @@ export function addEvidence(workspace,input,at){
 export function addAssessment(workspace,input,at){day(at);return validateWorkspace({...workspace,assessments:[...workspace.assessments,caseRecord(input)],history:[...workspace.history,{assessmentId:input.id,at,action:'Assessment created',note:'Analyst-defined intelligence question'}]});}
 export function stageDocument(workspace,input,at){
   day(at);const d=documentRecord({...input,reviewNote:''});
+  if(d.importBatchId||d.externalRecordId)fail('Stage external records through the validated import adapter.');
+  if(d.supersedesDocumentId){if(input.accessAcknowledged!==true)fail('Confirm access and reuse conditions before staging a source revision.');if(!documentIsCurrent(workspace,d.supersedesDocumentId))fail('Revise the latest source document; an earlier revision cannot branch.');if(d.recordedAt>at)fail('Source revision staging cannot precede its recorded date.');}
   if(workspace.documents.some(x=>x.id===d.id))fail('Document identifier already exists.');
   if(workspace.documents.some(x=>x.assessmentId===d.assessmentId&&x.url===d.url&&x.excerpt===d.excerpt&&x.publisher===d.publisher))fail('This source excerpt is already in the intake queue for this assessment.');
-  return validateWorkspace({...workspace,documents:[...workspace.documents,d],history:[...workspace.history,{assessmentId:d.assessmentId,at,action:'Document staged',note:`${d.id}: awaiting analyst intake review`} ]});
+  return validateWorkspace({...workspace,documents:[...workspace.documents,d],assessments:workspace.assessments.map(c=>c.id===d.assessmentId&&d.supersedesDocumentId&&c.status==='Reviewed'?{...c,status:'Needs review'}:c),history:[...workspace.history,{assessmentId:d.assessmentId,at,action:d.supersedesDocumentId?'Source revision staged':'Document staged',note:d.supersedesDocumentId?`${d.supersedesDocumentId} → ${d.id}: earlier source retained; reviewed conclusion reopened`:`${d.id}: awaiting analyst intake review`} ]});
 }
 export function incorporateDocument(workspace,documentId,input,at){
   day(at);const d=workspace.documents.find(x=>x.id===documentId);if(!d)fail('Unknown source document.');
+  if(!documentIsCurrent(workspace,d.id))fail('This source is superseded. Review its latest revision instead.');
   if(workspace.evidence.some(e=>e.sourceDocumentId===d.id))fail('This document has already been incorporated.');
   if(input.accessAcknowledged!==true)fail('Confirm the source access and reuse conditions before incorporation.');
   const reviewNote=str(input.reviewNote,'Intake review note',2000);
@@ -123,6 +153,7 @@ export function incorporateDocument(workspace,documentId,input,at){
 export function createFixtureProposal(workspace,documentId,runId,proposalId,at){
   day(at);const d=workspace.documents.find(d=>d.id===documentId),c=workspace.assessments.find(c=>c.id===d?.assessmentId);
   if(!d||!c||!d.synthetic)fail('Select a staged synthetic document for the local fixture.');
+  if(!documentIsCurrent(workspace,d.id))fail('This source is superseded. Select its latest revision.');
   if(workspace.evidence.some(e=>e.sourceDocumentId===documentId))fail('This document has already been incorporated.');
   if(workspace.proposalRuns.some(r=>r.snapshot.document.id===documentId&&r.proposals.some(p=>p.status==='Proposed')))fail('Review or reject the pending proposal for this source first.');
   const run=fixtureRun(c,d,runId,proposalId,at);
@@ -163,11 +194,15 @@ export function exportAssessment(workspace,assessmentId){
   const quote=v=>String(v).replace(/[\\`*_{}\[\]#]/g,'\\$&').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\r?\n/g,'\n> ');
   const lines=['# Ruthless — analyst assessment',`Title: ${clean(c.title)}`,`Area: ${clean(c.area)} | Scope: ${c.scope} | As of: ${c.asOf}`,`Status: ${c.status} | Confidence: ${c.confidence} (analyst assigned) | Priority: ${c.priority}`,`Synthetic records: ${s.timeline.filter(e=>e.synthetic).length}/${s.records}`,'','Prototype analyst workspace. This report is not an attack forecast, designation, determination of guilt, or instruction for operational action. Source labels and review status are analyst-supplied; external files and history are editable. Reviewed does not mean independent agency approval.','',`Question: ${clean(c.question)}`,`Judgment: ${clean(c.judgment)||'Not recorded'}`,`Information gaps: ${clean(c.gaps)||'Not recorded'}`,`Review note: ${clean(c.reviewNote)||'Not recorded'}`,`Cited evidence IDs: ${c.citedEvidence.join(', ')||'None'}`,'','## Evidence timeline',`${s.sourceGroups} analyst-assigned supporting source groups. This count does not establish independence or truth.`,''];
   for(const e of s.timeline){lines.push(`### ${e.id} — ${clean(e.title)}`,`${e.reportedAt} | ${e.synthetic?'SYNTHETIC':'Analyst-entered public reference'} | ${e.claimState} | ${e.relation}`,`Publisher: ${clean(e.publisher)} | Underlying source group: ${clean(e.originGroup)}`,`Statement: ${clean(e.statement)}`,`Source URL (unverified by application): ${e.url||'Synthetic training record; no publisher claim'}`);
+    if(e.sourceDocumentId&&!documentIsCurrent(workspace,e.sourceDocumentId))lines.push('SOURCE SUPERSEDED: earlier evidence retained as history; inspect source revisions before relying on this statement.');
     if(e.proposalRunId)lines.push(`Proposal lineage: ${e.proposalRunId} / ${e.proposalId} — local synthetic fixture, no AI called; analyst accepted`);
     const d=workspace.documents.find(d=>d.id===e.sourceDocumentId);if(d)lines.push(`Source document: ${d.id} | Language: ${clean(d.language)} | Excerpt location: ${clean(d.locator)}`,'Retained excerpt (escaped for Markdown display; original preserved in workspace):',`> ${quote(d.excerpt)}`,`Access/reuse conditions (analyst recorded): ${clean(d.accessNote)}`,`Intake review note: ${clean(d.reviewNote)}`);lines.push('');
   }
+  lines.push('## Source revisions','Staged corrections are source records, not automatically incorporated evidence. Earlier excerpts and judgments are retained.',`Acknowledged revision IDs (analyst supplied): ${c.reviewedRevisionIds.join(', ')||'None'}`,'');
+  for(const d of workspace.documents.filter(d=>d.assessmentId===assessmentId&&d.supersedesDocumentId))lines.push(`### ${d.id} — ${clean(d.title)}`,`Supersedes: ${d.supersedesDocumentId} | Reported ${d.reportedAt} | ${documentIsCurrent(workspace,d.id)?'Latest retained revision':'Superseded revision'}`,`Revision note: ${clean(d.revisionNote)}`,'Retained revised excerpt:',`> ${quote(d.excerpt)}`,`Access/reuse conditions (analyst recorded): ${clean(d.accessNote)}`,'');
   lines.push('## Research follow-up tasks','Owner labels and task completion are analyst-supplied; they do not establish verified identity or approve an assessment.','');
   for(const t of workspace.tasks.filter(t=>t.assessmentId===assessmentId))lines.push(`### ${t.id} — ${clean(t.title)}`,`Status: ${t.status} | Due: ${t.dueAt} | Owner label (unverified): ${clean(t.owner)||'Unassigned'}`,`Permitted research scope: ${clean(t.scope)}`,`Progress note: ${clean(t.note)||'Not recorded'}`,`Result note: ${clean(t.resultNote)||'Not recorded'}`,`Linked evidence: ${t.linkedEvidence.join(', ')||'None'}`,'');
+  for(const t of workspace.tasks.filter(t=>t.assessmentId===assessmentId&&workspace.evidence.some(e=>t.linkedEvidence.includes(e.id)&&e.sourceDocumentId&&!documentIsCurrent(workspace,e.sourceDocumentId))))lines.push(`Task ${t.id}: linked evidence has a superseded source; the previous task state/result is retained for analyst follow-up.`);
   return lines.join('\n');
 }
 export function demoWorkspace(){

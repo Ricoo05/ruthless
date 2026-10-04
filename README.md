@@ -1,4 +1,4 @@
-# Project Ruthless — Intelligence Workbench v0.7
+# Project Ruthless — Intelligence Workbench v0.8
 
 Ruthless is being developed as terrorism intelligence analysis software for government and government-agency customers, covering domestic, cross-border and international developments relevant to India, with broader geographic support. The intended platform spans threat analysis, intelligence gathering, data integration, operations workflows and AI orchestration. The current release is a manual evidence-analysis, document-intake and research-task and proposal-review and synthetic-evaluation prototype using fictional cases. Prevention effectiveness and customer demand have not been validated.
 
@@ -20,6 +20,10 @@ Open http://127.0.0.1:4173/. The local server binds to loopback. The retained cy
 4. Record the judgment, information gaps, confidence, citations and review note. Reviewed assessments require all these fields and explicit consideration of conflicting evidence. A reviewed conclusion cannot cite a report published after its as-of date.
 5. Adding evidence reopens a Reviewed assessment. Confidence is analyst-assigned, not an attack probability. Review labels are local workflow status, not agency approval.
 6. Save workspace requests a JSON download. Confirm receipt only after finding the actual saved file. The app keeps the unsaved marker until that acknowledgement and invalidates it if the workspace changes. Open workspace restores a JSON file after validation. Preview brief displays the applied assessment with linked source excerpts. Export brief requests a Markdown download. Unapplied assessment changes can be discarded explicitly.
+
+## Source integration and correction workflow
+
+Document intake now stages a built-in synthetic batch containing an original, shared-source repost and linked correction, after source-conditions acknowledgement. Repeating an unchanged batch skips its records. The offline JSON adapter validates all rows atomically and writes a new workspace without fetching sources or adding evidence. Manual corrections retain prior excerpts/evidence, reopen Reviewed assessments and require revision consideration before re-review. Superseded sources cannot be used for new incorporation or fixture proposals. See `docs/SOURCE-INTEGRATION.md` for the schema and CLI.
 
 ## Research follow-up workflow
 
@@ -43,23 +47,23 @@ The offline checker exports input-only fixtures, validates candidate files and c
 
 All evidence in the bundled demonstration is fictional and labeled synthetic. NIA, MHA and UN pages are linked as references; no claim of live ingestion is made. There are no AI calls, customer-data uploads, analytics, browser persistence, automated actions or protected audit records. Files and history are editable and unencrypted. Use synthetic or approved non-sensitive material for evaluation.
 
-Threat workspace limits: 100 assessments, 200 retained source excerpts, 500 research tasks, 1,000 evidence records, 40 proposal runs (8 proposals/run, 4 citations/proposal), 2,000 history entries and 2 MB in UTF-8. Limits are checked before mutations. The original cyber module retains its separate project format and 12 MB limit. The two document formats are not interchangeable. Threat workspace format version 4 stores sources, tasks and proposal runs. Versions 1–3 migrate with empty proposal queues; versions 1–2 also have no tasks, and version 1 has no retained documents. Older releases cannot read version 4.
+Threat workspace limits: 100 assessments, 200 retained source excerpts, 500 research tasks, 1,000 evidence records, 40 proposal runs (8 proposals/run, 4 citations/proposal), 2,000 history entries and 2 MB in UTF-8. Limits are checked before mutations. The original cyber module retains its separate project format and 12 MB limit. The two document formats are not interchangeable. Threat workspace format version 5 stores sources, tasks, proposal runs, linked corrections and up to 40 import batches (50 rows per batch). Versions 1–4 migrate without invented revision/import metadata; v4 proposal history is retained. Versions 1–3 migrate with empty proposal queues; versions 1–2 also have no tasks, and version 1 has no retained documents. Older releases cannot read version 5.
 
-Browser export receipt and file-import round trips remain unverified in v0.7. The in-app browser download event previously timed out, and files were not found at the expected Downloads paths. Do not close a working session before confirming that its file was received. Core serialization and restore validation pass automated tests.
+Browser export receipt and file-import round trips remain unverified in v0.8. The in-app browser download event previously timed out, and files were not found at the expected Downloads paths. Do not close a working session before confirming that its file was received. Core serialization and restore validation pass automated tests.
 
 ## Checks
 
 ```powershell
-node --test tests/core.test.mjs tests/threat.test.mjs tests/intake.test.mjs tests/tasks.test.mjs tests/proposals.test.mjs tests/evaluation.test.mjs
+node --test tests/core.test.mjs tests/threat.test.mjs tests/intake.test.mjs tests/tasks.test.mjs tests/proposals.test.mjs tests/evaluation.test.mjs tests/revisions.test.mjs tests/imports.test.mjs
 node --check dist/threat-app.mjs
 node --check dist/threat-core.mjs
 node --check dist/proposal-core.mjs
 ```
 
-66 tests pass across both modules. See `docs/VERIFICATION.md` for browser evidence and remaining limits. `docs/THREAT-ANALYSIS-DIRECTION.md` is the current product direction and supersedes the earlier cyber-first commercial hypothesis.
+83 tests pass across both modules. See `docs/VERIFICATION.md` for browser evidence and remaining limits. `docs/THREAT-ANALYSIS-DIRECTION.md` is the current product direction and supersedes the earlier cyber-first commercial hypothesis.
 
 ## Release record
 
-The same private Site is retained. The latest confirmed v0.7 deployment, source commit and limitations are recorded in sibling `ruthless-release-v0.7.json`. Until that receipt exists with status `succeeded`, v0.7 publication is not confirmed. Public sharing has not been requested.
+The same private Site is retained. The latest confirmed v0.8 deployment, source commit and limitations are recorded in sibling `ruthless-release-v0.8.json`. Until that receipt exists with status `succeeded`, v0.8 publication is not confirmed. Public sharing has not been requested.
 
 Current broader company scope and delivery gates are in `docs/PLATFORM-DIRECTION.md`. The practitioner interview/pilot draft is in `docs/PILOT-DISCOVERY.md`. Local research tasks and synthetic fixture proposals are implemented; authenticated collaboration, customer data connectors and AI execution remain planned. The first AI proposal/validation design is in `docs/AI-ORCHESTRATION-CONTRACT.md`.
