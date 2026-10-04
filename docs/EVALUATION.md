@@ -22,9 +22,9 @@ Every case requires attribution, uncertainty and scope checks. Applicable cases 
 
 For each applicable criterion record Pass, Fail or Not assessed. Pass and Fail require an explanatory note and reviewer label. The checker rejects missing/unknown/duplicate criteria. Any unassessed criterion leaves the case needing semantic review; any failure records a semantic failure. Structurally invalid outputs remain invalid even if all reviewer labels say Pass. Local reviewer labels are not authenticated identities.
 
-Proposed gate before a live-provider pilot: no unresolved structural failures, every applicable semantic criterion assessed, no unresolved semantic failure, and failures retained with case-level notes. These are development criteria, not customer-agreed numeric thresholds. A pilot owner must approve the task, dataset, deployment/retention requirements and success measures. Have independent practitioners review attribution/inference, and a fluent reviewer assess Hindi/mixed-language material. Use new unseen cases and record disagreements. Freeze the suite and prompt/provider versions before measuring a future provider; do not tune on reserved cases and then present them as unseen evaluation.
+Proposed gate before customer use (not a prerequisite for the first synthetic provider experiment): no unresolved structural failures, every applicable semantic criterion assessed, no unresolved semantic failure, and failures retained with case-level notes. These are development criteria, not customer-agreed numeric thresholds. A pilot owner must approve the task, dataset, deployment/retention requirements and success measures. Have independent practitioners review attribution/inference, and a fluent reviewer assess Hindi/mixed-language material. Use new unseen cases and record disagreements. Freeze the suite and prompt/provider versions before measuring a future provider; do not tune on reserved cases and then present them as unseen evaluation.
 
-Reports retain input/rubric and candidate SHA-256 fingerprints. Changed candidate content, input/rubric version, suite or split invalidates earlier annotations. Fingerprints catch mismatched files; editable local reports can be forged and are not protected audit trails. Candidate labels are caller-supplied and do not prove provider identity. Candidate execution timestamps, verified reviewer identity and server-side audit are not implemented.
+Reports retain input/rubric and candidate SHA-256 fingerprints. Changed candidate content, input/rubric version, suite or split invalidates earlier annotations. Fingerprints catch mismatched files; editable local reports can be forged and are not protected audit trails. Candidate labels are caller-supplied and do not prove provider identity. The v0.9 runner records editable execution timestamps and provider response metadata separately; verified reviewer identity and protected server-side audit are not implemented.
 
 ## Offline workflow
 
@@ -45,6 +45,10 @@ node scripts/evaluate.mjs check --input ../eval-faithful-dev.json --review ../ev
 ```
 
 Use `--split holdout` with fresh filenames for the reserved set. Use `--kind misleading` to demonstrate exact citations with unassessed semantic defects, and `--kind malformed` for invalid quotes. `--help` lists the commands. Exit 0 means structural checks did not fail and no recorded semantic failure exists; it is not semantic approval. Exit 2 means structural or recorded semantic failure. Exit 1 means invalid arguments, file data or an output write error. Templates default every criterion to Not assessed. Nothing inserts benchmark outputs into assessment evidence or marks assessments Reviewed.
+
+## First model integration
+
+v0.9 implements a separate bounded synthetic Responses runner and local console; see `AI-RUNNER.md`. Only input-only fixtures enter requests. No real provider has been called or measured. Authored controls and mocked transport tests do not establish model quality.
 
 ## Next gate
 
