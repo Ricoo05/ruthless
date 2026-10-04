@@ -6,12 +6,12 @@ const doc={id:'DOC-001',assessmentId:caseID,title:'Fictional follow-up',publishe
 const input={id:'EV-001',statement:'The fictional publisher reports that the cause remains unconfirmed.',claimState:'Reported',relation:'Challenges',reviewNote:'Attribution preserved; embedded instructions treated as source text. Not independent corroboration.',accessAcknowledged:true};
 const staged=()=>stageDocument(demoWorkspace(),doc,at);
 
-test('version 1 migrates without inventing source provenance; version 2 round trips',()=>{
-  const w=demoWorkspace();assert.equal(w.version,2);assert.deepEqual(w.documents,[]);
+test('version 1 migrates without inventing source provenance; current version round trips',()=>{
+  const w=demoWorkspace();assert.equal(w.version,3);assert.deepEqual(w.documents,[]);
   const legacy={...w,version:1};delete legacy.documents;legacy.evidence[0].sourceDocumentId='forged';
   const migrated=parseWorkspace(JSON.stringify(legacy));assert.deepEqual(migrated.documents,[]);assert.equal(migrated.evidence[0].sourceDocumentId,'');
   const next=staged();assert.deepEqual(parseWorkspace(serializeWorkspace(next)),next);
-  assert.throws(()=>validateWorkspace({...next,version:3}),/Unsupported/);
+  assert.throws(()=>validateWorkspace({...next,version:4}),/Unsupported/);
   assert.throws(()=>validateWorkspace({...next,documents:undefined}),/200 source/);
 });
 test('staging retains excerpt as data and does not change evidence or review state',()=>{

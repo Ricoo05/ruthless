@@ -1,3 +1,7 @@
+## Work continued — v0.5, 4 October 2026
+
+Research-task creation, states, scoped follow-up, owner labels, due dates, evidence-linked completion and reopening are implemented. Workspace schema v3 migrates v1/v2 without inventing tasks. 45 tests pass; browser checks are in `docs/VERIFICATION.md`. Current release receipt is sibling `ruthless-release-v0.5.json`; only `succeeded` confirms publication. First AI proposal contract is in `docs/AI-ORCHESTRATION-CONTRACT.md`. Stay on Sol 6.1 High for bounded implementation. Usage checks remain disabled; no pause or checkpoint request is inferred. Historical notes below are retained.
+
 ## Resume update — 4 October 2026
 
 Work resumed on Sol 6.1 High. The founder expanded the company scope to threat analysis, intelligence gathering, data integration, operations and AI orchestration. Read `docs/PLATFORM-DIRECTION.md` first. v0.4 adds manual document staging/incorporation and source-linked briefs; 37 tests pass. Publication receipt is sibling `ruthless-release-v0.4.json`; only `succeeded` confirms deployment. No pause is being requested or inferred. The older v0.3 checkpoint below is retained as history.

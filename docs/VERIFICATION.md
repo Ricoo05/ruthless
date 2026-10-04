@@ -66,3 +66,13 @@ Use GPT-6.1 Sol High for routine work after this review. Finish the blocked brow
 - The unsaved synthetic QA session resisted reload; a fresh tab in the same in-app browser was used to check the final CSS build. No alternate browser or upload workaround was used.
 - Screenshots are sibling `ruthless-intake-desktop-v0.4.png` (incorporated synthetic source) and `ruthless-intake-mobile-v0.4.png` (Hindi synthetic document awaiting review). QA documents are session-only and are not bundled into the release.
 - Exact source/deployment status is in sibling `ruthless-release-v0.4.json`. Private publication is not a hosted browser compatibility or independent security assessment.
+
+
+## v0.5 research-task queue — 4 October 2026
+
+- 45 tests passed: 17 cyber, 12 assessment, 8 intake and 8 task tests. Task coverage includes creation bounds, state requirements, atomic rejection, same-assessment evidence, chronology, explanations/reopening, overdue filters, legacy v1/v2 migration and brief/round-trip provenance. All four app/core modules passed syntax checks.
+- Browser: empty queue; created an unassigned overdue synthetic follow-up; completion without result/evidence blocked; valid completion excluded from overdue and left the linked assessment in Draft; reopening without a new note blocked; documented reopening retained the prior result; View assessment navigated to the correct case.
+- Read-only brief preview contained the task, unverified owner label and reopening note. Search produced an explicit empty state and restored the task when cleared.
+- At 390×844, client and scroll width were both 375 CSS px. Viewport override reset. No errors/warnings were reported during task checks. Desktop/mobile screenshots are sibling `ruthless-tasks-desktop-v0.5.png` and `ruthless-tasks-mobile-v0.5.png`; synthetic QA tasks are not bundled into the release.
+- File save/reopen remains browser-unverified from the previous release. No new file upload attempt or bypass was made. Workspace v3 task/source round trips pass core tests, but this does not establish durable browser storage.
+- The task queue is session-local and records analyst labels; it provides no authenticated identity, shared assignment, protected audit, automated execution or AI calls. Exact private publication state is in sibling `ruthless-release-v0.5.json`.

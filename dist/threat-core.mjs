@@ -1,5 +1,5 @@
 export const FORMAT='ruthless-threat-workspace';
-export const WORKSPACE_VERSION=2;
+export const WORKSPACE_VERSION=3;
 export const MAX_BYTES=2_000_000;
 export const SCOPES=['Domestic','Cross-border','International'];
 export const STATES=['Draft','Needs review','Reviewed'];
@@ -7,6 +7,7 @@ export const CONFIDENCE=['Insufficient','Low','Moderate','High'];
 export const PRIORITIES=['Routine','Priority review'];
 export const RELATIONS=['Supports','Challenges','Context'];
 export const CLAIM_STATES=['Unverified','Reported','Disputed','Context'];
+export const TASK_STATES=['Open','In progress','Blocked','Completed','Cancelled'];
 const fail=m=>{throw new Error(m);};
 const object=v=>v&&typeof v==='object'&&!Array.isArray(v);
 const str=(v,label,max=4000,required=true)=>{if(typeof v!=='string')fail(`${label} must be text.`);const s=v.trim();if((required&&!s)||s.length>max)fail(`${label} must contain ${required?'1':'0'}–${max} characters.`);return s;};
@@ -34,6 +35,16 @@ function documentRecord(v){
   if(!v.synthetic&&!url)fail('Non-synthetic documents require a source URL.');
   return {id:id(v.id),assessmentId:id(v.assessmentId),title:str(v.title,'Document title',200),publisher:str(v.publisher,'Publisher',150),originGroup:str(v.originGroup,'Underlying source group',150),url,reportedAt,recordedAt,language:str(v.language,'Original language',80),locator:str(v.locator,'Excerpt location',200),accessNote:str(v.accessNote,'Access and reuse conditions',1500),excerpt:str(v.excerpt,'Source excerpt',4000),synthetic:v.synthetic,reviewNote:str(v.reviewNote??'','Intake review note',2000,false)};
 }
+function taskRecord(v){
+  if(!object(v)||!Array.isArray(v.linkedEvidence)||v.linkedEvidence.length>1000)fail('Invalid research task.');
+  const linkedEvidence=v.linkedEvidence.map(id);if(new Set(linkedEvidence).size!==linkedEvidence.length)fail('Duplicate task evidence links.');
+  const createdAt=day(v.createdAt),updatedAt=day(v.updatedAt);if(updatedAt<createdAt)fail('Task update date cannot precede creation.');
+  const result={id:id(v.id),assessmentId:id(v.assessmentId),title:str(v.title,'Task title',180),scope:str(v.scope,'Permitted research scope',1500),owner:str(v.owner,'Owner label',120,false),dueAt:day(v.dueAt),createdAt,updatedAt,status:choice(v.status,TASK_STATES,'task status'),note:str(v.note,'Task progress note',2000,false),resultNote:str(v.resultNote,'Task result note',2000,false),linkedEvidence};
+  if(['In progress','Completed'].includes(result.status)&&!result.owner)fail('In progress and Completed tasks require an owner label.');
+  if(['Blocked','Cancelled'].includes(result.status)&&!result.note)fail('Blocked and Cancelled tasks require a progress note.');
+  if(result.status==='Completed'&&(!result.resultNote||!linkedEvidence.length))fail('Completed tasks require a result note and linked evidence.');
+  return result;
+}
 function unique(records){if(new Set(records.map(v=>v.id)).size!==records.length)fail('Duplicate record identifiers.');}
 function assertReview(c,evidence){
   if(c.status!=='Reviewed')return;
@@ -42,10 +53,12 @@ function assertReview(c,evidence){
   if(evidence.some(e=>c.citedEvidence.includes(e.id)&&e.reportedAt>c.asOf))fail('Reviewed assessments cannot cite reports later than their as-of date.');
 }
 export function validateWorkspace(v){
-  if(!object(v)||v.format!==FORMAT||![1,WORKSPACE_VERSION].includes(v.version))fail('Unsupported threat workspace format.');
+  if(!object(v)||v.format!==FORMAT||![1,2,WORKSPACE_VERSION].includes(v.version))fail('Unsupported threat workspace format.');
   if(!Array.isArray(v.assessments)||!v.assessments.length||v.assessments.length>100||!Array.isArray(v.evidence)||v.evidence.length>1000||!Array.isArray(v.history)||v.history.length>2000)fail('Workspace limits: 1–100 assessments, 1,000 evidence records, 2,000 history entries.');
-  if(v.version===WORKSPACE_VERSION&&(!Array.isArray(v.documents)||v.documents.length>200))fail('Workspace limit: 200 source documents.');
+  if(v.version>=2&&(!Array.isArray(v.documents)||v.documents.length>200))fail('Workspace limit: 200 source documents.');
+  if(v.version===WORKSPACE_VERSION&&(!Array.isArray(v.tasks)||v.tasks.length>500))fail('Workspace limit: 500 research tasks.');
   const assessments=v.assessments.map(caseRecord),evidence=v.evidence.map(e=>evidenceRecord(v.version===1?{...e,sourceDocumentId:''}:e)),documents=v.version===1?[]:v.documents.map(documentRecord);unique(assessments);unique(evidence);unique(documents);
+  const tasks=v.version===WORKSPACE_VERSION?v.tasks.map(taskRecord):[];unique(tasks);
   const caseIDs=new Set(assessments.map(c=>c.id)),evidenceIDs=new Map(evidence.map(e=>[e.id,e.assessmentId]));
   for(const e of evidence)if(!caseIDs.has(e.assessmentId))fail('Evidence refers to an unknown assessment.');
   for(const d of documents)if(!caseIDs.has(d.assessmentId))fail('Document refers to an unknown assessment.');
@@ -57,8 +70,13 @@ export function validateWorkspace(v){
     if(['publisher','originGroup','url','reportedAt','recordedAt','synthetic'].some(k=>e[k]!==d[k]))fail('Evidence provenance must match its source document.');
   }
   for(const c of assessments){if(c.citedEvidence.some(e=>evidenceIDs.get(e)!==c.id))fail('Citations must refer to evidence in the same assessment.');assertReview(c,evidence);}
+  for(const t of tasks){
+    if(!caseIDs.has(t.assessmentId))fail('Task refers to an unknown assessment.');
+    if(t.linkedEvidence.some(e=>evidenceIDs.get(e)!==t.assessmentId))fail('Task evidence must belong to the same assessment.');
+    if(t.status==='Completed'&&evidence.some(e=>t.linkedEvidence.includes(e.id)&&(e.reportedAt>t.updatedAt||e.recordedAt>t.updatedAt)))fail('Task completion cannot precede its linked evidence.');
+  }
   const history=v.history.map(h=>{if(!object(h)||!caseIDs.has(h.assessmentId))fail('Invalid history reference.');return {assessmentId:id(h.assessmentId),at:day(h.at),action:str(h.action,'History action',150),note:str(h.note,'History note',2000,false)};});
-  const result={format:FORMAT,version:WORKSPACE_VERSION,assessments,evidence,documents,history};serializeWorkspace(result);return result;
+  const result={format:FORMAT,version:WORKSPACE_VERSION,assessments,evidence,documents,tasks,history};serializeWorkspace(result);return result;
 }
 export function parseWorkspace(raw){if(typeof raw!=='string'||new TextEncoder().encode(raw).length>MAX_BYTES)fail('Workspace must be no larger than 2 MB in UTF-8.');let v;try{v=JSON.parse(raw);}catch{fail('Workspace is not valid JSON.');}return validateWorkspace(v);}
 export function evidenceSummary(workspace,assessmentId){const rows=workspace.evidence.filter(e=>e.assessmentId===assessmentId);return {records:rows.length,sourceGroups:new Set(rows.filter(e=>e.relation==='Supports').map(e=>e.originGroup.toLowerCase())).size,challenging:rows.filter(e=>e.relation==='Challenges').length,unverified:rows.filter(e=>e.claimState==='Unverified').length,timeline:[...rows].sort((a,b)=>a.reportedAt.localeCompare(b.reportedAt)||a.id.localeCompare(b.id))};}
@@ -90,6 +108,22 @@ export function incorporateDocument(workspace,documentId,input,at){
   result.history[result.history.length-1]={assessmentId:d.assessmentId,at,action:'Document incorporated',note:`${d.id} → ${input.id}: analyst reviewed source conditions and statement; not independent verification`};
   return validateWorkspace(result);
 }
+export function addTask(workspace,input,at){
+  day(at);const task=taskRecord({...input,createdAt:at,updatedAt:at,status:'Open',note:'',resultNote:'',linkedEvidence:[]});
+  if(workspace.tasks.some(t=>t.id===task.id))fail('Task identifier already exists.');
+  return validateWorkspace({...workspace,tasks:[...workspace.tasks,task],history:[...workspace.history,{assessmentId:task.assessmentId,at,action:'Research task created',note:`${task.id}: ${task.title}; owner label ${task.owner||'Unassigned'}`} ]});
+}
+export function updateTask(workspace,taskId,changes,at){
+  day(at);const original=workspace.tasks.find(t=>t.id===taskId);if(!original)fail('Unknown research task.');
+  if(at<original.updatedAt)fail('Task update date cannot move backwards.');
+  const next=taskRecord({...original,owner:changes.owner??original.owner,dueAt:changes.dueAt??original.dueAt,status:changes.status??original.status,note:changes.note??original.note,resultNote:changes.resultNote??original.resultNote,linkedEvidence:changes.linkedEvidence??original.linkedEvidence,updatedAt:at});
+  if(['Completed','Cancelled'].includes(original.status)&&next.status!==original.status&&(!next.note||next.note===original.note))fail('Reopening a finished task requires a new progress note.');
+  return validateWorkspace({...workspace,tasks:workspace.tasks.map(t=>t.id===taskId?next:t),history:[...workspace.history,{assessmentId:next.assessmentId,at,action:'Research task updated',note:`${taskId}: ${original.status} → ${next.status}; owner label ${original.owner||'Unassigned'} → ${next.owner||'Unassigned'}`} ]});
+}
+export function searchTasks(workspace,{query='',status='All',assessmentId='All',overdueOnly=false,asOf}={}){
+  if(overdueOnly)day(asOf);const q=query.trim().toLowerCase();
+  return workspace.tasks.filter(t=>(status==='All'||t.status===status)&&(assessmentId==='All'||t.assessmentId===assessmentId)&&(!q||[t.title,t.owner,t.scope].join(' ').toLowerCase().includes(q))&&(!overdueOnly||(!['Completed','Cancelled'].includes(t.status)&&t.dueAt<asOf))).sort((a,b)=>a.dueAt.localeCompare(b.dueAt)||a.id.localeCompare(b.id));
+}
 export function searchAssessments(workspace,{query='',scope='All',status='All'}={}){const q=query.toLowerCase().trim();return workspace.assessments.filter(c=>(scope==='All'||c.scope===scope)&&(status==='All'||c.status===status)&&(!q||[c.title,c.area,c.question].join(' ').toLowerCase().includes(q)));}
 export function exportAssessment(workspace,assessmentId){
   const c=workspace.assessments.find(c=>c.id===assessmentId);if(!c)fail('Unknown assessment.');const s=evidenceSummary(workspace,c.id);const clean=v=>String(v).replace(/[\r\n]+/g,' ').replace(/[\\`*_{}\[\]<>#]/g,'');
@@ -98,6 +132,8 @@ export function exportAssessment(workspace,assessmentId){
   for(const e of s.timeline){lines.push(`### ${e.id} — ${clean(e.title)}`,`${e.reportedAt} | ${e.synthetic?'SYNTHETIC':'Analyst-entered public reference'} | ${e.claimState} | ${e.relation}`,`Publisher: ${clean(e.publisher)} | Underlying source group: ${clean(e.originGroup)}`,`Statement: ${clean(e.statement)}`,`Source URL (unverified by application): ${e.url||'Synthetic training record; no publisher claim'}`);
     const d=workspace.documents.find(d=>d.id===e.sourceDocumentId);if(d)lines.push(`Source document: ${d.id} | Language: ${clean(d.language)} | Excerpt location: ${clean(d.locator)}`,'Retained excerpt (escaped for Markdown display; original preserved in workspace):',`> ${quote(d.excerpt)}`,`Access/reuse conditions (analyst recorded): ${clean(d.accessNote)}`,`Intake review note: ${clean(d.reviewNote)}`);lines.push('');
   }
+  lines.push('## Research follow-up tasks','Owner labels and task completion are analyst-supplied; they do not establish verified identity or approve an assessment.','');
+  for(const t of workspace.tasks.filter(t=>t.assessmentId===assessmentId))lines.push(`### ${t.id} — ${clean(t.title)}`,`Status: ${t.status} | Due: ${t.dueAt} | Owner label (unverified): ${clean(t.owner)||'Unassigned'}`,`Permitted research scope: ${clean(t.scope)}`,`Progress note: ${clean(t.note)||'Not recorded'}`,`Result note: ${clean(t.resultNote)||'Not recorded'}`,`Linked evidence: ${t.linkedEvidence.join(', ')||'None'}`,'');
   return lines.join('\n');
 }
 export function demoWorkspace(){
