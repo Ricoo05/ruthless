@@ -1,4 +1,4 @@
-# Project Ruthless — Intelligence Workbench v0.15
+# Project Ruthless — Intelligence Workbench v0.16
 
 Ruthless is being developed as terrorism intelligence analysis software for government and government-agency customers, covering domestic, cross-border and international developments relevant to India, with broader geographic support. The intended platform spans threat analysis, intelligence gathering, data integration, operations workflows and AI orchestration. The current release connects case questions, selected fictional reports and cited AI drafts with manual evidence analysis, document intake, research tasks and synthetic semantic review. Prevention effectiveness and customer demand have not been validated.
 
@@ -36,6 +36,12 @@ Questions, selected original reports and cited drafts now live in the same case.
 ## Source integration and correction workflow
 
 Document intake now stages a built-in synthetic batch containing an original, shared-source repost and linked correction, after source-conditions acknowledgement. Repeating an unchanged batch skips its records. The offline JSON adapter validates all rows atomically and writes a new workspace without fetching sources or adding evidence. Manual corrections retain prior excerpts/evidence, reopen Reviewed assessments and require revision consideration before re-review. Superseded sources cannot be used for new incorporation or fixture proposals. See `docs/SOURCE-INTEGRATION.md` for the schema and CLI.
+
+## Local public-advisory collection
+
+Run `node scripts/collect-advisory.mjs --collect` locally to retrieve three sections of the official GOV.UK India travel advisory into ignored `.collection-runtime/`. Open **Source collection**, paste its report JSON, and inspect scope, source dates, failures and freshness. The UI validates selected hashes and extracts plain text safely. Choose an assessment and exact passage, record source conditions, and explicitly stage it in Document intake. Repeated passages skip; corrections require an earlier excerpt and explanation. Evidence incorporation remains a separate review. The hosted Site provides this review UI, while collection runs locally. See `docs/COLLECTION-REVIEW.md` and `docs/COLLECTION-ARCHITECTURE.md`.
+
+Loaded collection reports and unapplied selections are session-only. Staged passages, capture identity, content hash and source conditions follow workspace JSON save/recovery. These real public excerpts cannot enter the existing synthetic-only backend or AI runner. No source truth, complete coverage or detection effectiveness is established by a successful fetch.
 
 ## Research follow-up workflow
 
@@ -85,7 +91,7 @@ npm run check
 npm run backend:demo
 ```
 
-198 tests pass across both modules, including all CLI tests. See `docs/VERIFICATION.md` for browser evidence and remaining limits. `docs/THREAT-ANALYSIS-DIRECTION.md` is the current product direction and supersedes the earlier cyber-first commercial hypothesis.
+219 tests pass across the application and local collection modules, including the existing CLI tests. See `docs/VERIFICATION.md` for browser evidence and remaining limits. `docs/THREAT-ANALYSIS-DIRECTION.md` is the current product direction and supersedes the earlier cyber-first commercial hypothesis.
 
 ## Release record
 

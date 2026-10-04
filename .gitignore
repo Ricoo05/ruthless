@@ -5,6 +5,7 @@ node_modules/
 .env
 .env.*
 .backend-runtime/
+.collection-runtime/
 *.sqlite
 *.sqlite-journal
 *.sqlite-wal
