@@ -1,5 +1,7 @@
 # Report linkage evaluation — v0.20
 
+The v0.21 multilingual experiment and manual source-quotation review are documented in [SEMANTIC-LINKAGE.md](SEMANTIC-LINKAGE.md). The lexical methods and historical counts below remain unchanged.
+
 ## Decision
 
 Keep the current workbench matcher as a visibly limited retrieval baseline. The newly implemented BM25 challenger does not earn promotion on this diagnostic set. The next candidate should combine multilingual retrieval with a separate event-context assessment, retaining original text, conflicting accounts and source dependence. A ranking score must not become a forecast or an operational alert.
