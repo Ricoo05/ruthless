@@ -1,3 +1,4 @@
+import {validateLinkReviews} from './link-review-records.mjs';
 import {validateProposalRuns,proposalIsCurrent,fixtureRun} from './proposal-core.mjs';
 import {analysisScenario,matchesAnalysisSource,analysisSourceSnapshot,validateAnalysisRuns,analysisIsCurrent} from './analysis-core.mjs';
 import {evaluateCandidates} from './evaluation-core.mjs';
@@ -5,7 +6,7 @@ import {assessmentDraft,draftEvidenceIds} from './assessment-draft.mjs';
 export {analysisIsCurrent} from './analysis-core.mjs';
 export {proposalIsCurrent} from './proposal-core.mjs';
 export const FORMAT='ruthless-threat-workspace';
-export const WORKSPACE_VERSION=7;
+export const WORKSPACE_VERSION=8;
 export const MAX_BYTES=2_000_000;
 export const SCOPES=['Domestic','Cross-border','International'];
 export const STATES=['Draft','Needs review','Reviewed'];
@@ -77,7 +78,7 @@ function assertReview(c,evidence){
   if(evidence.some(e=>c.citedEvidence.includes(e.id)&&e.reportedAt>c.asOf))fail('Reviewed assessments cannot cite reports later than their as-of date.');
 }
 export function validateWorkspace(v){
-  if(!object(v)||v.format!==FORMAT||![1,2,3,4,5,6,WORKSPACE_VERSION].includes(v.version))fail('Unsupported threat workspace format.');
+  if(!object(v)||v.format!==FORMAT||![1,2,3,4,5,6,7,WORKSPACE_VERSION].includes(v.version))fail('Unsupported threat workspace format.');
   if(!Array.isArray(v.assessments)||!v.assessments.length||v.assessments.length>100||!Array.isArray(v.evidence)||v.evidence.length>1000||!Array.isArray(v.history)||v.history.length>2000)fail('Workspace limits: 1–100 assessments, 1,000 evidence records, 2,000 history entries.');
   if(v.version>=2&&(!Array.isArray(v.documents)||v.documents.length>200))fail('Workspace limit: 200 source documents.');
   if(v.version>=3&&(!Array.isArray(v.tasks)||v.tasks.length>500))fail('Workspace limit: 500 research tasks.');
@@ -131,7 +132,8 @@ export function validateWorkspace(v){
     const sourceEvidenceIds=draftEvidenceIds({evidence},run,proposal);
     if(sourceEvidenceIds.length!==origin.sourceEvidenceIds.length||sourceEvidenceIds.some(e=>!origin.sourceEvidenceIds.includes(e)||!c.citedEvidence.includes(e)))fail('Judgment starting-point citations must retain every cited source binding.');
   }
-  const result={format:FORMAT,version:WORKSPACE_VERSION,assessments,evidence,documents,tasks,proposalRuns,importBatches,analysisRuns,history};serializeWorkspace(result);return result;
+  const linkReviews=v.version>=8?validateLinkReviews(v.linkReviews,{assessments,documents,evidence},{day,sourceURL}):[];
+  const result={format:FORMAT,version:WORKSPACE_VERSION,assessments,evidence,documents,tasks,proposalRuns,importBatches,analysisRuns,linkReviews,history};serializeWorkspace(result);return result;
 }
 export function createAnalysisCase(workspace,{scenarioId,assessmentId,documentIds,scope,area},at){
   const scenario=analysisScenario(scenarioId);day(at);

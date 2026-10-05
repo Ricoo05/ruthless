@@ -123,7 +123,7 @@ export function openWorkspaceStore({file,tenantId,key,now=()=>Date.now()}) {
       let workspace,raw;
       try { workspace=parseWorkspace(serializeWorkspace(input)); raw=serializeWorkspace(workspace); }
       catch { reject(400,'invalid_workspace'); }
-      if(workspace.evidence.some(e=>!e.synthetic)||workspace.documents.some(d=>!d.synthetic)) reject(400,'synthetic_records_required');
+      if(workspace.evidence.some(e=>!e.synthetic)||workspace.documents.some(d=>!d.synthetic)||workspace.linkReviews.some(r=>!r.snapshot.left.synthetic||!r.snapshot.right.synthetic)) reject(400,'synthetic_records_required');
       return transaction(()=>{
         authorize(principal,tenantId,workspaceId,'write',now());
         const events=verify(),existing=current(workspaceId);

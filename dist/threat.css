@@ -15,6 +15,7 @@
 #judgment-preview-text,#judgment-preview-gaps{width:100%}#judgment-preview-context,#judgment-existing-context{overflow-wrap:anywhere;line-height:1.6}.analysis-source button{margin-bottom:16px}
 
 #workspace-json-text{width:100%;font-family:ui-monospace,monospace;font-size:.875rem}
+#link-review-dialog{width:min(1000px,calc(100vw - 40px));max-width:100%;max-height:90vh;overflow:auto}#link-review-form textarea,#link-review-form input,#link-review-form select{width:100%}#link-review-originals{overflow-wrap:anywhere}#link-review-form label{display:block;margin:14px 0 6px}
 dialog .checkline[hidden]{display:none}
 
 .backend-panel{margin-top:20px}.backend-panel .actions{margin-top:14px}.backend-panel select{max-width:100%;margin:8px 0}#backend-status{overflow-wrap:anywhere}#backend-preview-json,#backend-credential{width:100%}#backend-preview-context{overflow-wrap:anywhere}

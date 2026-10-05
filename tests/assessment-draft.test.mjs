@@ -39,5 +39,5 @@ test('restoration rejects invented, cross-case, malformed and chronologically im
   assert.throws(()=>prepareAssessmentFromAnalysis(w,runId,proposalId(w),'2026-02-30'));assert.throws(()=>prepareAssessmentFromAnalysis(w,runId,proposalId(w),'2026-10-03'),/precede/);
 });
 test('v6 files retain analytical drafts and migrate without invented judgment lineage',async()=>{
-  const w=await ready(),v6=structuredClone(w);v6.version=6;for(const c of v6.assessments)delete c.judgmentOrigin;for(const r of v6.analysisRuns)delete r.snapshot.assessment.judgmentOrigin;const restored=validateWorkspace(v6);assert.equal(restored.version,7);assert.ok(restored.assessments.every(c=>c.judgmentOrigin===null));assert.deepEqual(restored.analysisRuns[0].output,w.analysisRuns[0].output);assert.doesNotThrow(()=>prepareAssessmentFromAnalysis(restored,runId,proposalId(w),at));
+  const w=await ready(),v6=structuredClone(w);v6.version=6;for(const c of v6.assessments)delete c.judgmentOrigin;for(const r of v6.analysisRuns)delete r.snapshot.assessment.judgmentOrigin;const restored=validateWorkspace(v6);assert.equal(restored.version,8);assert.ok(restored.assessments.every(c=>c.judgmentOrigin===null));assert.deepEqual(restored.analysisRuns[0].output,w.analysisRuns[0].output);assert.doesNotThrow(()=>prepareAssessmentFromAnalysis(restored,runId,proposalId(w),at));
 });
