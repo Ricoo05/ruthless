@@ -1,4 +1,4 @@
-# Project Ruthless — Intelligence Workbench v0.22
+# Project Ruthless — Intelligence Workbench v0.23
 
 Ruthless is being developed as terrorism intelligence analysis software for government and government-agency customers, covering domestic, cross-border and international developments relevant to India, with broader geographic support. The intended platform spans threat analysis, intelligence gathering, data integration, operations workflows and AI orchestration. The current release connects case questions, selected fictional reports and cited AI drafts with manual evidence analysis, document intake, research tasks and synthetic semantic review. Prevention effectiveness and customer demand have not been validated.
 
@@ -19,6 +19,12 @@ Open **Open linkage evaluation** from the release entry. Compare TF-IDF and BM25
 Expand an original candidate and **Review event context**. Quote event place/time from both sources and retain a manual proposal with a reviewer label and uncertainty note. Exact quotation checks reject fabricated passages; interpretation remains a reviewer judgment. Proposals are session-only and do not merge reports, approve evidence or generate alerts. Both partitions and labels are visible authored controls, not independent validation. See `docs/SEMANTIC-LINKAGE.md` for reproduction, measured failures and the context-review contract; `docs/LINKAGE-EVALUATION.md` records the lexical baseline. No paid API call or live-source inference is added. Running the optional local model experiment requires its separate dependency installation; viewing retained results requires neither those dependencies nor an API key.
 
 v0.22 adds **MiniLM + quoted-context ordering**. Unique date or same-script fictional-place mismatches move candidates later without removing reports or changing cosine scores. It ranks the Related report first in 7/8 examples in each partition; the English–Hindi examples remain incorrect first results. These rules were designed after inspecting the authored failures and require separate validation. The review dialog displays extracted mentions and **Use extracted quotations** prepares their exact source spans, leaving reviewed relationships Unknown and the proposed conclusion Insufficient context. See `docs/CONTEXT-ORDERING.md` for the supported formats, ambiguous/correction cases and unchanged review workload.
+
+## Early-warning review
+
+v0.23 adds **Early-warning review** to the main workbench and release entry. It automatically reviews every retained current report for unfinished intake, challenging evidence, repeated source groups and uncertain date mentions without requiring a keyword query. Expand each case’s as-of timeline to inspect original text and exact date quotations. **Prepare context verification task** opens the existing task form with current source references and review reasons; explicitly creating it adds follow-up work without changing evidence or judgments.
+
+Try the acknowledged fictional regional exercise from this desk to see domestic and international context together. Publication and recorded dates control availability; later corrections do not rewrite earlier as-of views. Group labels and stances remain analyst-supplied. The desk refreshes on opening/applying settings and has no background collector, terrorism classifier, semantic event merger or validated attack forecasts. See `docs/EARLY-WARNING-REVIEW.md` for rules, bounds and the next evaluation requirement.
 
 ## Report connections
 
