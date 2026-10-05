@@ -1,5 +1,13 @@
 # Verification record — 3 October 2026
 
+## v0.19 — report connections, 5 October 2026
+
+- Full Node suite: 253 tests passed, zero failures/skips; 47 declared module syntax checks passed. Nine new tests cover hand-calculated TF-IDF cosine, nonmutation, negation, shared groups/cross-case labels, known-by dates and vocabulary fitting, source corrections, incorporated-paraphrase exclusion, colliding document/evidence IDs, Hindi/NFKC preservation, empty/boilerplate controls, strict settings, 200-record bounds and stable top-40 ordering. No dependencies or paid API requests were added.
+- Desktop browser QA loaded the acknowledged fictional regional exercise and compared without literal-query terms: eight eligible records, 28 evaluated pairs and six qualifying pairs. Originals and provenance remained visible. The highest pair was an unrelated repost control sharing boilerplate (cosine about 0.354); the shared-source exercise repost pair ranked lower (about 0.237). This demonstrates the baseline's false-positive limitation, not measured retrieval effectiveness.
+- Preparing a linkage task filled the correct left assessment and both record IDs, with a scope requiring context, corrections and source-dependence checks. Explicit creation produced one Open research task while the four starter evidence records remained unchanged. Pair references are plain task-scope text, not immutable typed model-run lineage. The unsaved test session ended when the browser runtime restarted; task persistence is not claimed for that session.
+- A fresh browser session reran the eight-record comparison on mobile at 390x844. Document client/scroll widths measured 375/375 CSS px and warning/error logs were empty. The viewport override was reset. Proof is sibling `ruthless-report-connections-mobile-v0.19.png`.
+- Comparison results remain session-only. No reports were automatically merged, no semantic model was installed and no evidence, forecast, review approval or operational alert was generated. Existing public collection and authored forecasting/replay remain separate modules. No checkpoint archive or paid provider request was created. Owner-private publication is verified separately against the exact pushed source and deployment status.
+
 ## Earlier v0.1 checks
 
 - `node --test tests/core.test.mjs`: 10 tests passed, 0 failed. Covers official catalog validation, exact matching, score factors, CSV quoting/BOM/newlines, malformed rows, duplicate rejection, maximum finding count, required closure notes, immutable review updates, project round trips, invalid project/catalog structures, filters, spreadsheet formula neutralization, and brief caveats.

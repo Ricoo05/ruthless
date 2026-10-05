@@ -12,13 +12,19 @@ function spans(text,term) {
   const escaped=term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
   let count=0;const matches=[];for(const m of text.matchAll(new RegExp(escaped,'giu'))){count++;if(matches.length<20)matches.push({start:m.index,end:m.index+m[0].length,quote:m[0]});}return {spans:matches,count};
 }
-export function scanSignals(input,settings) {
-  const workspace=validateWorkspace(input),query=signalQuery(settings),cases=new Map(workspace.assessments.map(c=>[c.id,c]));
+function currentRows(workspace,{from,to,scope='All'}) {
+  day(from);day(to);if(from>to||!['All','Domestic','Cross-border','International'].includes(scope))throw new Error('Invalid report comparison window.');
+  const cases=new Map(workspace.assessments.map(c=>[c.id,c]));
   // Scan retained original excerpts where available. An incorporated source
   // is not counted again from its analyst statement; staged sources stay staged.
-  const availableDocuments=workspace.documents.filter(d=>d.reportedAt<=query.to&&d.recordedAt<=query.to);
+  const availableDocuments=workspace.documents.filter(d=>d.reportedAt<=to&&d.recordedAt<=to);
   const rows=[...availableDocuments.filter(d=>!availableDocuments.some(next=>next.supersedesDocumentId===d.id)).map(d=>({...d,kind:'source_excerpt',text:d.excerpt,claimState:'Not incorporated',relation:'Unassigned',evidenceId:workspace.evidence.find(e=>e.sourceDocumentId===d.id)?.id??''})),...workspace.evidence.filter(e=>!e.sourceDocumentId).map(e=>({...e,kind:'analyst_statement',text:e.statement,evidenceId:e.id}))];
   for(const row of rows)if(row.evidenceId){const e=workspace.evidence.find(e=>e.id===row.evidenceId);row.claimState=e.claimState;row.relation=e.relation;}
+  return rows.filter(row=>row.reportedAt>=from&&row.reportedAt<=to&&row.recordedAt<=to&&(scope==='All'||cases.get(row.assessmentId).scope===scope)).map(row=>({...row,recordKey:`${row.kind}:${row.id}`,caseTitle:cases.get(row.assessmentId).title,scope:cases.get(row.assessmentId).scope,area:cases.get(row.assessmentId).area}));
+}
+export function currentReportRecords(input,window){return currentRows(validateWorkspace(input),window);}
+export function scanSignals(input,settings) {
+  const workspace=validateWorkspace(input),query=signalQuery(settings),cases=new Map(workspace.assessments.map(c=>[c.id,c])),rows=currentRows(workspace,query);
   const matches=[];
   for(const row of rows) {
     const c=cases.get(row.assessmentId);if((query.scope!=='All'&&c.scope!==query.scope)||row.reportedAt<query.from||row.reportedAt>query.to||row.recordedAt>query.to)continue;
@@ -28,5 +34,5 @@ export function scanSignals(input,settings) {
   }
   const caseMatches=workspace.assessments.map(c=>{const records=matches.filter(r=>r.assessmentId===c.id),groups=new Set(records.map(r=>r.originGroup.toLocaleLowerCase('en-US')));return {assessmentId:c.id,title:c.title,scope:c.scope,area:c.area,recordCount:records.length,sourceGroupCount:groups.size,thresholdMet:groups.size>=query.minGroups,challengingCount:records.filter(r=>r.relation==='Challenges').length,recordIds:records.map(r=>r.recordId)};}).filter(c=>c.recordCount);
   const sourceGroups=[...new Set(matches.map(r=>r.originGroup.toLocaleLowerCase('en-US')))].map(key=>{const records=matches.filter(r=>r.originGroup.toLocaleLowerCase('en-US')===key);return {label:records[0].originGroup,recordIds:records.map(r=>r.recordId),assessmentIds:[...new Set(records.map(r=>r.assessmentId))]};});
-  return {kind:'literal_indicator_triage',query,recordsScanned:rows.filter(r=>r.reportedAt>=query.from&&r.reportedAt<=query.to&&r.recordedAt<=query.to&&(query.scope==='All'||cases.get(r.assessmentId).scope===query.scope)).length,matches:matches.sort((a,b)=>a.reportedAt.localeCompare(b.reportedAt)||a.recordId.localeCompare(b.recordId)),cases:caseMatches,sourceGroups,limitations:['Literal matches include negations, allegations and benign contexts. No semantic threat classification is performed.','Source groups and provenance are analyst-supplied and do not prove independent corroboration.','No match does not mean no threat. Missing, late or differently worded reports may be missed.','Thresholds prioritize review only; they are not attack probabilities, actor links or agency approvals.']};
+  return {kind:'literal_indicator_triage',query,recordsScanned:rows.length,matches:matches.sort((a,b)=>a.reportedAt.localeCompare(b.reportedAt)||a.recordId.localeCompare(b.recordId)),cases:caseMatches,sourceGroups,limitations:['Literal matches include negations, allegations and benign contexts. No semantic threat classification is performed.','Source groups and provenance are analyst-supplied and do not prove independent corroboration.','No match does not mean no threat. Missing, late or differently worded reports may be missed.','Thresholds prioritize review only; they are not attack probabilities, actor links or agency approvals.']};
 }

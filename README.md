@@ -1,4 +1,4 @@
-# Project Ruthless — Intelligence Workbench v0.18
+# Project Ruthless — Intelligence Workbench v0.19
 
 Ruthless is being developed as terrorism intelligence analysis software for government and government-agency customers, covering domestic, cross-border and international developments relevant to India, with broader geographic support. The intended platform spans threat analysis, intelligence gathering, data integration, operations workflows and AI orchestration. The current release connects case questions, selected fictional reports and cited AI drafts with manual evidence analysis, document intake, research tasks and synthetic semantic review. Prevention effectiveness and customer demand have not been validated.
 
@@ -11,6 +11,10 @@ node serve.mjs
 ```
 
 Open http://127.0.0.1:4173/. The local server binds to loopback. The retained cyber exposure module is at `/exposure.html`; its instructions are in `docs/CYBER-EXPOSURE.md`.
+
+## Report connections
+
+Choose **Open report connections** on the release entry, select dates and geographic scope, then **Compare related reports**. A local TF-IDF cosine baseline suggests pairs for inspecting original passages, shared wording and recorded source groups across cases. Literal query terms are not required and do not affect comparison. After loading the acknowledged fictional regional exercise, the default window compares eight records and suggests six pairs. Boilerplate can rank unrelated reports highly; this is retrieval for analyst review, not a threat score. **Prepare linkage verification task** fills the research-task form with both source IDs; create it explicitly after reviewing the scope. Evidence and judgments are unchanged. See `docs/REPORT-CONNECTIONS.md` for the algorithm, bounds and known limitations.
 
 ## Forecasting research and 3D replay
 
