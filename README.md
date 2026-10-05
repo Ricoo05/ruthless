@@ -1,4 +1,4 @@
-# Project Ruthless — Intelligence Workbench v0.23
+# Project Ruthless — Intelligence Workbench v0.24
 
 Ruthless is being developed as terrorism intelligence analysis software for government and government-agency customers, covering domestic, cross-border and international developments relevant to India, with broader geographic support. The intended platform spans threat analysis, intelligence gathering, data integration, operations workflows and AI orchestration. The current release connects case questions, selected fictional reports and cited AI drafts with manual evidence analysis, document intake, research tasks and synthetic semantic review. Prevention effectiveness and customer demand have not been validated.
 
@@ -25,6 +25,8 @@ v0.22 adds **MiniLM + quoted-context ordering**. Unique date or same-script fict
 v0.23 adds **Early-warning review** to the main workbench and release entry. It automatically reviews every retained current report for unfinished intake, challenging evidence, repeated source groups and uncertain date mentions without requiring a keyword query. Expand each case’s as-of timeline to inspect original text and exact date quotations. **Prepare context verification task** opens the existing task form with current source references and review reasons; explicitly creating it adds follow-up work without changing evidence or judgments.
 
 Try the acknowledged fictional regional exercise from this desk to see domestic and international context together. Publication and recorded dates control availability; later corrections do not rewrite earlier as-of views. Group labels and stances remain analyst-supplied. The desk refreshes on opening/applying settings and has no background collector, terrorism classifier, semantic event merger or validated attack forecasts. See `docs/EARLY-WARNING-REVIEW.md` for rules, bounds and the next evaluation requirement.
+
+v0.24 connects **Related-report leads** directly into Early-warning review. The existing TF-IDF baseline runs automatically for the applied window. Each pair retains original source passages, shared weighted terms and its unchanged similarity score, alongside date-mention comparison, same-group context, cross-case context and opposing analyst-assigned stances. Filter these lead types and prepare a two-record verification task. Date mismatches and denials remain visible; no reports are merged or classified as terrorist intent. See `docs/WARNING-CONNECTIONS.md` for current coverage, limits and measured evaluation gaps.
 
 ## Report connections
 
