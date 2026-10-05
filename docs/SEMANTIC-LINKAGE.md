@@ -1,5 +1,7 @@
 # Multilingual report linkage — v0.21
 
+The raw retained model run below is unchanged. v0.22 adds a separate [quoted-context ordering experiment](CONTEXT-ORDERING.md) and source-mention quotation preparation. No model inference was rerun or its saved scores altered.
+
 Ruthless now compares actual local pretrained-model inference with the existing lexical methods. This is candidate retrieval research toward source-linked early warning. It does not classify an attack, infer individual intent, verify reports or demonstrate prevention effectiveness.
 
 ## Inspect retained output

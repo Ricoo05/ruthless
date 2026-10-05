@@ -1,4 +1,4 @@
-# Project Ruthless — Intelligence Workbench v0.21
+# Project Ruthless — Intelligence Workbench v0.22
 
 Ruthless is being developed as terrorism intelligence analysis software for government and government-agency customers, covering domestic, cross-border and international developments relevant to India, with broader geographic support. The intended platform spans threat analysis, intelligence gathering, data integration, operations workflows and AI orchestration. The current release connects case questions, selected fictional reports and cited AI drafts with manual evidence analysis, document intake, research tasks and synthetic semantic review. Prevention effectiveness and customer demand have not been validated.
 
@@ -17,6 +17,8 @@ Open http://127.0.0.1:4173/. The local server binds to loopback. The retained cy
 Open **Open linkage evaluation** from the release entry. Compare TF-IDF and BM25, then **Load saved multilingual run** to include actual local inference from a pinned pretrained MiniLM encoder on all 64 fictional texts. On the eight evaluation examples, MiniLM ranks the related report first in 4/8 versus 2/8 for each lexical method. Four first results remain unrelated; no method is promoted into the workbench. Returning all three candidates gives MiniLM 100% recall@3 on this tiny set, so that metric alone does not establish useful accuracy.
 
 Expand an original candidate and **Review event context**. Quote event place/time from both sources and retain a manual proposal with a reviewer label and uncertainty note. Exact quotation checks reject fabricated passages; interpretation remains a reviewer judgment. Proposals are session-only and do not merge reports, approve evidence or generate alerts. Both partitions and labels are visible authored controls, not independent validation. See `docs/SEMANTIC-LINKAGE.md` for reproduction, measured failures and the context-review contract; `docs/LINKAGE-EVALUATION.md` records the lexical baseline. No paid API call or live-source inference is added. Running the optional local model experiment requires its separate dependency installation; viewing retained results requires neither those dependencies nor an API key.
+
+v0.22 adds **MiniLM + quoted-context ordering**. Unique date or same-script fictional-place mismatches move candidates later without removing reports or changing cosine scores. It ranks the Related report first in 7/8 examples in each partition; the English–Hindi examples remain incorrect first results. These rules were designed after inspecting the authored failures and require separate validation. The review dialog displays extracted mentions and **Use extracted quotations** prepares their exact source spans, leaving reviewed relationships Unknown and the proposed conclusion Insufficient context. See `docs/CONTEXT-ORDERING.md` for the supported formats, ambiguous/correction cases and unchanged review workload.
 
 ## Report connections
 
