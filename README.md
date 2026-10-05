@@ -1,4 +1,4 @@
-# Project Ruthless — Intelligence Workbench v0.19
+# Project Ruthless — Intelligence Workbench v0.20
 
 Ruthless is being developed as terrorism intelligence analysis software for government and government-agency customers, covering domestic, cross-border and international developments relevant to India, with broader geographic support. The intended platform spans threat analysis, intelligence gathering, data integration, operations workflows and AI orchestration. The current release connects case questions, selected fictional reports and cited AI drafts with manual evidence analysis, document intake, research tasks and synthetic semantic review. Prevention effectiveness and customer demand have not been validated.
 
@@ -11,6 +11,10 @@ node serve.mjs
 ```
 
 Open http://127.0.0.1:4173/. The local server binds to loopback. The retained cyber exposure module is at `/exposure.html`; its instructions are in `docs/CYBER-EXPOSURE.md`.
+
+## Report linkage evaluation
+
+Open **Open linkage evaluation** from the release entry. Run the current TF-IDF policy and a fixed BM25 challenger against 16 authored queries split across development/evaluation partitions, each with three candidate reports. Inspect wrong first results, missed related reports, originals and authored rationales. Both methods choose a related report first in only 2/8 evaluation examples; BM25 is not promoted into the workbench. The partitions are visible, synthetic diagnostic controls, not independent validation. See `docs/LINKAGE-EVALUATION.md` for reproducible results and the next multilingual retrieval/event-context contract. No paid inference or live-source collection is added.
 
 ## Report connections
 
