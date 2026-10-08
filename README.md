@@ -1,4 +1,4 @@
-# Project Ruthless — Intelligence Workbench v0.25
+# Project Ruthless — Intelligence Workbench v0.26
 
 Ruthless is being developed as terrorism intelligence analysis software for government and government-agency customers, covering domestic, cross-border and international developments relevant to India, with broader geographic support. The intended platform spans threat analysis, intelligence gathering, data integration, operations workflows and AI orchestration. The current release connects case questions, selected fictional reports and cited AI drafts with manual evidence analysis, document intake, research tasks and synthetic semantic review. Prevention effectiveness and customer demand have not been validated.
 
@@ -11,6 +11,14 @@ node serve.mjs
 ```
 
 Open http://127.0.0.1:4173/. The local server binds to loopback. The retained cyber exposure module is at `/exposure.html`; its instructions are in `docs/CYBER-EXPOSURE.md`.
+
+## Main detection pipeline
+
+The root now opens **Detection console**. Retained original reports are processed automatically through English/Hindi security-signal rules, exact clause extraction, limited negation/context handling, identical-text suppression, recorded-source grouping and rolling warning thresholds. Existing case assignments provide geographic context. Watch, Warning candidate and Contested warning candidate show the underlying reports and change over an as-of timeline. Prepare warning verification task uses the existing task queue with current source references. No report is automatically accepted as evidence or treated as confirmed terrorist intent.
+
+Select **Open synthetic incident replay**, then **Jump to first warning** or play report arrival. The authored aerial case first warns on 3 October, four days before its fictional 7 October incident. A suspicious-object false alarm and a missed incident remain visible. At the final day, Reveal authored outcomes reports one timely warning, one false warning, one miss and one uneventful control; authored precision/recall are both 50%, not independent accuracy estimates. This is a working deterministic warning engine, not a trained terrorism predictor. The isolated replay leaves the workspace unchanged.
+
+Ingest permitted source capture connects to the existing advisory review/intake path. Newly recorded older publications remain inspectable as context and cannot escalate a current warning; advisory titles and conditional guidance also stay context under these limited rules. Collection runs locally; the hosted console can analyze retained or manually staged reports. No new social/CCTV feed, paid API inference or background worker was added. See `docs/DETECTION-PIPELINE.md` for rule behavior and remaining validation.
 
 ## Report linkage evaluation
 
