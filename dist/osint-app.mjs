@@ -1,0 +1,57 @@
+import {COUNTRIES,TOPICS,OGL,fetchPublicSource,stagePublicPassage} from './osint-core.mjs';
+import {exportPublicSource} from './osint-export.mjs';
+import {extractSourceText} from './collection-text.mjs';
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+export function osintDesk({getWorkspace,applyWorkspace,canChange,isActive,uid,today,feedback}){
+  let provider='govuk',country='india',topic='safety',busy=false,quote='',assessmentId='',slug='',message='',controller=null;
+  const captures=new Map(),attempts=new Map(),lastRequest=new Map();
+  const key=()=>`${provider}:${country}:${provider==='govuk'?'advisory':topic}`;
+  const $=id=>document.getElementById(id);
+  function selected(){return captures.get(key());}
+  function render(){
+    if(!isActive())return;
+    const capture=selected(),attempt=attempts.get(key()),w=getWorkspace();
+    if(!w.assessments.some(c=>c.id===assessmentId))assessmentId=w.assessments[0]?.id??'';
+    if(capture?.sections&&!capture.sections.some(s=>s.slug===slug))slug=capture.sections[0].slug;
+    const section=capture?.sections?.find(s=>s.slug===slug);
+    $('content').innerHTML=`<section class="panel osint-panel"><div class="panel-heading"><div><h2>Public-source OSINT</h2><p class="muted">Collect → inspect → retain an exact passage → review</p></div><span class="chip">REAL PUBLIC SOURCES · ON DEMAND</span></div><div class="case-body">
+      <p>Read official advice and discover public news coverage directly from configured publishers. Results start empty and come from the selected live API.</p>
+      <form id="osint-fetch-form" class="osint-controls"><div><label for="osint-provider">Source</label><select id="osint-provider"${busy?' disabled':''}><option value="govuk"${provider==='govuk'?' selected':''}>GOV.UK · official travel advice</option><option value="gdelt"${provider==='gdelt'?' selected':''}>GDELT · public news index</option></select></div><div><label for="osint-country">Country mentioned</label><select id="osint-country"${busy?' disabled':''}>${Object.entries(COUNTRIES).map(([id,label])=>`<option value="${id}"${id===country?' selected':''}>${label}</option>`).join('')}</select></div>${provider==='gdelt'?`<div><label for="osint-topic">Research topic</label><select id="osint-topic"${busy?' disabled':''}>${Object.entries(TOPICS).map(([id,t])=>`<option value="${id}"${id===topic?' selected':''}>${t.label}</option>`).join('')}</select></div>`:''}<button class="primary" type="submit"${busy?' disabled':''}>${busy?'Fetching public source…':'Fetch real public data'}</button>${busy?'<button type="button" id="osint-cancel">Cancel request</button>':''}</form>
+      <p class="muted">${provider==='govuk'?'Coverage: one UK government publisher, English, up to three advisory sections per selected country. This is public advice, not an incident feed.':'Coverage: up to 20 news links from the last seven days. Country matches are text matches, not verified event locations. Headlines are leads for reading, not corroborated findings.'} No account is required. Your browser sends the selected country/topic to the publisher; workspace content is not sent.</p>
+      <div class="osint-status" role="status"><strong>${busy?'Request in progress':attempt?.cancelled?'Request cancelled':attempt?.error?'Latest request failed':capture?'Source received':'Not fetched'}</strong><span>${attempt?`Last attempt: ${esc(attempt.at)}`:'No network request has been made for this selection.'}</span>${capture?`<span>Retained successful fetch: ${esc(capture.checkedAt)}</span>`:''}</div>
+      ${attempt?.error?`<p class="error">${esc(attempt.error)}${capture?' The earlier successful capture below is retained and is not a fresh result.':''}</p>`:''}
+      <p id="osint-message" class="${message?'notice':'muted'}" role="status">${esc(message)}</p>
+      ${capture?`<div class="actions"><button id="osint-export" data-format="json">Download source JSON</button><button id="osint-export-csv" data-format="csv">Export source CSV</button><button id="osint-export-html" data-format="html">Export source report</button></div>`:''}
+      ${section?`<div class="osint-source-layout"><section><p class="small-label">${esc(capture.publisher)}</p><h3>${esc(COUNTRIES[country])} · official advice</h3><p>Publisher updated: <strong>${esc(capture.publisherUpdatedAt)}</strong>. This is the advisory update time, not the time of an incident.</p><label for="osint-section">Advisory section</label><select id="osint-section"${busy?' disabled':''}>${capture.sections.map(s=>`<option value="${s.slug}"${s.slug===slug?' selected':''}>${esc(s.title)}</option>`).join('')}</select><blockquote class="osint-original">${esc(section.originalText)}</blockquote><a href="${section.sourceURL}" target="_blank" rel="noopener noreferrer">Read this section at GOV.UK</a><p class="muted">Contains public sector information licensed under the <a href="${OGL}" target="_blank" rel="noopener noreferrer">Open Government Licence v3.0</a>. Source text is displayed as plain text; source instructions are not executed.</p></section><section><h3>Retain a source passage</h3><p>Keep the exact words and their provenance in Document intake for analyst review.</p><form id="osint-stage-form"><label for="osint-case">Assessment</label><select id="osint-case"${busy?' disabled':''}>${w.assessments.map(c=>`<option value="${esc(c.id)}"${c.id===assessmentId?' selected':''}>${esc(c.title)}</option>`).join('')}</select><label for="osint-quote">Exact passage from this section</label><textarea id="osint-quote" maxlength="4000" rows="7" required${busy?' disabled':''}>${esc(quote)}</textarea><label class="checkline"><input type="checkbox" id="osint-ack"${busy?' disabled':''}><span>I reviewed the source, reuse conditions and relevance of this exact passage.</span></label><button class="primary" type="submit"${busy?' disabled':''}>Stage real passage for review</button></form><div class="actions"><button id="osint-clear"${busy?' disabled':''}>Clear passage draft</button><button data-open-view="intake">Open document intake</button></div><p class="muted">Staged documents are marked real-source, with a source URL and capture time. They are not automatically accepted as evidence or sent to AI. Save the workspace JSON to retain them.</p></section></div>`:''}
+      ${capture?.articles?`<section><h3>${capture.articles.length} indexed news link${capture.articles.length===1?'':'s'}</h3><p>${esc(capture.scope)} ${capture.omitted} duplicate, invalid or excess result(s) omitted.</p>${capture.articles.length?`<div class="osint-news">${capture.articles.map(a=>`<article><p class="small-label">${esc(a.publisherDomain)} · ${esc(a.language)}</p><h3><a href="${esc(a.url)}" target="_blank" rel="noopener noreferrer">${esc(a.title)}</a></h3><p class="muted">Index first saw this link: ${esc(a.firstSeenAt)}</p></article>`).join('')}</div>`:'<p class="empty">No indexed links were returned for this country and topic. This does not establish absence of incidents.</p>'}<p class="muted">Only headlines and link metadata are collected. Article text and images stay with their publishers; review their terms before retaining material.</p></section>`:''}
+      ${!capture?'<p class="empty">Choose a country and source, then fetch. No fictional records, sample headlines, or generated substitutes appear here.</p>':''}
+      <details><summary>Source access, coverage and interpretation</summary><p>Two configured public APIs; no comprehensive internet coverage, social-account collection, private messages, photographs or personal locations. Requests happen only when you press Fetch. No background monitoring is running.</p><p>News-index coverage, outages, rate limits and publisher revisions can affect results. Source labels do not prove independence. Public advice and reported claims require verification; collection does not identify a threat or produce an attack probability.</p><p>Captured results remain in this tab until you download them. The current version does not restore source snapshots; use the original publisher or fetch again. Staged passages are retained through the workspace save/restore workflow.</p><p><a href="https://content-api.publishing.service.gov.uk/" target="_blank" rel="noopener noreferrer">GOV.UK API documentation</a> · <a href="https://blog.gdeltproject.org/gdelt-doc-2-0-api-debuts/" target="_blank" rel="noopener noreferrer">GDELT API documentation</a></p></details>
+    </div></section>`;
+  }
+  document.addEventListener('input',e=>{if(e.target.id==='osint-quote')quote=e.target.value;});
+  document.addEventListener('change',e=>{
+    if(!isActive()||busy)return;const id=e.target.id;if(!['osint-provider','osint-country','osint-topic','osint-section','osint-case'].includes(id))return;
+    if(quote.trim()&&id!=='osint-case'){message='Stage or clear the passage draft before changing its source.';render();return;}
+    if(id==='osint-provider')provider=e.target.value;if(id==='osint-country')country=e.target.value;if(id==='osint-topic')topic=e.target.value;if(id==='osint-section')slug=e.target.value;if(id==='osint-case')assessmentId=e.target.value;message='';render();
+  });
+  document.addEventListener('submit',async e=>{
+    if(!['osint-fetch-form','osint-stage-form'].includes(e.target.id))return;e.preventDefault();if(busy||!isActive()||!canChange())return;
+    if(e.target.id==='osint-stage-form'){
+      try{const next=stagePublicPassage(getWorkspace(),selected(),{slug,excerpt:quote,assessmentId,id:uid('doc'),at:today(),acknowledged:$('osint-ack').checked});applyWorkspace(next);quote='';message='Real-source passage staged in Document intake. Save the workspace to retain it.';feedback(message);}catch(error){message=error.message;}render();return;
+    }
+    if(quote.trim()){message='Stage or clear the passage draft before fetching a new capture.';render();return;}
+    const last=lastRequest.get(provider)??0;if(Date.now()-last<30000){message='Wait 30 seconds between requests to the same source.';render();return;}
+    const request={provider,country,topic},requestKey=key();lastRequest.set(provider,Date.now());controller=new AbortController();busy=true;message='';attempts.set(requestKey,{at:new Date().toISOString(),error:null});render();
+    try{const capture=await fetchPublicSource({...request,extractText:extractSourceText,signal:controller.signal});captures.set(requestKey,capture);}
+    catch(error){attempts.get(requestKey).error=error.message;attempts.get(requestKey).cancelled=controller.signal.aborted;}
+    finally{busy=false;controller=null;render();}
+  });
+  document.addEventListener('click',e=>{
+    const button=e.target.closest('button'),id=button?.id;if(!isActive())return;if(id==='osint-cancel'&&busy){controller?.abort();return;}if(busy)return;
+    if(id==='osint-clear'){quote='';message='Passage draft cleared.';render();}
+    if(['osint-export','osint-export-csv','osint-export-html'].includes(id)&&selected()){
+      const capture=selected(),format=button.dataset.format,exported=exportPublicSource(capture,format),url=URL.createObjectURL(new Blob([exported.text],{type:exported.type}));const a=document.createElement('a');a.href=url;a.download=`ruthless-public-${provider}-${country}-${capture.checkedAt.slice(0,10)}.${format}`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+    }
+  });
+  return {render,hasDraft:()=>!!quote.trim(),reset:()=>{quote='';assessmentId='';message='';}};
+}

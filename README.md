@@ -1,6 +1,12 @@
-# Project Ruthless — Intelligence Workbench v0.27
+# Project Ruthless — Intelligence Workbench v0.28
 
-Ruthless is being developed as terrorism intelligence analysis software for government and government-agency customers, covering domestic, cross-border and international developments relevant to India, with broader geographic support. The intended platform spans threat analysis, intelligence gathering, data integration, operations workflows and AI orchestration. The current release connects case questions, selected fictional reports and cited AI drafts with manual evidence analysis, document intake, research tasks and synthetic semantic review. Prevention effectiveness and customer demand have not been validated.
+Ruthless is being developed as terrorism intelligence analysis software for government and government-agency customers, covering domestic, cross-border and international developments relevant to India, with broader geographic support. The intended platform spans threat analysis, intelligence gathering, data integration, operations workflows and AI orchestration. The current release adds real public advisory collection and a bounded news-index adapter to source review, document intake and research tasks. Explicit fictional exercises and cited synthetic AI drafts remain available as research demonstrations. Prevention effectiveness and customer demand have not been validated.
+
+## Real public-source OSINT (v0.28)
+
+Root and /#osint open Public-source OSINT. New sessions contain an empty research case, without fictional reports. Fetch real public data queries configured public APIs directly from the browser. GOV.UK supplies current advisory sections for six countries; GDELT supplies up to 20 news-index links for three fixed incident-research topics. During verification, GOV.UK succeeded and GDELT was rate-limited; unavailable sources show an error without fabricated fallback data.
+
+Cancellation, per-provider request spacing, source/update timestamps, exact-passage intake and JSON/CSV/HTML exports are implemented. The browser declined the download test; export serializers passed automated checks. No background collector, social-profile aggregation or new AI provider is connected. See docs/PUBLIC-OSINT.md.
 
 ## Run
 
@@ -14,7 +20,7 @@ Open http://127.0.0.1:4173/. The local server binds to loopback. The retained cy
 
 ## Main detection pipeline
 
-The root now opens **Detection console**. Retained original reports are processed automatically through English/Hindi security-signal rules, exact clause extraction, limited negation/context handling, identical-text suppression, recorded-source grouping and rolling warning thresholds. Existing case assignments provide geographic context. Watch, Warning candidate and Contested warning candidate show the underlying reports and change over an as-of timeline. Prepare warning verification task uses the existing task queue with current source references. No report is automatically accepted as evidence or treated as confirmed terrorist intent.
+Select **Detection console** or open `/#detection`. Retained original reports are processed automatically through English/Hindi security-signal rules, exact clause extraction, limited negation/context handling, identical-text suppression, recorded-source grouping and rolling warning thresholds. Existing case assignments provide geographic context. Watch, Warning candidate and Contested warning candidate show the underlying reports and change over an as-of timeline. Prepare warning verification task uses the existing task queue with current source references. No report is automatically accepted as evidence or treated as confirmed terrorist intent.
 
 Select **Run suicide-bombing warning exercise**, then **Jump to first warning** or **Play report arrival**. Five fictional intelligence reports produce a warning candidate on 3 October, a contested state on 4 October and a changed state after a clarification on 5 October. The 3D animation uses the detector's current report markers and warning state, rather than a separately scripted attack animation. At the final day, Reveal authored outcomes checks the warning against a separately authored attempted bombing on 7 October: four days of fictional lead time. It does not identify a bomber, calculate an attack probability, animate execution or demonstrate prevention. The isolated exercise leaves the workspace unchanged. See `docs/EXPLOSIVE-WARNING-EXERCISE.md`.
 
