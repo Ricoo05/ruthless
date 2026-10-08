@@ -1,0 +1,496 @@
+{
+  "kind": "authored_detection_challenges",
+  "version": 1,
+  "baselineVersion": "report-signals-1",
+  "baselineCommit": "47b68e24b4fcb5b14c2952d6afbadb9c1e2544e6",
+  "baselineSourceSha256": "bf425f489f91f72f771c5ace3da8af2d457ce5c6ffa0b8588f736f5b94024ecf",
+  "limit": "Visible authored development controls; not an independent benchmark or threat forecast validation.",
+  "cases": [
+    {
+      "id": "no-doubt",
+      "synthetic": true,
+      "text": "No doubt a drone was reported.",
+      "title": "",
+      "expected": [
+        {
+          "code": "aerial",
+          "polarity": "Reported claim"
+        }
+      ],
+      "rationale": "No doubt is affirmation, not an object denial.",
+      "baseline": [
+        {
+          "code": "aerial",
+          "polarity": "Denied / withdrawn"
+        }
+      ]
+    },
+    {
+      "id": "no-injuries",
+      "synthetic": true,
+      "text": "No injuries were reported when a drone was observed.",
+      "title": "",
+      "expected": [
+        {
+          "code": "aerial",
+          "polarity": "Reported claim"
+        }
+      ],
+      "rationale": "The negative refers to injuries, not the object observation.",
+      "baseline": [
+        {
+          "code": "aerial",
+          "polarity": "Denied / withdrawn"
+        }
+      ]
+    },
+    {
+      "id": "not-confirmed",
+      "synthetic": true,
+      "text": "Officials did not confirm the threat report.",
+      "title": "",
+      "expected": [
+        {
+          "code": "warning",
+          "polarity": "Unverified report"
+        }
+      ],
+      "rationale": "Lack of confirmation is uncertainty, not withdrawal.",
+      "baseline": [
+        {
+          "code": "warning",
+          "polarity": "Denied / withdrawn"
+        }
+      ]
+    },
+    {
+      "id": "not-seen",
+      "synthetic": true,
+      "text": "A report said that a drone had not been seen.",
+      "title": "",
+      "expected": [
+        {
+          "code": "aerial",
+          "polarity": "Denied / withdrawn"
+        }
+      ],
+      "rationale": "The observation is explicitly negated.",
+      "baseline": [
+        {
+          "code": "aerial",
+          "polarity": "Reported claim"
+        }
+      ]
+    },
+    {
+      "id": "not-verified",
+      "synthetic": true,
+      "text": "A threat report was received and has not been verified.",
+      "title": "",
+      "expected": [
+        {
+          "code": "warning",
+          "polarity": "Unverified report"
+        }
+      ],
+      "rationale": "The report exists without verified meaning.",
+      "baseline": [
+        {
+          "code": "warning",
+          "polarity": "Reported claim"
+        }
+      ]
+    },
+    {
+      "id": "separate-uncertainty",
+      "synthetic": true,
+      "text": "A drone was observed, but the threat report was not confirmed.",
+      "title": "",
+      "expected": [
+        {
+          "code": "aerial",
+          "polarity": "Reported claim"
+        },
+        {
+          "code": "warning",
+          "polarity": "Unverified report"
+        }
+      ],
+      "rationale": "Confirmation uncertainty applies to the separate threat report.",
+      "baseline": [
+        {
+          "code": "aerial",
+          "polarity": "Unverified report"
+        },
+        {
+          "code": "warning",
+          "polarity": "Unverified report"
+        }
+      ]
+    },
+    {
+      "id": "ruled-out",
+      "synthetic": true,
+      "text": "The reported threat was ruled out.",
+      "title": "",
+      "expected": [
+        {
+          "code": "warning",
+          "polarity": "Denied / withdrawn"
+        }
+      ],
+      "rationale": "The account explicitly dismisses the threat.",
+      "baseline": [
+        {
+          "code": "warning",
+          "polarity": "Reported claim"
+        }
+      ]
+    },
+    {
+      "id": "separate-alarm",
+      "synthetic": true,
+      "text": "A drone was detected; the security alarm was reported as a false alarm.",
+      "title": "",
+      "expected": [
+        {
+          "code": "aerial",
+          "polarity": "Reported claim"
+        },
+        {
+          "code": "security",
+          "polarity": "Denied / withdrawn"
+        }
+      ],
+      "rationale": "The alarm denial does not negate the separate observation.",
+      "baseline": [
+        {
+          "code": "aerial",
+          "polarity": "Reported claim"
+        },
+        {
+          "code": "security",
+          "polarity": "Denied / withdrawn"
+        }
+      ]
+    },
+    {
+      "id": "not-a-hoax",
+      "synthetic": true,
+      "text": "The threat report was not a hoax.",
+      "title": "",
+      "expected": [
+        {
+          "code": "warning",
+          "polarity": "Reported claim"
+        }
+      ],
+      "rationale": "Negation of hoax is not a withdrawal; it still establishes no truth.",
+      "baseline": [
+        {
+          "code": "warning",
+          "polarity": "Denied / withdrawn"
+        }
+      ]
+    },
+    {
+      "id": "hindi-confirmation",
+      "synthetic": true,
+      "text": "ड्रोन की पुष्टि नहीं हुई।",
+      "title": "",
+      "expected": [
+        {
+          "code": "aerial",
+          "polarity": "Unverified report"
+        }
+      ],
+      "rationale": "The Hindi statement withholds confirmation.",
+      "baseline": [
+        {
+          "code": "aerial",
+          "polarity": "Unverified report"
+        }
+      ]
+    },
+    {
+      "id": "hindi-no-report",
+      "synthetic": true,
+      "text": "ड्रोन की कोई सूचना नहीं मिली।",
+      "title": "",
+      "expected": [
+        {
+          "code": "aerial",
+          "polarity": "Denied / withdrawn"
+        }
+      ],
+      "rationale": "The Hindi report explicitly says no information was received.",
+      "baseline": [
+        {
+          "code": "aerial",
+          "polarity": "Denied / withdrawn"
+        }
+      ]
+    },
+    {
+      "id": "no-reporter",
+      "synthetic": true,
+      "text": "No one reported a drone.",
+      "title": "",
+      "expected": [
+        {
+          "code": "aerial",
+          "polarity": "Denied / withdrawn"
+        }
+      ],
+      "rationale": "The statement denies any such report.",
+      "baseline": [
+        {
+          "code": "aerial",
+          "polarity": "Denied / withdrawn"
+        }
+      ]
+    },
+    {
+      "id": "separate-withdrawal",
+      "synthetic": true,
+      "text": "A new drone was reported while the earlier threat was withdrawn.",
+      "title": "",
+      "expected": [
+        {
+          "code": "aerial",
+          "polarity": "Reported claim"
+        },
+        {
+          "code": "warning",
+          "polarity": "Denied / withdrawn"
+        }
+      ],
+      "rationale": "Earlier threat withdrawal does not erase the new observation.",
+      "baseline": [
+        {
+          "code": "warning",
+          "polarity": "Denied / withdrawn"
+        },
+        {
+          "code": "aerial",
+          "polarity": "Denied / withdrawn"
+        }
+      ]
+    },
+    {
+      "id": "seen-wording",
+      "synthetic": true,
+      "text": "A drone was seen near a fictional building.",
+      "title": "",
+      "expected": [
+        {
+          "code": "aerial",
+          "polarity": "Reported claim"
+        }
+      ],
+      "rationale": "Seen is an attributed observation cue.",
+      "baseline": [
+        {
+          "code": "aerial",
+          "polarity": "Context only"
+        }
+      ]
+    },
+    {
+      "id": "conditional",
+      "synthetic": true,
+      "text": "If a drone is reported, consult existing procedures.",
+      "title": "",
+      "expected": [
+        {
+          "code": "aerial",
+          "polarity": "Context only"
+        }
+      ],
+      "rationale": "Conditional guidance is not a new observation.",
+      "baseline": [
+        {
+          "code": "aerial",
+          "polarity": "Context only"
+        }
+      ]
+    },
+    {
+      "id": "drill",
+      "synthetic": true,
+      "text": "A scheduled drill reported a drone.",
+      "title": "",
+      "expected": [
+        {
+          "code": "aerial",
+          "polarity": "Context only"
+        }
+      ],
+      "rationale": "Explicit drill context remains separate.",
+      "baseline": [
+        {
+          "code": "aerial",
+          "polarity": "Context only"
+        }
+      ]
+    },
+    {
+      "id": "advisory-title",
+      "synthetic": true,
+      "text": "A drone was reported.",
+      "title": "General safety advisory",
+      "expected": [
+        {
+          "code": "aerial",
+          "polarity": "Context only"
+        }
+      ],
+      "rationale": "Explicitly titled advice remains context under this prototype policy.",
+      "baseline": [
+        {
+          "code": "aerial",
+          "polarity": "Context only"
+        }
+      ]
+    },
+    {
+      "id": "unverified-bomb",
+      "synthetic": true,
+      "text": "An unverified bomb threat was reported.",
+      "title": "",
+      "expected": [
+        {
+          "code": "warning",
+          "polarity": "Unverified report"
+        },
+        {
+          "code": "explosive",
+          "polarity": "Unverified report"
+        }
+      ],
+      "rationale": "Unverified allegation remains visible without confirmation.",
+      "baseline": [
+        {
+          "code": "warning",
+          "polarity": "Unverified report"
+        },
+        {
+          "code": "explosive",
+          "polarity": "Unverified report"
+        }
+      ]
+    },
+    {
+      "id": "not-only",
+      "synthetic": true,
+      "text": "Not only a drone was reported; a security alarm was also logged.",
+      "title": "",
+      "expected": [
+        {
+          "code": "aerial",
+          "polarity": "Reported claim"
+        },
+        {
+          "code": "security",
+          "polarity": "Reported claim"
+        }
+      ],
+      "rationale": "Not only is coordination, not denial.",
+      "baseline": [
+        {
+          "code": "aerial",
+          "polarity": "Reported claim"
+        },
+        {
+          "code": "security",
+          "polarity": "Reported claim"
+        }
+      ]
+    },
+    {
+      "id": "no-credible-object",
+      "synthetic": true,
+      "text": "No credible explosive was found.",
+      "title": "",
+      "expected": [
+        {
+          "code": "explosive",
+          "polarity": "Denied / withdrawn"
+        }
+      ],
+      "rationale": "The object observation is explicitly denied.",
+      "baseline": [
+        {
+          "code": "explosive",
+          "polarity": "Denied / withdrawn"
+        }
+      ]
+    },
+    {
+      "id": "unsupported-wording",
+      "synthetic": true,
+      "text": "An unusual pattern was logged in a fictional area.",
+      "title": "",
+      "expected": [],
+      "rationale": "Unsupported wording is retained as a potential miss, not inferred security intent.",
+      "baseline": []
+    },
+    {
+      "id": "hindi-observation",
+      "synthetic": true,
+      "text": "ड्रोन देखा गया।",
+      "title": "",
+      "expected": [
+        {
+          "code": "aerial",
+          "polarity": "Reported claim"
+        }
+      ],
+      "rationale": "The Hindi phrase attributes an observation.",
+      "baseline": [
+        {
+          "code": "aerial",
+          "polarity": "Reported claim"
+        }
+      ]
+    },
+    {
+      "id": "hindi-drill",
+      "synthetic": true,
+      "text": "अभ्यास में ड्रोन देखा गया।",
+      "title": "",
+      "expected": [
+        {
+          "code": "aerial",
+          "polarity": "Context only"
+        }
+      ],
+      "rationale": "The observation belongs to an explicit exercise.",
+      "baseline": [
+        {
+          "code": "aerial",
+          "polarity": "Context only"
+        }
+      ]
+    },
+    {
+      "id": "film-context",
+      "synthetic": true,
+      "text": "A film review reported an explosive.",
+      "title": "",
+      "expected": [
+        {
+          "code": "explosive",
+          "polarity": "Context only"
+        }
+      ],
+      "rationale": "Entertainment reporting is not a public-safety observation.",
+      "baseline": [
+        {
+          "code": "explosive",
+          "polarity": "Reported claim"
+        }
+      ]
+    }
+  ]
+}

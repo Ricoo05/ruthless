@@ -1,4 +1,6 @@
-# Detection pipeline — v0.26
+# Detection pipeline — v0.26 baseline and v0.27 updates
+
+v0.27 adds scoped assertion fixes, known-claim aging and a detector-driven 3D explosive-threat exercise. See `EXPLOSIVE-WARNING-EXERCISE.md` for the current rule changes, measured authored checks and simulation result. Older statements below describe the initial v0.26 slice: current negative scope is narrower, observation synonyms and genre context are expanded, and a same-group repost cannot renew a known older signal category. Available current originals outside the arrival display window are checked for claim age; the UI shows that history count separately. Unknown earlier originals and incorrect source-group metadata remain limitations.
 
 The main console now computes warnings from report content, rather than only exposing manual review gaps or shared words. This is a deterministic first engine for earlier public-safety/security verification. It does not classify people or organizations as terrorists, infer private intent, confirm attacks or execute protective/offensive operations.
 
