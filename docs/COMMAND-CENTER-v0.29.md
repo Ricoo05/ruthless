@@ -24,8 +24,8 @@ The 2026-10-10 authorization is up to $1 total for public incident media. A dura
 
 ## Verification on 2026-10-10
 
-- 354 automated tests passed after the session's filesystem restrictions were lifted; the formerly blocked directory-symlink fixture then passed unchanged.
-- 78 module syntax checks passed before final documentation; final packaging repeats checks for changed modules.
+- 355 automated tests passed after the session's filesystem restrictions were lifted; the formerly blocked directory-symlink fixture then passed unchanged.
+- 78 module syntax checks passed; changed modules passed subsequent targeted checks.
 - Live browser collection returned 266 retained real records: GOV.UK 3, CISA 200, USGS 54 and EONET 9. GDELT failed visibly; no substitute data was supplied. Counts and availability are time-dependent.
 - A real NASA archive image, PIA20364 (2016), was selected and analyzed through the local API. The frame-linked draft described visible water/land patterns and uncertainty. Estimated API cost was $0.000679; $0.05 reserved. This was an archival media-analysis check, not detection of a current event or independent verification of its interpretation.
 - Desktop 1440×1000 and mobile 390×844 checks showed no horizontal document overflow. Mobile navigation and filtered command search worked. Real source filtering and GOV.UK advisory staging into existing intake were checked. The existing detection console still runs on an empty real-source workspace and reports missing coverage.
