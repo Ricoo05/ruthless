@@ -1,10 +1,16 @@
-# Project Ruthless — Intelligence Workbench v0.28
+# Project Ruthless — Intelligence Workbench v0.29
+
+## Command center, global collection and media review
+
+The default `/#watch` view now collects five bounded real public sources and displays source coverage, retained records, actual request activity and source-linked intake. The interface uses a shared obsidian/silver design system with responsive navigation, Ctrl/Cmd+K workspace search and the approved engraved RUTHLESS emblem. Existing analysis and backend workflows are preserved.
+
+`/#media` adds real NASA archive image/video discovery, playback and selected-frame review. Run `node scripts/serve-research.mjs --enable-media-ai` for the explicitly authorized local selected-media API experiment at http://127.0.0.1:4181/. The static hosted edition has no paid AI endpoint. See [v0.29 functionality, verification and limitations](docs/COMMAND-CENTER-v0.29.md).
 
 Ruthless is being developed as terrorism intelligence analysis software for government and government-agency customers, covering domestic, cross-border and international developments relevant to India, with broader geographic support. The intended platform spans threat analysis, intelligence gathering, data integration, operations workflows and AI orchestration. The current release adds real public advisory collection and a bounded news-index adapter to source review, document intake and research tasks. Explicit fictional exercises and cited synthetic AI drafts remain available as research demonstrations. Prevention effectiveness and customer demand have not been validated.
 
 ## Real public-source OSINT (v0.28)
 
-Root and /#osint open Public-source OSINT. New sessions contain an empty research case, without fictional reports. Fetch real public data queries configured public APIs directly from the browser. GOV.UK supplies current advisory sections for six countries; GDELT supplies up to 20 news-index links for three fixed incident-research topics. During verification, GOV.UK succeeded and GDELT was rate-limited; unavailable sources show an error without fabricated fallback data.
+The retained /#osint view opens Public-source OSINT. New sessions contain an empty research case, without fictional reports. Fetch real public data queries configured public APIs directly from the browser. GOV.UK supplies current advisory sections for six countries; GDELT supplies up to 20 news-index links for fixed incident-research topics. During verification, GOV.UK succeeded and GDELT was unavailable; unavailable sources show an error without fabricated fallback data.
 
 Cancellation, per-provider request spacing, source/update timestamps, exact-passage intake and JSON/CSV/HTML exports are implemented. The browser declined the download test; export serializers passed automated checks. No background collector, social-profile aggregation or new AI provider is connected. See docs/PUBLIC-OSINT.md.
 

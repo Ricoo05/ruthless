@@ -1,7 +1,8 @@
 import {validateWorkspace, stageDocument} from './threat-core.mjs';
 
 export const COUNTRIES = Object.freeze({india:'India', pakistan:'Pakistan', bangladesh:'Bangladesh', nepal:'Nepal', 'sri-lanka':'Sri Lanka', 'united-arab-emirates':'United Arab Emirates'});
-export const TOPICS = Object.freeze({safety:{label:'Public safety advisories',query:'("public safety" OR "travel advisory" OR "security advisory")'},disaster:{label:'Disaster and emergency response',query:'(flood OR earthquake OR "emergency response")'},cyber:{label:'Cybersecurity advisories',query:'(cybersecurity OR "cyber incident" OR "security vulnerability")'}});
+export const NEWS_SCOPES = Object.freeze({world:'Worldwide',...COUNTRIES,'united-states':'United States','united-kingdom':'United Kingdom',france:'France',germany:'Germany',australia:'Australia',japan:'Japan',indonesia:'Indonesia',singapore:'Singapore','south-africa':'South Africa',brazil:'Brazil',ukraine:'Ukraine',israel:'Israel'});
+export const TOPICS = Object.freeze({safety:{label:'Public safety advisories',query:'("public safety" OR "travel advisory" OR "security advisory")'},security:{label:'Reported security incidents',query:'("security incident" OR "terrorist attack" OR "terrorism warning" OR "bomb threat")'},disaster:{label:'Disaster and emergency response',query:'(flood OR earthquake OR "emergency response")'},cyber:{label:'Cybersecurity advisories',query:'(cybersecurity OR "cyber incident" OR "security vulnerability")'}});
 export const OGL='https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/';
 const LIMIT=2_000_000;
 const text=(v,max)=>typeof v==='string'&&v.trim().length>0&&v.length<=max;
@@ -13,11 +14,11 @@ export function publicURL(value){
   try{const u=new URL(value);if(u.protocol!=='https:'||u.username||u.password||u.port||!u.hostname.includes('.')||!/[a-z]$/i.test(u.hostname)||/(?:^|\.)(localhost|local|internal|test|invalid)$/i.test(u.hostname))return null;return u.href;}catch{return null;}
 }
 export function sourceRequest({provider,country,topic='safety'}){
-  if(!own(COUNTRIES,country)||!own(TOPICS,topic))fail('Choose a configured country and topic.');
+  if(!own(provider==='gdelt'?NEWS_SCOPES:COUNTRIES,country)||!own(TOPICS,topic))fail('Choose a configured country and topic.');
   if(provider==='govuk')return `https://www.gov.uk/api/content/foreign-travel-advice/${country}`;
   if(provider!=='gdelt')fail('Unknown public source.');
   const url=new URL('https://api.gdeltproject.org/api/v2/doc/doc');
-  url.search=new URLSearchParams({query:`"${COUNTRIES[country]}" ${TOPICS[topic].query}`,mode:'artlist',format:'json',maxrecords:'20',timespan:'7d',sort:'datedesc'}).toString();
+  url.search=new URLSearchParams({query:`${country==='world'?'':`"${NEWS_SCOPES[country]}" `}${TOPICS[topic].query}`,mode:'artlist',format:'json',maxrecords:'20',timespan:'7d',sort:'datedesc'}).toString();
   return url.href;
 }
 export function parsePublicSource(payload,{provider,country,topic='safety',checkedAt,extractText}){

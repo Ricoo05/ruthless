@@ -4,7 +4,7 @@ import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 import {aiService} from './scripts/ai-service.mjs';
 const root=path.resolve(fileURLToPath(new URL('./dist/',import.meta.url)));
-const types={'.html':'text/html; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json'};
+const types={'.html':'text/html; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.png':'image/png'};
 const args=process.argv.slice(2),aiOptions={enabled:false};
 for(let i=0;i<args.length;i++){if(args[i]==='--enable-ai')aiOptions.enabled=true;else if(['--model','--max-requests','--max-output-tokens'].includes(args[i])&&args[i+1]){const key={'--model':'model','--max-requests':'maxRequests','--max-output-tokens':'maxOutputTokens'}[args[i]];aiOptions[key]=key==='model'?args[++i]:Number(args[++i]);}else throw new Error('Unknown server option. AI is disabled by default.');}
 const handleAI=aiService({...aiOptions,apiKey:process.env.OPENAI_API_KEY??''});

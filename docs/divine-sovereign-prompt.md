@@ -1,0 +1,26 @@
+# RUTHLESS — Divine Sovereign emblem
+
+Generated and revised with the built-in image-generation tool on 2026-10-10. These are generated design assets, not photographs of actual sculptures.
+
+Earlier sculptural candidate: `dist/assets/ruthless-divine-sovereign-v2.png`. The user selected the later engraving, `dist/assets/ruthless-divine-sovereign-v3.png`; see `divine-sovereign-revision-3.md`. Earlier versions remain separate.
+
+## Original generation prompt
+
+Use case: logo-brand. Asset: RUTHLESS — THE DIVINE SOVEREIGN, a premium mythic-divine sculptural emblem for an intelligence application's black website and splash screen.
+Create a vertically oriented, perfectly balanced, symmetrical emblem on pure black. At its center a magnificent mature regal maternal goddess carved from dark marble and celestial silver emerges three-dimensionally from an intricately carved gothic-celestial frame; her upper body visibly breaks beyond its boundaries. Her commanding serene face is partially concealed by her OWN TWO HANDS: exactly one elegant anatomically correct hand completely covers each eye. Both eyes are fully concealed by her hands, not by fabric. Clearly readable two hands, natural wrists, five fingers per hand.
+Two colossal symmetrical angelic wings erupt outward and upward behind her, dominating the composition with meticulous layered sculpted metallic feathers. Beneath and beside her stand exactly two smaller masculine ancient ceremonial warriors, symmetrically bowing deeply toward her, lowered heads, engraved dark armour and flowing black cloaks, solemn reverence.
+Above the goddess, an enormous perfectly legible capital "R" crowns the entire emblem. Gothic-seraphic architectural monogram, sharp polished silver silhouette, fine engraving and subtle angelic motifs, coherent enough to work independently as an app icon.
+Beneath the full emblem, exact text "RUTHLESS" (R U T H L E S S), majestic readable uppercase imperial lettering with gothic elegance and futuristic precision, balanced wide spacing and architectural cuts. No other text.
+Palette strictly obsidian, charcoal, graphite, antique platinum, polished silver, moonlit ivory, controlled cold white reflections. Monumental gothic cathedral sculpture and dark Renaissance artistry, ancient celestial empire reborn as refined futuristic technology. Exceptional dimensional relief, dark marble, engraved metal, dramatic shadows, refined negative space, cold celestial lighting. Keep complete wing tips, crown, guardians and wordmark within frame with comfortable black margins.
+Avoid cartoon, anime, esports or stock gaming logo styling, bright colors, neon glow, excessive clutter, random symbols, malformed hands, extra limbs, asymmetry, illegible typography. Prioritize the essential silhouette and clear pose over tiny ornament. Deliver a breathtaking premium finished emblem, not a mockup on merchandise.
+
+## Selected revision prompt
+
+Edit the supplied RUTHLESS emblem into a convincing photograph of an actual master-crafted metal and stone heraldic relief, designed and hand-finished by a skilled sculptor and lettering artist. The current image feels overly polished, procedurally ornate and like generic AI fantasy art. Substantially refine its art direction while preserving its core identity.
+
+Keep: central mature regal goddess with her OWN two hands fully covering her two eyes, one hand per eye, natural anatomy; two immense balanced wings; exactly two smaller bowing male guardians; architectural enclosing frame; a large readable R above; exact readable uppercase word RUTHLESS beneath. Black background, silver/charcoal/obsidian palette.
+
+Change the execution: photographed museum-quality bas-relief or luxury foundry commission, not a CGI fantasy illustration. Reduce ornament density by approximately half. Remove repeated starbursts, floating jewelry, extraneous spires and arbitrary decorative symbols. Strong deliberate silhouette, disciplined generous negative space. The goddess wears a modest classical sculpted robe, with realistic folds; less fashion-armour, no exaggerated cleavage. Mature classical facial anatomy and physically plausible hands with individual finger joints, tendons and natural slight differences. Guardians in simple believable engraved ceremonial armour, lowered heads and heavy wool cloaks. Wings have a designed hierarchy of feather groups, individually varied carved feather shapes and tool-cut edges, not hundreds of identical glossy blades.
+Materials: oxidized sterling silver and darkened pewter relief, satin worn edges, fine hand-chisel traces, subtle casting irregularities and authentic patina. No gold tones. Physically coherent relief depth and soft studio side lighting from one large source. Highlights restrained; no glowing rim lights or glassy skin. Use a pure black studio background.
+Typography is a custom editorial Roman-capital wordmark with disciplined kerning and restrained engraved serifs, exact RUTHLESS; R monogram above is clean, powerful, readable with minimal ornamental cuts. Preserve tall balanced composition, all elements within comfortable margins. Finish should look photographable, tactile, costly, thoughtfully composed and credible as an actual sculpted emblem. No watermark or extra text.
+

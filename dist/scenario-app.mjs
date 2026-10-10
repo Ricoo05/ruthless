@@ -12,19 +12,19 @@ function ring(position,radius,color,dashed=false){const points=Array.from({lengt
 function draw(){
   if(!ctx)return;
   ctx.clearRect(0,0,width,height);const frame=scenarioFrame(step,hypothesis,scenarioId);
-  polygon([[-10,0,-8],[10,0,-8],[10,0,8],[-10,0,8]],'#10222c','#27434f');
-  for(let i=-10;i<=10;i+=2)line([[i,.01,-8],[i,.01,8]],'#203b46');for(let i=-8;i<=8;i+=2)line([[-10,.01,i],[10,.01,i]],'#203b46');
-  polygon([[-2.5,.03,-.5],[4.5,.03,-.5],[4.5,.03,5],[-2.5,.03,5]],'#173747','#6e9dce');
-  const surfaces=[...cuboid(0,0,2,2.6,1.5,2.4,['#254756','#315667','#294d5c','#355c68','#426b78']),...cuboid(3,0,2.5,1.3,.9,2,['#223d4b','#284955','#314f5a','#2a4954','#3d626b'])];
+  polygon([[-10,0,-8],[10,0,-8],[10,0,8],[-10,0,8]],'#141b24','#27434f');
+  for(let i=-10;i<=10;i+=2)line([[i,.01,-8],[i,.01,8]],'#2c3542');for(let i=-8;i<=8;i+=2)line([[-10,.01,i],[10,.01,i]],'#2c3542');
+  polygon([[-2.5,.03,-.5],[4.5,.03,-.5],[4.5,.03,5],[-2.5,.03,5]],'#293444','#8998ad');
+  const surfaces=[...cuboid(0,0,2,2.6,1.5,2.4,['#333f4e','#495363','#3a4656','#586373','#637082']),...cuboid(3,0,2.5,1.3,.9,2,['#303b49','#3a4655','#485361','#3d4959','#5a6779'])];
   const [x,y,z]=frame.position;
   surfaces.push(...cuboid(x,y-.12,z,.45,.24,.45,['#dbb16b','#ba955d','#c99d5f','#efc67f','#ffe1a1']));
   if(frame.possibleDisruption)surfaces.slice(0,10).forEach(s=>s.color='#654635');
   const sorted=surfaces.map(s=>({...s,depth:s.points.map(project).reduce((n,p)=>n+(p?.depth??0),0)/s.points.length})).sort((a,b)=>b.depth-a.depth);
   sorted.forEach(s=>polygon(s.points,s.color));
-  for(const o of frame.observations.filter(o=>o.position)){ring(o.position,.22,'#66ddca');line([[o.position[0],.05,o.position[2]],o.position],'#427f7a',true);label([o.position[0]+.3,o.position[1]+.3,o.position[2]],o.id,'#66ddca');}
-  if(step>0)line([frame.scenario.observations[0].position,step<4?frame.position:frame.scenario.observations[2].position],'#edb965',true);
-  if(step>4)line([frame.scenario.observations[2].position,frame.position],'#edb965',true);
-  if($('show-uncertainty').checked){const radius=.55+Math.max(0,step-4)*.28;ring(frame.position,radius,'#edb965',true);ring([x,y+.25,z],radius*.7,'#8d795b',true);}
+  for(const o of frame.observations.filter(o=>o.position)){ring(o.position,.22,'#d6dde8');line([[o.position[0],.05,o.position[2]],o.position],'#8b97aa',true);label([o.position[0]+.3,o.position[1]+.3,o.position[2]],o.id,'#d6dde8');}
+  if(step>0)line([frame.scenario.observations[0].position,step<4?frame.position:frame.scenario.observations[2].position],'#b5a892',true);
+  if(step>4)line([frame.scenario.observations[2].position,frame.position],'#b5a892',true);
+  if($('show-uncertainty').checked){const radius=.55+Math.max(0,step-4)*.28;ring(frame.position,radius,'#b5a892',true);ring([x,y+.25,z],radius*.7,'#8d795b',true);}
   line([[x,.05,z],frame.position],'#9a844f',true);
   if(frame.possibleDisruption)label([0,2.2,2],'ASSUMED SITE DISRUPTION','#e6ab80');
   label([-2.3,.1,5.6],'FICTIONAL CIVILIAN SITE','#95b9d7');label([-9,.1,7],'ABSTRACT SCENE / NO MAP');
