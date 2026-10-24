@@ -1,4 +1,10 @@
-# Project Ruthless — Intelligence Workbench v0.29
+# Project Ruthless — Intelligence Workbench v0.30
+
+## Persistent official warning review
+
+Source collection (`/#collection`) now includes a real, persistent official India terrorism-advisory review pipeline. The local research server preserves original source responses and versions in a separate public-data SQLite journal, detects changes to the terrorism passage, supports first-observation replay, source-linked review and existing document intake, and provides opt-in hourly collection with persistent cooldowns. First or unchanged guidance remains context. The hosted edition can explicitly inspect a dated genuine capture; it has no journal worker.
+
+Run `node scripts/serve-research.mjs`, open http://127.0.0.1:4181/#collection, and choose **Connect local journal**. No API key or paid inference is required. See the [engineering report and actual evaluation limits](docs/ENGINEERING-MILESTONE-v0.30.md) and [verified source/access review](docs/INTELLIGENCE-SOURCE-REVIEW.md). No attack-prediction performance or untouched real historical benchmark has been established.
 
 ## Command center, global collection and media review
 
@@ -6,7 +12,7 @@ The default `/#watch` view now collects five bounded real public sources and dis
 
 `/#media` adds real NASA archive image/video discovery, playback and selected-frame review. Run `node scripts/serve-research.mjs --enable-media-ai` for the explicitly authorized local selected-media API experiment at http://127.0.0.1:4181/. The static hosted edition has no paid AI endpoint. See [v0.29 functionality, verification and limitations](docs/COMMAND-CENTER-v0.29.md).
 
-Ruthless is being developed as terrorism intelligence analysis software for government and government-agency customers, covering domestic, cross-border and international developments relevant to India, with broader geographic support. The intended platform spans threat analysis, intelligence gathering, data integration, operations workflows and AI orchestration. The current release adds real public advisory collection and a bounded news-index adapter to source review, document intake and research tasks. Explicit fictional exercises and cited synthetic AI drafts remain available as research demonstrations. Prevention effectiveness and customer demand have not been validated.
+Ruthless is being developed as terrorism intelligence analysis software for government and government-agency customers, covering domestic, cross-border and international developments relevant to India, with broader geographic support. The intended platform spans threat analysis, intelligence gathering, data integration, operations workflows and AI orchestration. The current release adds persistent official advisory change review while preserving existing public-source, media and analyst workflows. Explicit fictional exercises and cited synthetic AI drafts remain available as research demonstrations. Prevention effectiveness and customer demand have not been validated.
 
 ## Real public-source OSINT (v0.28)
 

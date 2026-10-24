@@ -12,14 +12,44 @@ function spans(text,term) {
   const escaped=term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
   let count=0;const matches=[];for(const m of text.matchAll(new RegExp(escaped,'giu'))){count++;if(matches.length<20)matches.push({start:m.index,end:m.index+m[0].length,quote:m[0]});}return {spans:matches,count};
 }
+function latestWorkspaceActivity(workspace) {
+  // This distinguishes a current workspace view from a historical replay. It
+  // does not authenticate editable history or reconstruct earlier labels.
+  const dates=[...workspace.history.map(h=>h.at),...workspace.documents.map(d=>d.recordedAt),...workspace.evidence.map(e=>e.recordedAt),
+    ...workspace.tasks.map(t=>t.updatedAt),...workspace.importBatches.map(b=>b.stagedAt),
+    ...workspace.proposalRuns.flatMap(r=>[r.createdAt,...r.proposals.map(p=>p.reviewedAt)]),
+    ...workspace.analysisRuns.flatMap(r=>[r.createdAt,r.reviewedAt]),...workspace.linkReviews.map(r=>r.createdAt)];
+  return dates.filter(Boolean).reduce((latest,date)=>date>latest?date:latest,'');
+}
+function sourceAnalystMetadata(workspace,document,evidence,to,currentView) {
+  const pending={evidenceId:'',claimState:'Not incorporated',relation:'Unassigned',reviewNote:'',incorporationState:'Not incorporated',incorporatedAt:'',analystMetadataBasis:'No linked evidence'};
+  if(!evidence)return pending;
+  // Evidence inherits the source's recordedAt, not the date of incorporation.
+  // Only an exact workflow-history binding or an accepted proposal has that
+  // date in workspace v8. Missing/conflicting provenance cannot be backdated.
+  const note=`${document.id} → ${evidence.id}: analyst reviewed source conditions and statement; not independent verification`;
+  const dates=workspace.history.filter(h=>h.assessmentId===document.assessmentId&&h.action==='Document incorporated'&&h.note===note).map(h=>h.at);
+  if(evidence.proposalRunId){
+    const run=workspace.proposalRuns.find(r=>r.id===evidence.proposalRunId),proposal=run?.proposals.find(p=>p.id===evidence.proposalId);
+    if(proposal?.status==='Accepted'&&proposal.evidenceId===evidence.id)dates.push(proposal.reviewedAt);
+  }
+  const distinct=[...new Set(dates)];
+  if(distinct.length!==1||distinct[0]<document.recordedAt)return {...pending,claimState:'Unknown',relation:'Unknown',incorporationState:'Unknown',analystMetadataBasis:'Incorporation date unavailable or inconsistent'};
+  const incorporatedAt=distinct[0];
+  if(incorporatedAt>to)return {...pending,analystMetadataBasis:'Incorporation occurs after cutoff'};
+  const known={evidenceId:evidence.id,incorporationState:'Incorporated',incorporatedAt};
+  // No prior claimState/relation/reviewNote snapshots exist. Historical views
+  // retain the known incorporation, but must not borrow current annotations.
+  if(!currentView)return {...pending,...known,claimState:'Unknown',relation:'Unknown',analystMetadataBasis:'Historical analyst labels unavailable'};
+  return {...pending,...known,claimState:evidence.claimState,relation:evidence.relation,reviewNote:document.reviewNote,analystMetadataBasis:'Current workspace labels; no historical label snapshot'};
+}
 function currentRows(workspace,{from,to,scope='All'}) {
   day(from);day(to);if(from>to||!['All','Domestic','Cross-border','International'].includes(scope))throw new Error('Invalid report comparison window.');
   const cases=new Map(workspace.assessments.map(c=>[c.id,c]));
   // Scan retained original excerpts where available. An incorporated source
   // is not counted again from its analyst statement; staged sources stay staged.
-  const availableDocuments=workspace.documents.filter(d=>d.reportedAt<=to&&d.recordedAt<=to);
-  const rows=[...availableDocuments.filter(d=>!availableDocuments.some(next=>next.supersedesDocumentId===d.id)).map(d=>({...d,kind:'source_excerpt',text:d.excerpt,claimState:'Not incorporated',relation:'Unassigned',evidenceId:workspace.evidence.find(e=>e.sourceDocumentId===d.id)?.id??''})),...workspace.evidence.filter(e=>!e.sourceDocumentId).map(e=>({...e,kind:'analyst_statement',text:e.statement,evidenceId:e.id}))];
-  for(const row of rows)if(row.evidenceId){const e=workspace.evidence.find(e=>e.id===row.evidenceId);row.claimState=e.claimState;row.relation=e.relation;}
+  const availableDocuments=workspace.documents.filter(d=>d.reportedAt<=to&&d.recordedAt<=to),currentView=to>=latestWorkspaceActivity(workspace);
+  const rows=[...availableDocuments.filter(d=>!availableDocuments.some(next=>next.supersedesDocumentId===d.id)).map(d=>({...d,kind:'source_excerpt',text:d.excerpt,...sourceAnalystMetadata(workspace,d,workspace.evidence.find(e=>e.sourceDocumentId===d.id),to,currentView)})),...workspace.evidence.filter(e=>!e.sourceDocumentId).map(e=>({...e,kind:'analyst_statement',text:e.statement,evidenceId:e.id}))];
   return rows.filter(row=>row.reportedAt>=from&&row.reportedAt<=to&&row.recordedAt<=to&&(scope==='All'||cases.get(row.assessmentId).scope===scope)).map(row=>({...row,recordKey:`${row.kind}:${row.id}`,caseTitle:cases.get(row.assessmentId).title,scope:cases.get(row.assessmentId).scope,area:cases.get(row.assessmentId).area}));
 }
 export function currentReportRecords(input,window){return currentRows(validateWorkspace(input),window);}
@@ -30,7 +60,7 @@ export function scanSignals(input,settings) {
     const c=cases.get(row.assessmentId);if((query.scope!=='All'&&c.scope!==query.scope)||row.reportedAt<query.from||row.reportedAt>query.to||row.recordedAt>query.to)continue;
     const hits=query.terms.map(term=>({term,...spans(row.text,term)})).filter(h=>h.count);
     if(!hits.length||(query.mode==='all'&&hits.length!==query.terms.length))continue;
-    matches.push({recordId:row.id,assessmentId:row.assessmentId,caseTitle:c.title,scope:c.scope,area:c.area,kind:row.kind,title:row.title,publisher:row.publisher,originGroup:row.originGroup,reportedAt:row.reportedAt,recordedAt:row.recordedAt,synthetic:row.synthetic,sourceURL:row.url,locator:row.locator??'',accessNote:row.accessNote??'',text:row.text,claimState:row.claimState,relation:row.relation,evidenceId:row.evidenceId,hits});
+    matches.push({recordId:row.id,assessmentId:row.assessmentId,caseTitle:c.title,scope:c.scope,area:c.area,kind:row.kind,title:row.title,publisher:row.publisher,originGroup:row.originGroup,reportedAt:row.reportedAt,recordedAt:row.recordedAt,synthetic:row.synthetic,sourceURL:row.url,locator:row.locator??'',accessNote:row.accessNote??'',text:row.text,claimState:row.claimState,relation:row.relation,evidenceId:row.evidenceId,...(row.kind==='source_excerpt'?{incorporationState:row.incorporationState,incorporatedAt:row.incorporatedAt,analystMetadataBasis:row.analystMetadataBasis}:{}),hits});
   }
   const caseMatches=workspace.assessments.map(c=>{const records=matches.filter(r=>r.assessmentId===c.id),groups=new Set(records.map(r=>r.originGroup.toLocaleLowerCase('en-US')));return {assessmentId:c.id,title:c.title,scope:c.scope,area:c.area,recordCount:records.length,sourceGroupCount:groups.size,thresholdMet:groups.size>=query.minGroups,challengingCount:records.filter(r=>r.relation==='Challenges').length,recordIds:records.map(r=>r.recordId)};}).filter(c=>c.recordCount);
   const sourceGroups=[...new Set(matches.map(r=>r.originGroup.toLocaleLowerCase('en-US')))].map(key=>{const records=matches.filter(r=>r.originGroup.toLocaleLowerCase('en-US')===key);return {label:records[0].originGroup,recordIds:records.map(r=>r.recordId),assessmentIds:[...new Set(records.map(r=>r.assessmentId))]};});

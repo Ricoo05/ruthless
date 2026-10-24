@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {regionalScenario} from '../dist/signals-scenario.mjs';
-import {scanSignals,signalQuery} from '../dist/signals-core.mjs';
-import {demoWorkspace,stageDocument} from '../dist/threat-core.mjs';
+import {scanSignals,signalQuery,currentReportRecords} from '../dist/signals-core.mjs';
+import {demoWorkspace,stageDocument,incorporateDocument,createFixtureProposal,reviewProposal,addTask} from '../dist/threat-core.mjs';
 const q=(extra={})=>({terms:'incident',from:'2026-10-01',to:'2026-10-05',minGroups:2,...extra});
 test('literal detection preserves exact source passages and never mutates evidence or judgments',()=>{const w=demoWorkspace(),before=JSON.stringify(w),r=scanSignals(w,q());assert.equal(JSON.stringify(w),before);assert.ok(r.matches.length);for(const m of r.matches)for(const h of m.hits)for(const s of h.spans)assert.equal(m.text.slice(s.start,s.end),s.quote);assert.equal(r.kind,'literal_indicator_triage');assert.ok(r.limitations.some(l=>l.includes('negations')));});
 test('reposts count once per source group and below-threshold cases remain visible',()=>{const r=scanSignals(demoWorkspace(),q({terms:'fictional'}));const domestic=r.cases.find(c=>c.assessmentId==='training-domestic');assert.equal(domestic.recordCount,3);assert.equal(domestic.sourceGroupCount,2);assert.equal(domestic.challengingCount,1);assert.equal(domestic.thresholdMet,true);const cross=r.cases.find(c=>c.assessmentId==='training-crossborder');assert.equal(cross.thresholdMet,false);assert.ok(r.matches.some(m=>m.claimState==='Unverified'));});
@@ -15,3 +15,55 @@ test('invalid rules, dates and oversized terms reject instead of silently wideni
 
 test('fictional regional exercise preserves existing work, stages uncertainty and exposes benign matches',()=>{const original=demoWorkspace(),before=JSON.stringify(original),w=regionalScenario(original),r=scanSignals(w,q({terms:'threat'}));assert.equal(JSON.stringify(original),before);assert.equal(w.assessments.length,5);assert.equal(w.documents.length,4);assert.equal(w.evidence.length,original.evidence.length);assert.equal(r.matches.length,4);assert.equal(r.cases.find(c=>c.assessmentId==='regional-training-r7').sourceGroupCount,2);assert.ok(r.matches.some(m=>m.text.includes('no threat was observed')));assert.throws(()=>regionalScenario(w),/already present/);assert.ok(w.assessments.filter(c=>c.id.startsWith('regional')).every(c=>c.confidence==='Insufficient'&&c.status==='Needs review'));});
 test('literal occurrence reporting is bounded and retains the actual match count',()=>{const w=demoWorkspace();w.evidence[0].statement='a'.repeat(4000);const hit=scanSignals(w,q({terms:'a'})).matches.find(m=>m.recordId==='SYN-001').hits[0];assert.equal(hit.count,4000);assert.equal(hit.spans.length,20);});
+
+const temporalDocument=()=>({id:'temporal-source',assessmentId:'training-domestic',title:'Retained temporal report',publisher:'Authored publisher',originGroup:'temporal-source',url:'',reportedAt:'2026-10-03',recordedAt:'2026-10-03',language:'English',locator:'Paragraph 1',accessNote:'Authored temporal regression control.',excerpt:'Temporal marker: routine observation on 3 October 2026.',synthetic:true});
+const incorporateTemporal=(workspace,at)=>incorporateDocument(workspace,'temporal-source',{id:'temporal-evidence',statement:'Later analyst interpretation.',claimState:'Disputed',relation:'Challenges',reviewNote:'Later intake review must not appear before incorporation.',accessAcknowledged:true},at);
+const temporalRow=(workspace,to)=>currentReportRecords(workspace,{from:'2026-10-01',to}).find(r=>r.id==='temporal-source');
+
+test('a later incorporation cannot remove an earlier intake gap or reveal later evidence labels and notes',()=>{
+  const staged=stageDocument(demoWorkspace(),temporalDocument(),'2026-10-03'),w=incorporateTemporal(staged,'2026-10-05');
+  const earlier=temporalRow(w,'2026-10-04');
+  assert.equal(earlier.evidenceId,'');assert.equal(earlier.claimState,'Not incorporated');assert.equal(earlier.relation,'Unassigned');assert.equal(earlier.reviewNote,'');assert.equal(earlier.incorporatedAt,'');
+  assert.equal(earlier.text,temporalDocument().excerpt);assert.equal(w.evidence.at(-1).recordedAt,'2026-10-03');
+  const match=scanSignals(w,q({terms:'Temporal marker',to:'2026-10-04'})).matches[0];
+  assert.equal(match.evidenceId,'');assert.equal(match.incorporationState,'Not incorporated');
+  const current=temporalRow(w,'2026-10-05');
+  assert.equal(current.evidenceId,'temporal-evidence');assert.equal(current.claimState,'Disputed');assert.equal(current.relation,'Challenges');assert.equal(current.incorporatedAt,'2026-10-05');assert.match(current.analystMetadataBasis,/Current workspace/);
+});
+
+test('historical incorporation survives while unsupported historical labels and review notes remain unknown',()=>{
+  let w=incorporateTemporal(stageDocument(demoWorkspace(),temporalDocument(),'2026-10-03'),'2026-10-03');
+  w=addTask(w,{id:'later-task',assessmentId:'training-domestic',title:'Later follow-up',scope:'Authored later workspace activity.',owner:'',dueAt:'2026-10-05'},'2026-10-05');
+  const earlier=temporalRow(w,'2026-10-04');
+  assert.equal(earlier.evidenceId,'temporal-evidence');assert.equal(earlier.incorporationState,'Incorporated');assert.equal(earlier.incorporatedAt,'2026-10-03');assert.equal(earlier.claimState,'Unknown');assert.equal(earlier.relation,'Unknown');assert.equal(earlier.reviewNote,'');
+  w.evidence.at(-1).claimState='Reported';w.evidence.at(-1).relation='Supports';w.documents[0].reviewNote='Different current review note.';
+  assert.deepEqual(temporalRow(w,'2026-10-04'),earlier);
+  assert.equal(temporalRow(w,'2026-10-05').relation,'Supports');
+});
+
+test('missing or misleading incorporation history cannot borrow the source recorded date',()=>{
+  const w=incorporateTemporal(stageDocument(demoWorkspace(),temporalDocument(),'2026-10-03'),'2026-10-05');
+  const event=w.history.pop();
+  w.history.push({...event,note:event.note.replace('temporal-evidence:','temporal-evidence-extra:')});
+  w.history.push({...event,assessmentId:'training-crossborder'});
+  const row=temporalRow(w,'2026-10-05');
+  assert.equal(row.evidenceId,'');assert.equal(row.claimState,'Unknown');assert.equal(row.relation,'Unknown');assert.equal(row.incorporationState,'Unknown');assert.equal(row.reviewNote,'');
+});
+
+test('conflicting or impossible incorporation dates fail closed without erasing original source text',()=>{
+  const w=incorporateTemporal(stageDocument(demoWorkspace(),temporalDocument(),'2026-10-03'),'2026-10-05');
+  w.history.push({...w.history.at(-1),at:'2026-10-04'});
+  assert.equal(temporalRow(w,'2026-10-05').incorporationState,'Unknown');
+  w.history=w.history.filter(h=>h.action!=='Document incorporated');
+  w.history.push({assessmentId:'training-domestic',at:'2026-10-02',action:'Document incorporated',note:'temporal-source → temporal-evidence: analyst reviewed source conditions and statement; not independent verification'});
+  const row=temporalRow(w,'2026-10-05');assert.equal(row.evidenceId,'');assert.equal(row.incorporationState,'Unknown');assert.equal(row.text,temporalDocument().excerpt);
+});
+
+test('accepted proposal review time gates incorporation after its generic history event replaces manual intake history',()=>{
+  let w=stageDocument(demoWorkspace(),temporalDocument(),'2026-10-03');
+  w=createFixtureProposal(w,'temporal-source','temporal-run','temporal-proposal','2026-10-03');
+  w=reviewProposal(w,'temporal-run','temporal-proposal',{status:'Accepted',evidenceId:'temporal-evidence',claimState:'Unverified',relation:'Supports',reviewNote:'Reviewed source and fixture.',accessAcknowledged:true},'2026-10-05');
+  assert.ok(!w.history.some(h=>h.action==='Document incorporated'));
+  const earlier=temporalRow(w,'2026-10-04');assert.equal(earlier.evidenceId,'');assert.equal(earlier.reviewNote,'');assert.equal(earlier.claimState,'Not incorporated');
+  const current=temporalRow(w,'2026-10-05');assert.equal(current.evidenceId,'temporal-evidence');assert.equal(current.incorporatedAt,'2026-10-05');assert.equal(current.relation,'Supports');
+});

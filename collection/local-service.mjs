@@ -41,7 +41,7 @@ export async function readCollectionCatalog(directory,{at=new Date()}={}){
   return {...empty(),reportCount:reports.length,lastAttempt,lastSuccess:lastAttempt?.status==='failed'?(reports.find(r=>r.status==='collected')??null):null};
 }
 
-export function createCollectionServer({directory,serveAssets=async()=>false,mediaService=async()=>false,now=()=>new Date()}){
+export function createCollectionServer({directory,serveAssets=async()=>false,mediaService=async()=>false,intelligenceService=async()=>false,now=()=>new Date()}){
   let active=false;
   const send=(res,status,value)=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(JSON.stringify(value));};
   const server=http.createServer(async(req,res)=>{
@@ -50,6 +50,7 @@ export function createCollectionServer({directory,serveAssets=async()=>false,med
       const count=name=>req.rawHeaders.filter((_,i)=>i%2===0&&req.rawHeaders[i].toLowerCase()===name).length;
       if(req.socket.localAddress!=='127.0.0.1'||req.socket.remoteAddress!=='127.0.0.1'||req.headers.host!==host||count('host')!==1||!['same-origin','none',undefined].includes(req.headers['sec-fetch-site']))return send(res,403,{error:'local_origin_required'});
       if(await mediaService(req,res,origin))return;
+      if(await intelligenceService(req,res,origin))return;
       if(req.url==='/api/collection/status'&&req.method==='GET')return send(res,200,{enabled:true,mode:'read-only',sourceId:COLLECTION_SOURCE.id});
       if(req.url==='/api/collection/latest'&&req.method==='POST'){
         if(req.headers.origin!==origin||count('origin')!==1||count('x-ruthless-request')!==1||req.headers['x-ruthless-request']!=='collection-review-v1'||req.headers['content-type']!=='application/json'||req.headers.authorization||req.headers.cookie)return send(res,403,{error:'same_origin_review_required'});

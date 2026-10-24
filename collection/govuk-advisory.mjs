@@ -44,12 +44,12 @@ function snapshot(payload, raw, checkedAt) {
 }
 
 // Fixed endpoint only: callers cannot turn this into a general URL fetcher.
-export async function collectAdvisory({fetchImpl = globalThis.fetch, now = () => new Date()} = {}) {
+export async function collectAdvisory({fetchImpl = globalThis.fetch, now = () => new Date(), onValidatedResponse} = {}) {
   const checkedAt = now().toISOString();
   const run = {format: 'ruthless-collection-run', version: 1, id: randomUUID(),
     sourceId: SOURCE.id, endpoint: SOURCE.endpoint, checkedAt, scope: SOURCE.scope,
     status: 'failed', reason: null, bytesRead: 0, httpStatus: null, snapshot: null};
-  let reader;
+  let reader,retainedRaw;
   try {
     const response = await fetchImpl(SOURCE.endpoint, {method: 'GET', redirect: 'error',
       credentials: 'omit', signal: AbortSignal.timeout(15_000),
@@ -76,12 +76,14 @@ export async function collectAdvisory({fetchImpl = globalThis.fetch, now = () =>
     try {payload = JSON.parse(new TextDecoder('utf-8', {fatal: true}).decode(raw));}
     catch {fail('invalid_json_or_encoding');}
     run.snapshot = snapshot(payload, raw, checkedAt);
+    retainedRaw=raw;
     run.status = 'collected';
   } catch (error) {
     run.reason = error instanceof CollectionError ? error.message : 'network_or_timeout';
   } finally {
     if (reader) {try {await reader.cancel();} catch {} reader.releaseLock();}
   }
+  if(run.status==='collected'&&onValidatedResponse)await onValidatedResponse(retainedRaw);
   return run;
 }
 

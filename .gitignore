@@ -13,3 +13,4 @@ node_modules/
 *.sqlite-shm
 
 .media-runtime/
+.intelligence-runtime/

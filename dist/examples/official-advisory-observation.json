@@ -1,0 +1,297 @@
+{
+  "format": "ruthless-official-journal",
+  "version": 1,
+  "generatedAt": "2026-10-24T11:02:17.889Z",
+  "asOf": "2026-10-24T11:02:17.885Z",
+  "source": {
+    "id": "govuk-fcdo-india",
+    "endpoint": "https://www.gov.uk/api/content/foreign-travel-advice/india",
+    "page": "https://www.gov.uk/foreign-travel-advice/india",
+    "publisher": "Foreign, Commonwealth & Development Office (UK)",
+    "licence": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+    "attribution": "Contains public sector information licensed under the Open Government Licence v3.0.",
+    "scope": "One official travel advisory about India; not comprehensive incident coverage."
+  },
+  "ruleVersion": "official-india-advisory-v1",
+  "attempts": [
+    {
+      "id": "2802d7df-02ba-4309-b9af-1ebd44d95d64",
+      "firstObservedAt": "2026-10-24T10:46:32.026Z",
+      "run": {
+        "format": "ruthless-collection-run",
+        "version": 1,
+        "id": "627b4578-e4c3-4ec2-bd4d-9d95cceea8cb",
+        "sourceId": "govuk-fcdo-india",
+        "endpoint": "https://www.gov.uk/api/content/foreign-travel-advice/india",
+        "checkedAt": "2026-10-24T10:46:31.169Z",
+        "scope": "One official travel advisory about India; not comprehensive incident coverage.",
+        "status": "collected",
+        "reason": null,
+        "bytesRead": 123115,
+        "httpStatus": 200,
+        "snapshot": {
+          "synthetic": false,
+          "disposition": "quarantined",
+          "publisher": "Foreign, Commonwealth & Development Office (UK)",
+          "sourceUrl": "https://www.gov.uk/foreign-travel-advice/india",
+          "contentId": "ea7e300b-24dd-40af-afde-fd690a2df678",
+          "title": "India travel advice",
+          "publisherUpdatedAt": "2026-10-07T11:56:27+01:00",
+          "language": "en",
+          "responseSha256": "715dd56b9e48c8951018678825bfdeb4a704d03621aed8b2f378e9b29894c31e",
+          "selectedContentSha256": "35c1555d8b0c11e5bb2d08d0d3d9c7b971886417869b74ee673cdceebc274d5e",
+          "licenceUrl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+          "attribution": "Contains public sector information licensed under the Open Government Licence v3.0.",
+          "parts": [
+            {
+              "slug": "warnings-and-insurance",
+              "title": "Warnings and insurance",
+              "sourceUrl": "https://www.gov.uk/foreign-travel-advice/india/warnings-and-insurance",
+              "originalHtml": "\n<div role=\"note\" aria-label=\"Warning\" class=\"application-notice help-notice\">\n<p>Your travel insurance could be invalidated if you travel against advice from the Foreign, Commonwealth &amp; Development Office (FCDO).</p>\n</div>\n\n<h2 id=\"areas-where-fcdo-advises-against-travel\">Areas where <abbr title=\"Foreign, Commonwealth &amp; Development Office\">FCDO</abbr> advises against travel </h2>\n\n<h3 id=\"india-pakistan-border-area\">India-Pakistan border area</h3>\n\n<p><abbr title=\"Foreign, Commonwealth &amp; Development Office\">FCDO</abbr> advises against all travel within 10km of the India-Pakistan border. The Wagah-Attari border crossing is closed except for the daily border retreat ceremony.</p>\n\n<h3 id=\"union-territory-of-jammu-and-kashmir\">Union Territory of Jammu and Kashmir</h3>\n\n<p><abbr title=\"Foreign, Commonwealth &amp; Development Office\">FCDO</abbr> advises against all travel to the Union Territory of Jammu and Kashmir (including Pahalgam, Gulmarg, Sonamarg, the city of Srinagar and the Jammu-Srinagar national highway), except for:</p>\n\n<ul>\n  <li>travel by air to and from the city of Jammu</li>\n  <li>travel within the city of Jammu</li>\n</ul>\n\n<h3 id=\"manipur\">Manipur</h3>\n\n<p><abbr title=\"Foreign, Commonwealth &amp; Development Office\">FCDO</abbr> advises against all but essential travel to the state of Manipur including the capital, Imphal. Curfews and restrictions continue in parts of Manipur following ongoing ethnic violence since May 2023.</p>\n\n<p>Find out more about <a href=\"/foreign-travel-advice/india/regional-risks\">why <abbr title=\"Foreign, Commonwealth &amp; Development Office\">FCDO</abbr> advises against travel to these regions</a>.</p>\n\n<div class=\"call-to-action\">\n  <h2 id=\"global-travel-impacts-due-to-escalation-in-the-middle-east\">Global travel impacts due to escalation in the Middle East</h2>\n\n  <p>Escalation in the Middle East has caused widespread travel disruption, including airspace closures, delayed and cancelled flights.</p>\n\n  <p>Your travel plans may be affected, even if your destination is not in the Middle East. Before you travel:</p>\n\n  <ul>\n    <li>check travel advice for any countries or territories you are transiting through</li>\n    <li>check for the latest updates from your airline or tour operator</li>\n    <li>review your travel insurance policy for coverage</li>\n    <li>monitor local and international media for the latest information and sign up for travel advice email alerts</li>\n    <li>If you have been impacted by travel disruption and need to review your Indian visa contact the nearest Foreigners Regional Registration Office (FRRO). See <a rel=\"external\" href=\"https://indianfrro.gov.in/eservices/\">e-FRRO Home</a> (website not accessible outside India).</li>\n  </ul>\n</div>\n\n<h2 id=\"before-you-travel\">Before you travel</h2>\n\n<p>No travel can be guaranteed safe. Read all the advice in this guide. You may also find it helpful to:</p>\n\n<ul>\n  <li>see <a href=\"https://www.gov.uk/guidance/advice-for-women-travelling-abroad\">general advice for women travellers</a>\n</li>\n  <li>read our <a href=\"https://www.gov.uk/government/publications/disabled-travellers\">guide on disability and travel abroad</a>\n</li>\n  <li>see <a href=\"https://www.gov.uk/guidance/lesbian-gay-bisexual-and-transgender-foreign-travel-advice\">general advice for LGBT+ travellers</a>\n</li>\n  <li>read about <a href=\"https://www.gov.uk/guidance/solo-and-independent-travel\">safety for solo and independent travel</a>\n</li>\n  <li>see <a href=\"https://www.gov.uk/guidance/safer-adventure-travel-and-volunteering-overseas\">advice on volunteering and adventure travel abroad</a>\n</li>\n</ul>\n\n<h3 id=\"travel-insurance\">Travel insurance</h3>\n\n<p>If you choose to travel, research your destinations and <a href=\"https://www.gov.uk/guidance/foreign-travel-insurance\">get appropriate travel insurance</a>. Insurance should cover your itinerary, planned activities and expenses in an emergency. </p>\n\n<h2 id=\"about-fcdo-travel-advice\">About <abbr title=\"Foreign, Commonwealth &amp; Development Office\">FCDO</abbr> travel advice</h2>\n\n<p><abbr title=\"Foreign, Commonwealth &amp; Development Office\">FCDO</abbr> provides advice about risks of travel to help you make informed decisions. Find out <a href=\"https://www.gov.uk/guidance/about-foreign-commonwealth-development-office-travel-advice\">more about <abbr title=\"Foreign, Commonwealth &amp; Development Office\">FCDO</abbr> travel advice</a>. </p>\n\n<h3 id=\"get-travel-advice-updates\">Get travel advice updates</h3>\n\n<p>Sign up to <a href=\"https://www.gov.uk/foreign-travel-advice/india/email-signup\">get email notifications</a> when this travel advice is updated. </p>\n\n<p>Follow <abbr title=\"Foreign, Commonwealth &amp; Development Office\">FCDO</abbr>:   </p>\n\n<ul>\n  <li>\n    <p><a rel=\"external\" href=\"https://x.com/fcdotravelgovuk\">travel advice on X</a></p>\n  </li>\n  <li>\n    <p><a rel=\"external\" href=\"https://www.facebook.com/FCDOTravel/\">travel advice on Facebook</a></p>\n  </li>\n  <li>\n    <p><a rel=\"external\" href=\"https://www.instagram.com/accounts/login/?next=https%3A%2F%2Fwww.instagram.com%2Ftravelaware%2F&amp;is_from_rle\">Travel Aware on Instagram</a></p>\n  </li>\n</ul>\n\n"
+            },
+            {
+              "slug": "safety-and-security",
+              "title": "Safety and security",
+              "sourceUrl": "https://www.gov.uk/foreign-travel-advice/india/safety-and-security",
+              "originalHtml": "<p>This guide also has safety advice for <a href=\"/foreign-travel-advice/india/regional-risks\">regions of India</a>.</p>\n\n<h2 id=\"terrorism\">Terrorism</h2>\n\n<p>There is a high threat of terrorist attack globally affecting UK interests and British nationals, including from groups and individuals who view the UK and British nationals as targets. Stay aware of your surroundings at all times.   </p>\n\n<p>UK Counter Terrorism Policing has information and advice on <a rel=\"external\" href=\"https://www.counterterrorism.police.uk/runhidetell/\">staying safe</a> and what to do in the event of a terrorist attack. Find out <a href=\"https://www.gov.uk/guidance/reduce-your-risk-from-terrorism-while-abroad\">how to reduce your risk from terrorism while abroad</a>.</p>\n\n<div role=\"note\" aria-label=\"Warning\" class=\"application-notice help-notice\">\n<p>Terrorists are very likely to try to carry out attacks in India.</p>\n</div>\n\n<p>There is a heightened risk of terrorism in some Indian regions. Read <a href=\"/foreign-travel-advice/india/regional-risks\">our advice on regional risks in India</a> for more information.   </p>\n\n<p>Terrorist and insurgent groups operating in India include:</p>\n\n<ul>\n  <li>Lashkar-e-Taiba (LeT), Jaish-e-Mohammed (JeM) and associated proxy groups such as The Resistance Front in Indian-administered Kashmir</li>\n  <li>Naxalite (Maoist or Left Wing Extremism) groups active in some of the India’s eastern, southern and central states</li>\n  <li>Khalistani extremists operating mainly in Punjab</li>\n  <li>Daesh, Al Qa’ida in the Indian Subcontinent (<abbr title=\"Al Qa’ida in the Indian Subcontinent\">AQIS</abbr>) and other groups may also be planning attacks</li>\n</ul>\n\n<p>Terrorist attacks have targeted Indian government interests and civilians, including tourists and foreign nationals. Security has been strengthened, including at major hotels and transport hubs. However, terrorist attacks could be indiscriminate, including in places visited by foreign nationals, such as:</p>\n\n<ul>\n  <li>restaurants, hotels, bars, shopping centres and markets</li>\n  <li>stations and airports</li>\n  <li>places of worship and tourist attractions</li>\n  <li>festivals, sports venues and beaches</li>\n</ul>\n\n<p>Take particular care during periods of national or religious significance, such as:</p>\n\n<ul>\n  <li>Republic Day (26 January)</li>\n  <li>Independence Day (15 August)</li>\n  <li>Diwali (usually in October or November)</li>\n  <li>Eid (date changes each year)</li>\n</ul>\n\n<p>Stay aware of your surroundings and keep up to date with local media reports. It is advisable to always carry identity documents and follow the advice of local authorities.</p>\n\n<h2 id=\"demonstrations-and-mass-gatherings\">Demonstrations and mass gatherings</h2>\n\n<p>Strikes (sometimes referred to as ‘bandh’ or ‘hartal’), political rallies and demonstrations happen frequently and can become violent. The risks are higher during elections and after the death of party or government leaders. Protests can happen at short notice, especially around days of national importance.</p>\n\n<p>Local authorities may impose curfews and other restrictions. Transport and public services including mobile networks and internet may be disrupted. Stampedes have occurred during some events with large crowds like sporting events, parades or religious gatherings resulting in death and injuries.</p>\n\n<p>You should:</p>\n\n<ul>\n  <li>avoid protests or demonstrations, rallies and large gatherings including at religious sites</li>\n  <li>follow the advice of the local authorities and your travel company</li>\n  <li>monitor local media and follow any curfew restrictions</li>\n</ul>\n\n<h2 id=\"crime\">Crime</h2>\n\n<p>If you’re the victim of crime in India, call:</p>\n\n<ul>\n  <li>police helpline: 100</li>\n  <li>national emergency number: 112</li>\n  <li>women helpline: 1091</li>\n</ul>\n\n<h3 id=\"protecting-your-belongings\">Protecting your belongings</h3>\n\n<p>Keep a copy of your passport complete with your emergency contact details, visa and flight ticket separately from originals when travelling. Leave copies at home where others can access them, and store copies electronically. If your passport is lost or stolen, tell the police immediately and get a police report. You will need the police report for your exit visa application.  </p>\n\n<p>Take care of your possessions on buses, trains and in crowds. Criminals may ride past on motorbikes and snatch valuables.</p>\n\n<p>Be cautious in tourist areas, where scammers, pickpockets and ticket touts target foreign nationals.</p>\n\n<h3 id=\"scams\">Scams</h3>\n\n<p>Cybercrime, internet scamming, card skimming and confidence scams are common. These scams come in many forms and can cause great financial loss.</p>\n\n<p>Criminals often use the details of British High Commissions and Embassies. Be cautious and check the authenticity of details before responding.</p>\n\n<p>If you’re a victim, report it to local police and obtain a copy of the report for your insurer. You can also report a cybercrime on the National Cybercrime Helpline by dialling 1930 and make a complaint on the <a rel=\"external\" href=\"https://cybercrime.gov.in/Default.aspx\">national portal</a></p>\n\n<h3 id=\"drink-and-food-spiking\">Drink and food spiking</h3>\n\n<p>Be wary of accepting drinks or food from strangers or leaving drinks unattended. There have been reports of spiked drinks and food, with British nationals being robbed or assaulted.</p>\n\n<h3 id=\"methanol-poisoning\">Methanol poisoning</h3>\n\n<p>There has been an increase in cases of serious illness caused by alcoholic drinks containing methanol in popular travel destinations around the world.</p>\n\n<p>Even small amounts of methanol can kill. It is not possible to identify methanol in alcoholic drinks by taste or smell. See <a rel=\"external\" href=\"https://travelaware.campaign.gov.uk/spiking-and-methanol-poisoning/\">Travel Aware Drink Spiking and Methanol Poisoning</a> for information about how to reduce the risks. </p>\n\n<p>Seek urgent medical attention if you or someone you are travelling with show the <a rel=\"external\" href=\"https://travelaware.campaign.gov.uk/spiking-and-methanol-poisoning/\">signs of methanol poisoning</a> after drinking.</p>\n\n<h3 id=\"sexual-assault\">Sexual assault</h3>\n\n<p>There is a risk of sexual assault, including attacks on female foreign national visitors in tourist areas and cities.</p>\n\n<p>Female travellers often experience verbal and physical harassment by individuals or groups of men. Serious sexual attacks involving both Indian and foreign nationals have been reported. British women have been victims of sexual assault, including rape, in multiple states in India. Avoid isolated areas, including beaches, when alone at any time of day.</p>\n\n<p>See <a href=\"https://www.gov.uk/guidance/advice-for-women-travelling-abroad.\">advice for women travelling abroad</a>.</p>\n\n<h2 id=\"laws-and-cultural-differences\">Laws and cultural differences</h2>\n\n<h3 id=\"dress-code\">Dress code</h3>\n\n<p>Respect local dress code and customs, particularly when visiting religious sites and rural areas. </p>\n\n<h3 id=\"alcohol-laws-and-bans\">Alcohol laws and bans</h3>\n\n<p>Laws on alcohol, including buying, drinking and the legal drinking age, vary by state. Get advice from your travel agent, hotel or the authorities about the laws in areas you are visiting.</p>\n\n<p>It is illegal to drink alcohol in public places, such as parks.</p>\n\n<p>In some states, foreign nationals and non-resident Indians can buy 30-day alcohol permits.</p>\n\n<p>There is often a ban on the sale of alcohol during major religious festivals, national holidays and elections. Police can carry out vehicle checks during this period.</p>\n\n<p>The consumption, production or transportation of alcohol is illegal in:</p>\n\n<ul>\n  <li>Bihar</li>\n  <li>Gujarat</li>\n  <li>Mizoram</li>\n  <li>Nagaland</li>\n  <li>Union Territory of Lakshadweep</li>\n</ul>\n\n<p>If you drink or possess alcohol in these states, you could be arrested and held without bail. You could face a prison sentence of 5 to 10 years.</p>\n\n<h3 id=\"smoking-and-vapes-bans\">Smoking and vapes bans</h3>\n\n<p>It is illegal to smoke in most public places. Only smoke in designated smoking areas.</p>\n\n<p>Vapes and related products are banned. You cannot buy vapes in India or bring them into the country.</p>\n\n<h3 id=\"illegal-drugs-and-prison-sentences\">Illegal drugs and prison sentences</h3>\n\n<p>Do not get involved with any illegal drugs. Drugs are not categorised as they would be in the UK, into Class A, B and C and possession of any illegal drug could lead to sentencing. You could face a minimum sentence of 6 months for possession of small amounts deemed for personal consumption only, up to a 10-year sentence for other amounts. The judicial process is slow, and you could be detained for several years while your case is processed.</p>\n\n<h3 id=\"using-cameras-and-binoculars-in-secure-areas\">Using cameras and binoculars in secure areas</h3>\n\n<p>Activities involving cameras and binoculars, like photography, birdwatching or plane spotting, may be misunderstood. Be particularly careful near military sites, government buildings, airports and railway stations.</p>\n\n<h3 id=\"satellite-phones-and-other-devices\">Satellite phones and other devices  </h3>\n\n<p>It is illegal to possess and operate satellite phones and GPS devices in India without a licence, even if you are only transiting through India. This may also cover other satellite-enabled devices, including handheld or cycling GPSs. You can be fined or arrested for possession of these devices without permission and the item can be confiscated.</p>\n\n<p>A number of British nationals have been arrested or detained for bringing satellite phones and other satellite-enabled navigational devices into the country without prior permission. Contact the Indian Department of Telecommunication to <a rel=\"external\" href=\"https://dot.gov.in/contact-us\">request a licence</a>. Further information is also available at the <a rel=\"external\" href=\"https://bcasindia.gov.in/#/pages/permitted-and-prohibited/electronic-items\">Bureau of Civil Aviation Security</a>.</p>\n\n<h3 id=\"swimming-safety\">Swimming safety</h3>\n\n<p>There are strong currents in rivers and off many coasts and people drown every year. Most beaches do not have warning signs, flags or lifesaving equipment. Take local advice and follow warnings and instructions issued by lifeguards. Emergency service standards may differ from those in the UK.  </p>\n\n<p>See <a rel=\"external\" href=\"https://www.rlss.org.uk/safety-on-holiday\">water safety on holiday</a> from the Royal Life Saving Society.</p>\n\n<h3 id=\"trekking-in-india\">Trekking in India</h3>\n\n<p>Trekkers should:</p>\n\n<ul>\n  <li>travel in groups</li>\n  <li>use reputable local guides and stay on established routes</li>\n  <li>check if you need any special permits</li>\n</ul>\n\n<p>Leave details of where you’re going and when you expect to return with your accommodation. You are extremely unlikely to have a phone signal in the mountains, so make sure your accommodation provider registers your whereabouts using the <a rel=\"external\" href=\"https://indianfrro.gov.in/frro/FormC\">online C-form</a>.</p>\n\n<p>It is illegal to possess or operate satellite phones or GPS devices without prior permission of the Indian authorities. <a rel=\"external\" href=\"https://dot.gov.in/contact-us\">Contact the Indian Department of Telecommunication to request a licence</a>.</p>\n\n<p>Hazards when trekking exist throughout the year, especially above 3,000 metres, including:</p>\n\n<ul>\n  <li>altitude sickness</li>\n  <li>sudden weather changes, including thunderstorms</li>\n  <li>avalanches and snow drifts</li>\n  <li>landslides, flooding and rock falls</li>\n</ul>\n\n<p>Make sure your insurance policy covers you for altitudes over 2,400m and mountain rescue and helicopter costs.</p>\n\n<p>While commercial ground-based search and rescue (SAR) teams generally do not operate at base stations above 3,000m, commercial helicopters do. This would require insurance. In some border areas only the Indian Air Force can carry out air rescues. However, they are under no obligation to perform them and only carry out rescues during working hours.</p>\n\n<h3 id=\"lgbt-travellers\">LGBT+ travellers</h3>\n\n<p>Same-sex sexual relationships are legal in India. However same-sex marriage is illegal. Indian society is conservative. This includes attitudes to LGBT+ people, which can be less accepting than in the UK. There is a risk of harassment and discrimination, especially outside of big cities. Showing affection in public may attract unwanted and negative attention.</p>\n\n<p>See more <a href=\"https://www.gov.uk/lesbian-gay-bisexual-and-transgender-foreign-travel-advice\">advice for LGBT+ travellers</a>.</p>\n\n<h3 id=\"child-custody-and-family-law\">Child custody and family law</h3>\n\n<p>Indian family law is different from UK law. Special caution is needed when child custody becomes an issue. In case of dispute, <a rel=\"external\" href=\"https://find-a-professional-service-abroad.service.csd.fcdo.gov.uk/find/lawyers?country=India\">consult a lawyer in India</a> to find out more about the relevant laws.</p>\n\n<p>Commercial surrogacy is illegal for foreign nationals in India. Overseas Citizens of India (OCI) should seek legal guidance on non-commercial (altruistic) surrogacy.</p>\n\n<h3 id=\"wildlife-animal-products-and-souvenirs\">Wildlife, animal products and souvenirs</h3>\n\n<p>It is illegal to buy, sell, kill or capture any protected wild animal or trade its parts without a licence. India has a strong legal framework to regulate and restrict wildlife trade and is also a signatory to the Convention on International Trade in Endangered Species of Wild Fauna and Flora (CITES). If you’re caught purchasing or trafficking these illegally, you will be prosecuted and receive a prison sentence or fine.</p>\n\n<h3 id=\"sexual-offences-against-children\">Sexual offences against children</h3>\n\n<p>There are severe penalties for any form of sexual offence against a child. There is a minimum jail term of 20 years, which may go up to life in prison or a death sentence, for anyone convicted of raping a child aged 12 or under.</p>\n\n<h2 id=\"transport-risks\">Transport risks</h2>\n\n<h3 id=\"driving-in-india\">Driving in India</h3>\n\n<p>If you are planning to drive in India, see <a href=\"https://www.gov.uk/driving-abroad\">information on driving abroad</a>.</p>\n\n<p>You’ll need to have both the <a href=\"https://www.gov.uk/driving-abroad/international-driving-permit\">1949 version of the international driving permit (<abbr title=\"International driving permit\">IDP</abbr>)</a> and your UK driving licence with you in the car. You cannot buy an <abbr title=\"International driving permit\">IDP</abbr> outside the UK, so get one before you travel.</p>\n\n<p>Rules on how long you can drive on a UK licence vary from state to state.</p>\n\n<h3 id=\"road-safety\">Road safety</h3>\n\n<p>India has a high death rate from road accidents. Comply with the police if they are at the scene. If the police are not present, it could be unsafe to remain at the scene. If safe to do so, go to the nearest police station.</p>\n\n<p>Driving can be dangerous in urban and rural areas due to wandering livestock. Accidents involving cows can draw crowds and potentially lead to violence. Anyone in the vehicle involved may be attacked or targeted for extortion. It is common to use your horn or flash your headlights frequently to announce your presence on the road.</p>\n\n<p>Avoid travelling at night and in fog as accidents are common due to low visibility and there is a higher risk of crime at night. Always travel in a well-maintained vehicle.</p>\n\n<p>If you travel by motorbike, wear a helmet and proper footwear.</p>\n\n<p>Buses are often driven fast and recklessly. Accidents are common.</p>\n\n<p>Be careful when crossing streets, even in marked pedestrian areas and especially at night, as vehicles sometimes drive on the wrong side of the road.</p>\n\n<h3 id=\"taxis-and-rickshaws\">Taxis and rickshaws</h3>\n\n<p>Avoid travelling alone and hailing taxis on the street, especially at night. App-based taxis like Uber and Ola are widely available, including in all airport terminal buildings. Pre-paid taxi services are also available and many hotels offer transfers. If a hotel driver is collecting you at the airport by, make sure they properly identify themselves before you set off.</p>\n\n<p>If you book a taxi online, there’s usually a way to share journey details with your contacts who can then follow your location.</p>\n\n<p>Seatbelts are not common in 3-wheel taxis (autos) or in the back seats of taxis. Try to use taxis that have seatbelts.</p>\n\n<h3 id=\"air-travel\">Air travel</h3>\n\n<p>When travelling through an airport, allow enough time to complete check-in and security procedures, as your baggage may need to go through screening equipment and checks. Allow time for transiting between flights if you need to change from international terminals to domestic terminals, even if using the airport shuttle service. Some places, e.g. Mumbai and Goa, have two airports located at a considerable distance from each other. Check your airport when booking your flights, especially if you are transiting through these places.</p>\n\n<p>If you arrive on a charter flight booked through a tour operator, you can only fly into and out of the country with the same charter operator. Chartered flight passengers are not allowed to fly into or out of the country using a scheduled airline. </p>\n\n<h3 id=\"rail-travel\">Rail travel</h3>\n\n<p>Train travel in India is generally safe, however accidents happen and have previously resulted in death and serious injury. There are police or guards on trains and stations if you need help. You must carry valid ID.</p>\n\n<p>When travelling by train:</p>\n\n<ul>\n  <li>do not accept food or drinks from strangers</li>\n  <li>take care of your passport and valuables as thefts are common</li>\n  <li>avoid people at railway stations offering tickets and tours as you may be scammed</li>\n</ul>\n\n<h3 id=\"sea-travel\">Sea travel</h3>\n\n<p>Tourist boats and other small craft rarely carry life-saving equipment.</p>\n\n<p>Although piracy has not so far affected India’s territorial waters, it poses a significant threat in parts of the Indian Ocean. Mariners should follow shipping industry guidelines on precautions to take.</p>\n\n<p>Ships and crew must have the necessary authorisation and paperwork before entering Indian territorial waters and follow Indian laws and regulations. If carrying weapons on board ships in Indian territorial waters, you must follow Indian laws and regulations.</p>\n\n<h2 id=\"extreme-weather-and-natural-disasters\">Extreme weather and natural disasters</h2>\n\n<p>India can experience extreme weather events that threaten life and disrupt infrastructure, including buildings, roads and communications.</p>\n\n<p>Find out what you can do to prepare for and respond to <a href=\"https://www.gov.uk/guidance/tropical-cyclones\">extreme weather and natural hazards</a>.</p>\n\n<p>You should:</p>\n\n<ul>\n  <li>plan your travel so that you are aware of seasonal weather events, such as monsoon rains</li>\n  <li>follow the advice of local authorities and your travel company</li>\n  <li>check the <a rel=\"external\" href=\"https://mausam.imd.gov.in/\">Indian Meteorological Department</a> for weather updates</li>\n</ul>\n\n<h3 id=\"monsoons\">Monsoons</h3>\n\n<p>The monsoon season in India usually runs from June to November. Monsoon rains can cause:</p>\n\n<ul>\n  <li>flash flooding and landslides, which can often occur with limited warning, sometimes leading to significant loss of life and property, particularly in mountainous areas</li>\n  <li>towns and villages to be cut off</li>\n  <li>road closures affecting transport links</li>\n  <li>disruption in big cities due to flooding</li>\n  <li>disruption to services including telephone lines, internet services and electricity</li>\n</ul>\n\n<h3 id=\"cyclones-and-tropical-storms\">Cyclones and tropical storms</h3>\n\n<p>Tropical cyclones are a risk in India, particularly in:</p>\n\n<ul>\n  <li>the east coast of India, from September to December</li>\n  <li>the Bay of Bengal, from April to June and September to December</li>\n  <li>south India, from June to November</li>\n</ul>\n\n<p>Tropical cyclones can cause:</p>\n\n<ul>\n  <li>high winds: buildings can be damaged or destroyed; trees, power and telephone lines fall; flying debris becomes dangerous</li>\n  <li>storm surges: a tropical cyclone can cause a temporary rise in sea level of several metres which can flood coastal areas and damage buildings on the shoreline</li>\n  <li>very heavy rainfall: this can cause localised or widespread flooding and mudslides</li>\n</ul>\n\n<h3 id=\"earthquakes\">Earthquakes</h3>\n\n<p>Several parts of India lie on highly active fault zones, including areas of the north and north-east. The most active are along the length of the Himalayas. Tremors are common in these regions and can cause landslides. Limited emergency response vehicles, equipment and medical facilities could increase an earthquake’s impact.</p>\n\n<p>The US Federal Emergency Management Agency website has advice about <a rel=\"external\" href=\"http://www.ready.gov/earthquakes\">what to do before, during and after an earthquake</a>.</p>\n\n"
+            },
+            {
+              "slug": "regional-risks",
+              "title": "Regional risks",
+              "sourceUrl": "https://www.gov.uk/foreign-travel-advice/india/regional-risks",
+              "originalHtml": "<p>This section has safety advice for regions of India. It only covers regions where the Foreign, Commonwealth and Development Office (<abbr title=\"Foreign, Commonwealth &amp; Development Office\">FCDO</abbr>) has specific advice.</p>\n\n<p>You should also read <a href=\"/foreign-travel-advice/india\"><abbr title=\"Foreign, Commonwealth &amp; Development Office\">FCDO</abbr>’s overall travel advice</a> and <a href=\"/foreign-travel-advice/india/safety-and-security\">safety and security advice</a> for India.</p>\n\n<h2 id=\"india-pakistan-border-area-and-western-india\">India-Pakistan border area and western India</h2>\n\n<p><abbr title=\"Foreign, Commonwealth &amp; Development Office\">FCDO</abbr> advises against all travel within 10km of the India-Pakistan border. The Wagah-Attari border crossing is closed for tourist transit except for the daily border retreat ceremony. If you have plans to travel to India from Pakistan using any land borders, make alternate plans and follow the advice of local authorities</p>\n\n<p>The India-Pakistan border in Gujarat and Rajasthan is unmarked in some areas. Approaching it away from an official crossing point could be dangerous. Where it is unmarked, you could enter Pakistan illegally. </p>\n\n<h2 id=\"union-territory-of-jammu-and-kashmir\">Union Territory of Jammu and Kashmir </h2>\n\n<p><abbr title=\"Foreign, Commonwealth &amp; Development Office\">FCDO</abbr> advises against all travel to the Union Territory of Jammu and Kashmir (including Pahalgam, Gulmarg, Sonamarg, the city of Srinagar and the Jammu-Srinagar national highway), except for:</p>\n\n<ul>\n  <li>travel by air to and from the city of Jammu</li>\n  <li>travel within the city of Jammu</li>\n</ul>\n\n<p>There have been frequent terrorist incidents in Jammu and Kashmir. There is a continuing threat, towards Indian government targets and civilians including tourists and foreign nationals. See <a href=\"/foreign-travel-advice/india/safety-and-security#terrorism\">Terrorism</a>.</p>\n\n<p>There is a heavy security presence in the Kashmir Valley. This, combined with violent protests and operations by security forces, has resulted in a number of deaths and serious casualties.</p>\n\n<p>The authorities can impose and lift curfews and other restrictions frequently and quickly. Stay vigilant, monitor local media, and follow the advice of local authorities and your travel company.</p>\n\n<p>Foreign nationals are vulnerable in rural districts and outside the main population centres and tourist areas. There is a risk of unpredictable violence, including bombings, grenade attacks, shootings and kidnapping. The long-standing policy of the UK government is not to make substantive concessions to hostage takers. The level of consular assistance that the <a href=\"https://www.gov.uk/government/world/organisations/british-high-commission-new-delhi\">British High Commission in India</a> can provide in Jammu and Kashmir is severely limited.</p>\n\n<h2 id=\"manipur\">Manipur</h2>\n\n<p><abbr title=\"Foreign, Commonwealth &amp; Development Office\">FCDO</abbr> advises against all but essential travel to the state of Manipur due to ongoing ethnic violence since May 2023.</p>\n\n<p>There may be curfews and other restrictions including transport disruptions and the suspension of internet services at short notice in some parts of the state.</p>\n\n<p>Some insurgent groups are active in north-east India including in the state of Manipur.</p>\n\n<p>You should:</p>\n\n<ul>\n  <li>avoid protests or large gatherings</li>\n  <li>follow the advice of the local authorities and your travel company</li>\n  <li>monitor local media and follow any curfew restrictions</li>\n</ul>\n\n<h2 id=\"other-north-eastern-states\">Other north-eastern states</h2>\n\n<p>Sudden flareups and skirmishes may happen along inter-state borders in north-east India including Assam-Meghalaya borders. Please check with local authorities before traveling in the region.</p>\n\n<p>There have been skirmishes on the India-Bangladesh border. Travellers are advised to check with local authorities that it is safe to travel before visiting these areas.</p>\n\n<p>Protests, blockades and large gatherings are common in India’s north-eastern states. They can happen without warning and occasionally result in disorder. Blockades and protests may disrupt traffic along the national highways connecting them with each other and with Assam.</p>\n\n<p>Avoid protests and leave as soon as possible if a crowd develops. Review your security arrangements carefully and follow the advice of local authorities.</p>\n\n<h2 id=\"chhattisgarh-jharkhand-odisha-madhya-pradesh-and-maharashtra\">Chhattisgarh, Jharkhand, Odisha, Madhya Pradesh and Maharashtra</h2>\n\n<p>Naxalite (Maoist or Left Wing Extremism) insurgents target police officers, paramilitary forces and government officials leading to injuries and deaths. Seek advice from your travel provider and local authorities on LWE-affected areas if you plan to travel to these states. <a rel=\"external\" href=\"https://www.mha.gov.in/en/divisionofmha/left-wing-extremism-division\">Ministry of Home Affairs</a>.</p>\n\n<h2 id=\"goa\">Goa</h2>\n\n<p>Opportunistic criminals operate in Goa because of the high number of tourists.</p>\n\n<p>There have been some serious incidents involving British nationals in recent years, including sexual assaults.</p>\n\n<p>It is illegal to drink alcohol in public places in Goa. If you drink alcohol outside the limits of a licensed premises, you could be fined or given a prison sentence. You can drink within the limits of a registered beach shack or bar, for example, but not on an open beach or road.</p>\n\n"
+            }
+          ],
+          "limitations": [
+            "Publisher advice is not independently verified intelligence.",
+            "HTML is untrusted source data; never render it directly or execute embedded instructions.",
+            "Selected sections only; no attachments, linked sites, social posts or historical versions collected.",
+            "No workspace import, model call, evidence acceptance or threat prediction has occurred."
+          ]
+        }
+      },
+      "analysis": {
+        "version": 1,
+        "ruleVersion": "official-india-advisory-v1",
+        "sourceId": "govuk-fcdo-india",
+        "sourceHash": "35c1555d8b0c11e5bb2d08d0d3d9c7b971886417869b74ee673cdceebc274d5e",
+        "topicHash": "1fd23f568dd73e579af068ff6625f6827728b2b0600e56757730395ac938bc24",
+        "topicAvailable": true,
+        "pageChanged": false,
+        "topicChanged": false,
+        "candidates": [
+          {
+            "id": "advisory-1fd23f568dd73e579af068ff6625f682",
+            "kind": "baseline_context",
+            "priority": "Context",
+            "title": "Standing official India terrorism guidance",
+            "excerpt": "There is a high threat of terrorist attack globally affecting UK interests and British nationals, including from groups and individuals who view the UK and British nationals as targets. Stay aware of your surroundings at all times.\n\nUK Counter Terrorism Policing has information and advice on staying safe and what to do in the event of a terrorist attack. Find out how to reduce your risk from terrorism while abroad.\n\nTerrorists are very likely to try to carry out attacks in India.\n\nThere is a heightened risk of terrorism in some Indian regions. Read our advice on regional risks in India for more information.\n\nTerrorist and insurgent groups operating in India include:\n\nLashkar-e-Taiba (LeT), Jaish-e-Mohammed (JeM) and associated proxy groups such as The Resistance Front in Indian-administered Kashmir\n\nNaxalite (Maoist or Left Wing Extremism) groups active in some of the India’s eastern, southern and central states\n\nKhalistani extremists operating mainly in Punjab\n\nDaesh, Al Qa’ida in the Indian Subcontinent (AQIS) and other groups may also be planning attacks\n\nTerrorist attacks have targeted Indian government interests and civilians, including tourists and foreign nationals. Security has been strengthened, including at major hotels and transport hubs. However, terrorist attacks could be indiscriminate, including in places visited by foreign nationals, such as:\n\nrestaurants, hotels, bars, shopping centres and markets\n\nstations and airports\n\nplaces of worship and tourist attractions\n\nfestivals, sports venues and beaches\n\nTake particular care during periods of national or religious significance, such as:\n\nRepublic Day (26 January)\n\nIndependence Day (15 August)\n\nDiwali (usually in October or November)\n\nEid (date changes each year)\n\nStay aware of your surroundings and keep up to date with local media reports. It is advisable to always carry identity documents and follow the advice of local authorities.",
+            "sourceURL": "https://www.gov.uk/foreign-travel-advice/india/safety-and-security#terrorism",
+            "publisher": "Foreign, Commonwealth & Development Office (UK)",
+            "publisherUpdatedAt": "2026-10-07T11:56:27+01:00",
+            "capturedAt": "2026-10-24T10:46:31.169Z",
+            "sourceHash": "35c1555d8b0c11e5bb2d08d0d3d9c7b971886417869b74ee673cdceebc274d5e",
+            "topicHash": "1fd23f568dd73e579af068ff6625f6827728b2b0600e56757730395ac938bc24",
+            "rawSpans": [
+              {
+                "start": 157,
+                "end": 398
+              },
+              {
+                "start": 400,
+                "end": 760
+              },
+              {
+                "start": 840,
+                "end": 911
+              },
+              {
+                "start": 920,
+                "end": 1116
+              },
+              {
+                "start": 1118,
+                "end": 1183
+              },
+              {
+                "start": 1192,
+                "end": 1334
+              },
+              {
+                "start": 1337,
+                "end": 1460
+              },
+              {
+                "start": 1463,
+                "end": 1520
+              },
+              {
+                "start": 1523,
+                "end": 1686
+              },
+              {
+                "start": 1694,
+                "end": 2006
+              },
+              {
+                "start": 2015,
+                "end": 2079
+              },
+              {
+                "start": 2082,
+                "end": 2112
+              },
+              {
+                "start": 2115,
+                "end": 2165
+              },
+              {
+                "start": 2168,
+                "end": 2213
+              },
+              {
+                "start": 2221,
+                "end": 2311
+              },
+              {
+                "start": 2320,
+                "end": 2354
+              },
+              {
+                "start": 2357,
+                "end": 2394
+              },
+              {
+                "start": 2397,
+                "end": 2445
+              },
+              {
+                "start": 2448,
+                "end": 2485
+              },
+              {
+                "start": 2493,
+                "end": 2672
+              }
+            ],
+            "added": [],
+            "removed": [],
+            "explanation": "Retained standing advice. No new or imminent incident is established by this first or unchanged observation.",
+            "confidence": "Uncalibrated; source content not independently verified",
+            "independentSourceGroups": 1,
+            "contradictions": [],
+            "verificationQuestions": [
+              "Does this wording describe a dated development or standing guidance?",
+              "Can a separately originated official report corroborate the development?",
+              "Does the source describe an incident already underway, a public warning or a pre-incident indicator?"
+            ],
+            "possibleAlternatives": [
+              "Routine editorial update or continuing standing advice.",
+              "Removal or rewording of text does not establish resolution of a threat."
+            ]
+          }
+        ],
+        "coverage": "Terrorism section retained",
+        "limitations": [
+          "One travel-advisory publisher; no independent corroboration.",
+          "Priority describes review of published guidance, not attack likelihood.",
+          "First retrieval is a baseline; publication time is not evidence of earlier system knowledge.",
+          "No model inference, suspect identification, community profiling or external escalation."
+        ],
+        "paragraphs": [
+          "There is a high threat of terrorist attack globally affecting UK interests and British nationals, including from groups and individuals who view the UK and British nationals as targets. Stay aware of your surroundings at all times.",
+          "UK Counter Terrorism Policing has information and advice on staying safe and what to do in the event of a terrorist attack. Find out how to reduce your risk from terrorism while abroad.",
+          "Terrorists are very likely to try to carry out attacks in India.",
+          "There is a heightened risk of terrorism in some Indian regions. Read our advice on regional risks in India for more information.",
+          "Terrorist and insurgent groups operating in India include:",
+          "Lashkar-e-Taiba (LeT), Jaish-e-Mohammed (JeM) and associated proxy groups such as The Resistance Front in Indian-administered Kashmir",
+          "Naxalite (Maoist or Left Wing Extremism) groups active in some of the India’s eastern, southern and central states",
+          "Khalistani extremists operating mainly in Punjab",
+          "Daesh, Al Qa’ida in the Indian Subcontinent (AQIS) and other groups may also be planning attacks",
+          "Terrorist attacks have targeted Indian government interests and civilians, including tourists and foreign nationals. Security has been strengthened, including at major hotels and transport hubs. However, terrorist attacks could be indiscriminate, including in places visited by foreign nationals, such as:",
+          "restaurants, hotels, bars, shopping centres and markets",
+          "stations and airports",
+          "places of worship and tourist attractions",
+          "festivals, sports venues and beaches",
+          "Take particular care during periods of national or religious significance, such as:",
+          "Republic Day (26 January)",
+          "Independence Day (15 August)",
+          "Diwali (usually in October or November)",
+          "Eid (date changes each year)",
+          "Stay aware of your surroundings and keep up to date with local media reports. It is advisable to always carry identity documents and follow the advice of local authorities."
+        ]
+      }
+    }
+  ],
+  "reviews": [],
+  "retainedCount": 1,
+  "omittedAttempts": 0,
+  "omittedReviews": 0,
+  "head": null,
+  "state": {
+    "enabled": false
+  },
+  "integrity": {
+    "verifiedAtExport": true,
+    "notice": "Editable public snapshot, not external attestation."
+  },
+  "busy": false,
+  "lastError": null,
+  "evaluation": {
+    "scope": "Official India terrorism advisory change review",
+    "protocol": {
+      "developmentEnd": "2026-10-24T10:46:32.025Z",
+      "evaluationStart": "2026-10-24T10:46:32.026Z",
+      "evaluationEnd": "2026-10-24T11:02:17.885Z",
+      "labelIntervalConvention": "Half-open [start, end); adjacent intervals are allowed. An observation exactly at an interval end belongs to the next interval, if labelled.",
+      "independentLabelsDeclared": false,
+      "protocolTuningIndependentlyVerified": false,
+      "untouchedEvaluationIndependentlyVerified": false,
+      "baseline": "Alert whenever analysis.pageChanged is true; same eligible observations and labelled intervals as the engine."
+    },
+    "metrics": null,
+    "reason": "Scoring is unavailable: independent interval labels have not been declared.",
+    "sampleSizes": {
+      "attemptsReceived": 1,
+      "developmentAttempts": 0,
+      "gapPeriodAttempts": 0,
+      "afterEvaluationAttempts": 0,
+      "invalidAttempts": 0,
+      "failedCollectionAttempts": 0,
+      "topicUnavailableAttempts": 0,
+      "eligibleObservations": 1,
+      "unlabelledObservations": 1,
+      "incompleteLabelObservations": 0,
+      "completeLabelIntervals": 0,
+      "incompleteLabelIntervals": 0,
+      "intervalsWithoutObservations": 0,
+      "scoredIntervals": 0,
+      "baselineContextCandidatesIgnored": 1
+    },
+    "exclusions": [],
+    "intervals": [],
+    "observations": [
+      {
+        "id": "2802d7df-02ba-4309-b9af-1ebd44d95d64",
+        "runId": "627b4578-e4c3-4ec2-bd4d-9d95cceea8cb",
+        "firstObservedAt": "2026-10-24T10:46:32.026Z",
+        "checkedAt": "2026-10-24T10:46:31.169Z",
+        "publisherUpdatedAt": "2026-10-07T10:56:27.000Z",
+        "changedCandidateIds": [],
+        "baselineContextCandidatesIgnored": 1,
+        "pageChanged": false
+      }
+    ],
+    "attackPredictionMetrics": null,
+    "confidenceCalibration": null,
+    "limitations": [
+      "This evaluates review of changes to official guidance, not attack prediction, prevention, incident probability, or comprehensive intelligence coverage.",
+      "Publisher edition time is not the time an incident occurred or the time a warning became externally accessible.",
+      "Ground-truth labels must come from independent interval review. Their independence, protocol tuning, and untouched evaluation status are declarations, not independently guaranteed by this function.",
+      "Unlabelled intervals and intervals without an eligible successful observation are excluded; collection failures are coverage gaps and never establish a safe negative.",
+      "A current page collected late cannot be used as a historical snapshot merely because its publisher timestamp is old.",
+      "Confidence calibration and attack precision are unavailable because the detector supplies no validated predictive probabilities or attack outcome labels."
+    ]
+  },
+  "security": "Real public source and computed review context only. Local reviewer notes, raw full response, credentials and scheduling state are excluded. Not a signed authenticity record."
+}

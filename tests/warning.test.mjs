@@ -33,6 +33,28 @@ test('incorporation removes intake gap, avoids duplicate source counting and kee
   assert.equal(c.timeline.find(r=>r.id==='dated-source').text,doc().excerpt);
   assert.ok(!c.timeline.some(r=>r.id==='dated-evidence'));
 });
+
+test('later analyst incorporation does not rewrite earlier pending-intake or challenging-evidence review',()=>{
+  let w=stageDocument(demoWorkspace(),doc(),'2026-10-03');
+  w=incorporateDocument(w,'dated-source',{id:'dated-evidence',accessAcknowledged:true,statement:'A later interpretation.',claimState:'Disputed',relation:'Challenges',reviewNote:'Reviewed later than the historical cutoff.'},'2026-10-05');
+  const earlier=warningReview(w,{...window,to:'2026-10-04'}).cases.find(c=>c.assessmentId==='training-domestic');
+  assert.ok(earlier.rules.find(r=>r.code==='pending-intake').recordKeys.includes('source_excerpt:dated-source'));
+  assert.ok(!earlier.rules.find(r=>r.code==='challenging-evidence').recordKeys.includes('source_excerpt:dated-source'));
+  const source=earlier.timeline.find(r=>r.id==='dated-source');assert.equal(source.evidenceId,'');assert.equal(source.reviewNote,'');
+  const current=warningReview(w,window).cases.find(c=>c.assessmentId==='training-domestic');
+  assert.ok(!current.rules.some(r=>r.code==='pending-intake'));
+  assert.ok(current.rules.find(r=>r.code==='challenging-evidence').recordKeys.includes('source_excerpt:dated-source'));
+});
+
+test('a known past incorporation keeps its identity without inventing a historical evidence stance',()=>{
+  let w=stageDocument(demoWorkspace(),doc(),'2026-10-03');
+  w=incorporateDocument(w,'dated-source',{id:'dated-evidence',accessAcknowledged:true,statement:'An interpretation.',claimState:'Disputed',relation:'Challenges',reviewNote:'Current intake note.'},'2026-10-03');
+  w=addTask(w,{id:'later-history',assessmentId:'training-domestic',title:'Later follow-up',scope:'Later activity establishes a historical query.',owner:'',dueAt:'2026-10-05'},'2026-10-05');
+  const earlier=warningReview(w,{...window,to:'2026-10-04'}).cases.find(c=>c.assessmentId==='training-domestic');
+  assert.ok(!earlier.rules.some(r=>r.code==='pending-intake'));
+  assert.ok(!earlier.rules.find(r=>r.code==='challenging-evidence').recordKeys.includes('source_excerpt:dated-source'));
+  const source=earlier.timeline.find(r=>r.id==='dated-source');assert.equal(source.evidenceId,'dated-evidence');assert.equal(source.relation,'Unknown');assert.equal(source.claimState,'Unknown');
+});
 test('date context distinguishes publication from mentions without filling years or choosing among dates',()=>{
   const w=demoWorkspace();w.evidence[0].statement='🔎 On ३ अक्टूबर २०२६, routine observation.';w.evidence[1].statement='Routine activity on 3 October.';w.evidence[2].statement='Correction from 3 October 2026 to 4 October 2026.';w.evidence[3].statement='Routine activity on 31 February 2026.';
   const r=warningReview(w,window),rows=r.cases.flatMap(c=>c.timeline),dateRule=r.cases[0].rules.find(r=>r.code==='date-context');
