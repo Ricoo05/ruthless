@@ -31,3 +31,37 @@ jobs:
         run: node scripts/scan-secrets.mjs
       - name: Run all declared regression and integration tests
         run: node scripts/verify.mjs test
+  optional-dependencies:
+    name: Optional semantic dependency audit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: 24.22.1
+      - name: Install pinned optional runtime without lifecycle scripts
+        run: |
+          npm install --global pnpm@11.25.0 --ignore-scripts
+          pnpm --dir tools/semantic install --frozen-lockfile --ignore-scripts
+      - name: Audit optional dependency lockfile
+        run: pnpm --dir tools/semantic audit --audit-level high
+  container:
+    name: Docker preview and core tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - name: Build and execute full core suite in container
+        run: |
+          docker build -t ruthless-preview .
+          docker run --rm ruthless-preview node scripts/verify.mjs test
+      - name: Verify restricted static preview
+        run: |
+          docker compose up -d --wait --wait-timeout 90
+          curl --fail http://127.0.0.1:4173/
+          curl --fail http://127.0.0.1:4173/examples/official-advisory-observation.json
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:4173/api/intelligence/status)" = 404
+      - name: Stop preview
+        if: always()
+        run: docker compose down

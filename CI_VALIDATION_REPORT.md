@@ -6,6 +6,8 @@ Local baseline and clean clone: 415 tests pass, zero skips/failures in each run.
 
 No branch protection/required-check rule is configured or claimed. Private-repository plan support and the owner's preferred contribution policy require separate evaluation. No heavy paid benchmark or security service was enabled.
 
+Publication follow-up adds real Docker build/core-suite/static-preview checks and a frozen optional dependency audit job. Docker is absent locally; only actual remote results establish container verification. The updated optional native dependency was verified as sharp 0.35.5, the final pnpm audit reported zero known advisories, and all 64 fixed fictional embeddings completed. This is not an accuracy or security certification.
+
 Environmental caveat: an earlier Windows test reported inability to create a file symlink. The branch is not certified by a passing total. Optional local semantic inference and public-provider availability are outside this CI matrix.
 
 Follow-up: GitHub emitted Node 20 runtime deprecation notices for the original pinned v4 workflow actions. Replaced them with verified immutable official v6 action references and fixed runner labels to ubuntu-24.04 and windows-2025. A new actual run is required for this workflow revision; its result is available from the branch badge/Actions page. No application logic changed.

@@ -80,4 +80,10 @@ No full-internet crawling, social-profile aggregation, CCTV integration or auton
 - [Publication checklist](PUBLICATION_CHECKLIST.md)
 - [Contributing](CONTRIBUTING.md)
 
-Development used AI-assisted tools. Repository quality does not establish the owner's independent interview proficiency. No open-source license has been selected; third-party content retains its own attribution and reuse conditions. Public publication awaits owner approval and unresolved licensing review.
+Development used AI-assisted tools. Repository quality does not establish the owner's independent interview proficiency. Public portfolio access was authorized on 2 November 2026. No open-source license has been selected; third-party content retains its own attribution and reuse conditions. See [rights and source attribution](RIGHTS_AND_ATTRIBUTION.md).
+
+## Container preview and optional dependency verification
+
+`docker compose up --build --wait` provides a restricted static preview at http://127.0.0.1:4173/#collection. Choose Inspect retained public capture. Stop with `docker compose down`. This preview has no journal worker, collection API or paid inference. Use the Node quick start for the complete local journal workflow. Docker is verified by a dedicated GitHub CI job because Docker is absent on the development laptop; consult the actual job result.
+
+The optional semantic runtime uses pnpm 11.25.0. A narrow sharp 0.35.5 override corrects three known high-severity advisories found in 0.34.5. The subsequent audit reported zero known advisories across 80 dependencies at audit time, not a security guarantee. The updated runtime completed the actual 64-text experiment with 384-dimensional vectors and zero paid API calls. The fixed model input hash is unchanged; retained execution metadata is genuine.

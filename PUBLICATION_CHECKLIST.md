@@ -1,6 +1,6 @@
 # Publication checklist
 
-Destination: https://github.com/Ricoo05/ruthless — private repository, explicitly authorized by the owner on 2 November 2026. Private source pushes are authorized by that instruction. No public visibility change is authorized by the earlier private-repository request.
+Destination: https://github.com/Ricoo05/ruthless. The owner explicitly authorized public recruiter access on 2 November 2026 following the private readiness review. The provenance review is in RIGHTS_AND_ATTRIBUTION.md; no project-wide open-source license is selected on the owner's behalf.
 
 - [x] Inspect source, Git state and architecture.
 - [x] Run the existing full test suite: 415 pass, 0 skip/fail at baseline.
@@ -9,8 +9,8 @@ Destination: https://github.com/Ricoo05/ruthless — private repository, explici
 - [x] Preserve UI and existing detailed documentation.
 - [x] Confirm actual remote CI at source commit 77e4578: Windows and Ubuntu both passed.
 - [x] Complete authenticated fresh-clone verification and current browser walkthrough.
-- [ ] Choose a license after ownership review; resolve brand/model/third-party redistribution questions.
-- [ ] Obtain explicit approval for public visibility, with the exact destination and audited changes presented.
+- [x] Document brand/model/source provenance and preserve copyright without an invented license grant.
+- [x] Obtain explicit approval for public recruiter visibility at the existing destination.
 - [ ] Verify anonymous source access after public publication.
 - [ ] Verify public demo access or retain honestly documented local-only demo.
 

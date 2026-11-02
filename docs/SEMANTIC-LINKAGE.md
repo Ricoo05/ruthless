@@ -1,5 +1,7 @@
 # Multilingual report linkage — v0.21
 
+Publication verification, 2 November 2026: the fixed 64-text experiment was rerun on the same pinned model and Transformers version after overriding sharp to 0.35.5 for three known security advisories. pnpm is constrained to 11.25.0, with overrides in pnpm-workspace.yaml. The final audit reported zero known advisories across 80 dependencies. The genuine retained output now contains the new execution timestamp; input hash, 384-dimensional contract and synthetic-only scope are unchanged. No predictive performance or paid API use is claimed.
+
 The raw retained model run below is unchanged. v0.22 adds a separate [quoted-context ordering experiment](CONTEXT-ORDERING.md) and source-mention quotation preparation. No model inference was rerun or its saved scores altered.
 
 Ruthless now compares actual local pretrained-model inference with the existing lexical methods. This is candidate retrieval research toward source-linked early warning. It does not classify an attack, infer individual intent, verify reports or demonstrate prevention effectiveness.

@@ -14,8 +14,8 @@
     "runtime": "@huggingface/transformers",
     "runtimeVersion": "3.8.1"
   },
-  "executedAt": "2026-10-05T10:08:16.066Z",
-  "durationMs": 28106,
+  "executedAt": "2026-11-02T10:31:35.662Z",
+  "durationMs": 3890,
   "assets": [
     {
       "file": "Xenova/paraphrase-multilingual-MiniLM-L12-v2/2c4055b12046f11709e9df2c122e59ffbdc2f900/config.json",
