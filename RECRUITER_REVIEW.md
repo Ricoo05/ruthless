@@ -1,5 +1,7 @@
 # Recruiter acceptance review
 
+PUBLIC FOLLOW-UP: Source access and anonymous clone are now PASS, verified after explicit publication approval. All 415 tests passed in the anonymous clone. README, dated real screenshots, source, CI and learning material are publicly accessible. Rights are documented without claiming an open-source license. The optional native dependency audit and model execution are now verified. Remaining production-security and independent threat-performance limitations still apply; the historical private-state FAIL below is superseded for source accessibility. Docker verification depends on the actual current remote job result.
+
 Status after remote and authenticated clean-clone verification, 2 November 2026:
 
 1. Find repository: PASS — exact destination Ricoo05/ruthless exists.

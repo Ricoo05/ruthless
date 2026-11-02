@@ -1,5 +1,7 @@
 # RUTHLESS portfolio readiness audit
 
+PUBLIC FOLLOW-UP: The owner approved public recruiter access and publication succeeded. Anonymous metadata fetch and credential-free clone were verified, followed by 415 passing tests in that clone. Source/asset provenance is documented in RIGHTS_AND_ATTRIBUTION.md. The optional lockfile audit and the updated 64-input model experiment are now executed. The prior private-state and unverified-dependency classifications below describe the initial audit, not current access. Remote Docker results must still be read from the actual current CI run.
+
 Audit date: 2 November 2026. Scope: RUTHLESS only; the uploaded SearchForge X / FINOS directive is adapted to this existing intelligence workbench. Preserve implementation, UI and honest evidence. Baseline commit: a70fee3. Destination: Ricoo05/ruthless, private.
 
 - PASS — Architecture inspected: maintained browser modules in dist/, Node services in collection/ and backend/, 39 declared test files, built-in SQLite. Main package has no dependencies. Optional tools/semantic uses @huggingface/transformers 3.8.1 with pnpm lockfile.

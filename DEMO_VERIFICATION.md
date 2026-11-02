@@ -1,5 +1,7 @@
 # Reproduce a real RUTHLESS workflow
 
+Public portfolio source: https://github.com/Ricoo05/ruthless, anonymous access verified on 2 November 2026. `docker compose up --build --wait` is a restricted static preview with retained-capture review only; it does not run the strict loopback journal API. Use the full Node workflow below for collection and persistence. Docker CI tests the full core suite separately and checks that the static preview's API route returns 404. No hosted backend or current-incident prediction is implied.
+
 Requirements: Node 24.22.1, repository checkout, browser. No API key. Public network only needed for a fresh capture.
 
 1. Run `node scripts/serve-research.mjs`. Open http://127.0.0.1:4181/#collection.

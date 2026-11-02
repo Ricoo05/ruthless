@@ -61,7 +61,7 @@ The screenshot below is from the real October 24 local run, not a current incide
 
 ![Actual official advisory intake, October 24 2026](docs/screenshots/advisory-intake-2026-10-24.jpg)
 
-The same retained-capture replay and intake workflow was rechecked from a clean GitHub clone on November 2, with zero browser console warnings/errors. [Current browser evidence](docs/screenshots/clean-clone-source-2026-11-02.jpg). The badge above reflects actual workflow status and may require sign-in while this repository is private.
+The same retained-capture replay and intake workflow was rechecked from a clean GitHub clone on November 2, with zero browser console warnings/errors. [Current browser evidence](docs/screenshots/clean-clone-source-2026-11-02.jpg). The repository is now public; the badge above reflects actual workflow status.
 
 The existing Sites deployment requires owner sign-in; it is not a verified anonymous recruiter demo. Use the local quick start above.
 

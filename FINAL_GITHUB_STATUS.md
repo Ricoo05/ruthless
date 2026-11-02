@@ -1,5 +1,9 @@
 # GitHub status
 
+## Current public status — 2 November 2026
+
+PUBLIC ACCESS VERIFIED: https://github.com/Ricoo05/ruthless. An anonymous GitHub API request returned HTTP 200 with private=false. Git clone with credential helpers disabled and prompts disabled succeeded into a new directory; all 415 tests passed there with zero skips/failures. The owner explicitly approved public recruiter access after the earlier private review. RIGHTS_AND_ATTRIBUTION.md documents source and brand provenance without inventing an open-source license grant. Optional dependencies were audited and three sharp findings corrected with version 0.35.5; the final audit reported zero known advisories and the updated local runtime completed all 64 fictional embeddings. Docker verification is in the actual workflow, not inferred from a Dockerfile. Consult the current Actions run for final remote container status. The private-state notes below are retained history and are superseded by this section.
+
 Repository: https://github.com/Ricoo05/ruthless. Verified existing destination is private and owned by Ricoo05. No unrelated repositories modified. CLI authentication uses the OS credential store.
 
 Source and history pushed without force to main. Verified source commit: `77e45784921fdf6bec5134cea280c974ab26e913`. Actual successful CI: https://github.com/Ricoo05/ruthless/actions/runs/41427844978 — Windows and Ubuntu each passed 415 tests, zero skips/failures. Authenticated clean clone repeated 415 tests, syntax and real local API/browser checks successfully. Eight requested audit/status reports, preserved workbench guide, current screenshots and a 15-question learning guide are included. Later documentation commits run the same CI; current status is visible in Actions/the dynamic branch badge.

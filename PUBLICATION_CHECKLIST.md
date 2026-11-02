@@ -11,7 +11,7 @@ Destination: https://github.com/Ricoo05/ruthless. The owner explicitly authorize
 - [x] Complete authenticated fresh-clone verification and current browser walkthrough.
 - [x] Document brand/model/source provenance and preserve copyright without an invented license grant.
 - [x] Obtain explicit approval for public recruiter visibility at the existing destination.
-- [ ] Verify anonymous source access after public publication.
-- [ ] Verify public demo access or retain honestly documented local-only demo.
+- [x] Verify anonymous source access and credential-free clone after public publication.
+- [x] Retain honestly documented local-only full application and static-only container preview; no public backend is claimed.
 
 No force push, remote history rewrite, fake contributors, fabricated activity, paid hosting or account-level profile changes are authorized or performed. Local data is not deleted for tidiness. An absent public license is not an open-source grant.
