@@ -1,5 +1,7 @@
 # RUTHLESS
 
+[![Verify RUTHLESS](https://github.com/Ricoo05/ruthless/actions/workflows/verify.yml/badge.svg?branch=main)](https://github.com/Ricoo05/ruthless/actions/workflows/verify.yml)
+
 A Node.js intelligence research workbench for preserving public-source reports, reviewing official India advisory changes and tracing analyst decisions.
 
 RUTHLESS makes source passages, observation times and uncertainty inspectable. It is a research prototype: attack prediction, prevention effectiveness and agency readiness have not been validated.
@@ -58,6 +60,8 @@ The UI and analytical tools are retained under `dist/` as maintained source, not
 The screenshot below is from the real October 24 local run, not a current incident prediction. It shows a retained official passage awaiting review. See [reproducible walkthrough](DEMO_VERIFICATION.md).
 
 ![Actual official advisory intake, October 24 2026](docs/screenshots/advisory-intake-2026-10-24.jpg)
+
+The same retained-capture replay and intake workflow was rechecked from a clean GitHub clone on November 2, with zero browser console warnings/errors. [Current browser evidence](docs/screenshots/clean-clone-source-2026-11-02.jpg). The badge above reflects actual workflow status and may require sign-in while this repository is private.
 
 The existing Sites deployment requires owner sign-in; it is not a verified anonymous recruiter demo. Use the local quick start above.
 

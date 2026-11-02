@@ -12,6 +12,7 @@ Audit date: 2 November 2026. Scope: RUTHLESS only; the uploaded SearchForge X / 
 - BLOCKED — Docker execution: no Docker executable found. A container configuration is not advertised as verified.
 - BLOCKED — Public recruiter access: repository remains private; a public visibility change requires explicit approval after review.
 - BLOCKED — Public licensing readiness: no owner license choice; provenance/redistribution of generated brand assets and optional model artifacts needs review. Retained GOV.UK material carries OGL attribution; CERT-In reproduction has not been authorized.
-- NOT TESTED — Current hosted UI browser functionality in this audit. Prior real screenshots and October 24 browser checks remain dated evidence only.
+- PASS — Actual GitHub CI run 41427844978: 415 tests on each of Ubuntu and Windows, zero skips/failures. Authenticated clean clone repeated all 415 tests and syntax checks; the real local API and browser replay/intake checks passed. See linked reports.
+- NOT TESTED — Current hosted Sites UI in this audit; it still requires owner sign-in. Clean-clone local browser functionality is verified, with new November 2 screenshots.
 
 See CLEAN_CLONE_VERIFICATION.md, CI_VALIDATION_REPORT.md, SECURITY_REVIEW.md and RECRUITER_REVIEW.md for remaining evidence. No production readiness or validated attack-prediction claim is made.

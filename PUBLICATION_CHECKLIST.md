@@ -7,8 +7,8 @@ Destination: https://github.com/Ricoo05/ruthless — private repository, explici
 - [x] Check tracked secret/runtime exclusions and scan reachable historical blobs.
 - [x] Prepare genuine Windows/Linux CI, reproducible Node instructions and limitations.
 - [x] Preserve UI and existing detailed documentation.
-- [ ] Confirm actual remote CI at the published commit.
-- [ ] Complete fresh-clone verification and current browser walkthrough.
+- [x] Confirm actual remote CI at source commit 77e4578: Windows and Ubuntu both passed.
+- [x] Complete authenticated fresh-clone verification and current browser walkthrough.
 - [ ] Choose a license after ownership review; resolve brand/model/third-party redistribution questions.
 - [ ] Obtain explicit approval for public visibility, with the exact destination and audited changes presented.
 - [ ] Verify anonymous source access after public publication.
