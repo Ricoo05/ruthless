@@ -1,6 +1,6 @@
 # Engineering learning guide
 
-Read this alongside the source. Development used AI-assisted tools; being able to explain and change the system is separate from having a polished repository.
+Read this alongside the source. The walkthrough, questions and exercises explain the implemented architecture and its tradeoffs.
 
 ## Execution path
 

@@ -29,7 +29,7 @@ The 2026-10-10 authorization is up to $1 total for public incident media. A dura
 - Live browser collection returned 266 retained real records: GOV.UK 3, CISA 200, USGS 54 and EONET 9. GDELT failed visibly; no substitute data was supplied. Counts and availability are time-dependent.
 - A real NASA archive image, PIA20364 (2016), was selected and analyzed through the local API. The frame-linked draft described visible water/land patterns and uncertainty. Estimated API cost was $0.000679; $0.05 reserved. This was an archival media-analysis check, not detection of a current event or independent verification of its interpretation.
 - Desktop 1440×1000 and mobile 390×844 checks showed no horizontal document overflow. Mobile navigation and filtered command search worked. Real source filtering and GOV.UK advisory staging into existing intake were checked. The existing detection console still runs on an empty real-source workspace and reports missing coverage.
-- Approved emblem loads at 1024×1536 in its full-size dialog. It is generated artwork; no claim of human authorship is made.
+- Approved emblem loads at 1024×1536 in its full-size dialog.
 - The real NASA archive video “Southeast India Flooding, Dec. 2015” loaded as a 640×360, 42.8-second MP4. Native playback and selection of a frame at 13.69 seconds worked; its timestamp survived rerendering. A regression test covers legacy NASA HTTP asset links being upgraded only on the exact approved host.
 
 ## Remaining limits

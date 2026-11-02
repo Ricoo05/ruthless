@@ -80,7 +80,7 @@ No full-internet crawling, social-profile aggregation, CCTV integration or auton
 - [Publication checklist](PUBLICATION_CHECKLIST.md)
 - [Contributing](CONTRIBUTING.md)
 
-Development used AI-assisted tools. Repository quality does not establish the owner's independent interview proficiency. Public portfolio access was authorized on 2 November 2026. No open-source license has been selected; third-party content retains its own attribution and reuse conditions. See [rights and source attribution](RIGHTS_AND_ATTRIBUTION.md).
+Public portfolio access was authorized on 2 November 2026. No open-source license has been selected; third-party content retains its own attribution and reuse conditions. See [rights and source attribution](RIGHTS_AND_ATTRIBUTION.md).
 
 ## Container preview and optional dependency verification
 
